@@ -1,0 +1,1 @@
+An FBX viewer using the assimp library and WPF 3D because why not.
