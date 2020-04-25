@@ -10,16 +10,19 @@ namespace FBXViewer
 {
     public class Camera
     {
-        private ProjectionCamera _camera;
+        private readonly ProjectionCamera _camera;
+        private readonly Vector3D _initialPivot;
         private Vector3D _position;
         private Quaternion _rotation;
         private readonly Vector3D _originalForward;
         private readonly Vector3D _originalUp;
         private readonly Vector3D _originalPosition;
+        private Vector3D _pivot;
 
-        public Camera(ProjectionCamera camera)
+        public Camera(ProjectionCamera camera, Vector3D initialPivot)
         {
             _camera = camera;
+            _initialPivot = _pivot = initialPivot;
             _position = _camera.Position.AsVector3D();
             _originalPosition = _camera.Position.AsVector3D();
             var up = _camera.UpDirection.AsVector3D();
@@ -51,9 +54,14 @@ namespace FBXViewer
             var up = _rotation.GetMatrix() * new Vector3D(0, 1, 0) ;
             var right = _rotation.GetMatrix() * new Vector3D(1, 0, 0);
             _position += up * y + right * x;
-            _camera.Position = _position.AsPoint3D();
+            _pivot += up * y + right * x;
             
-            Debug.WriteLine($"Camera position: {_camera.Position}. Up: {up} Right: {right}");
+            _camera.Position = _position.AsPoint3D();
+            var lookDir = (_pivot - _position);
+            lookDir.Normalize();
+            _camera.LookDirection = lookDir.AsMVector3D();
+            
+            Debug.WriteLine($"Camera position: {_camera.Position}. dir: {_camera.LookDirection} Pivot {_pivot}");
         }
 
         public void Zoom(in float delta)

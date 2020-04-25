@@ -79,9 +79,9 @@ namespace FBXViewer
 
             var perspectiveCamera = new PerspectiveCamera(
                 new Point3D(cameraPosition.X, cameraPosition.Y, cameraPosition.Z),
-                lookDir.AsMVector3D(), new MVector3D(0, 1, 0), 50f);
+                lookDir.AsMVector3D(), new MVector3D(0, 1, 0), 39.6f);
 
-            _camera = new Camera(perspectiveCamera);
+            _camera = new Camera(perspectiveCamera, center);
             
             
             var light = new PointLight(Colors.Cornsilk, perspectiveCamera.Position){};
@@ -132,7 +132,7 @@ namespace FBXViewer
 
         private void MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            var delta = e.Delta * -0.12f;
+            var delta = e.Delta * -0.5f;
             _camera.Zoom(delta);
         }
 
@@ -162,6 +162,7 @@ namespace FBXViewer
                 var delta = (newPos - _pos) * deltaTime;
 
                 _time = timeNow;
+                _pos = newPos;
 
                 DoMouseDrag(delta);
 
@@ -177,7 +178,8 @@ namespace FBXViewer
             }
             protected override void DoMouseDrag(Vector delta)
             {
-                Outer._camera.Pan((float) delta.X, (float) delta.Y);
+                delta *= 20;
+                Outer._camera.Pan((float) -delta.X, (float) delta.Y);
             }
         }
     }
