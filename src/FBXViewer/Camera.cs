@@ -1,64 +1,43 @@
 using System.Diagnostics;
 using System.Numerics;
-using System.Windows.Controls;
 using System.Windows.Media.Media3D;
-using Assimp;
-using Quaternion = Assimp.Quaternion;
-using Vector3D = Assimp.Vector3D;
 
 namespace FBXViewer
 {
     public class Camera
     {
         private readonly ProjectionCamera _camera;
-        private readonly Vector3D _initialPivot;
-        private Vector3D _position;
-        private Quaternion _rotation;
-        private readonly Vector3D _originalForward;
-        private readonly Vector3D _originalUp;
-        private readonly Vector3D _originalPosition;
-        private Vector3D _pivot;
+        private readonly Vector3 _initialPivot;
+        private Vector3 _position;
+        private readonly Vector3 _originalForward;
+        private readonly Vector3 _originalUp;
+        private readonly Vector3 _originalPosition;
+        private Vector3 _pivot;
+        private Vector3 _forward;
+        private Vector3 _up;
 
-        public Camera(ProjectionCamera camera, Vector3D initialPivot)
+        public Camera(ProjectionCamera camera, Vector3 initialPivot)
         {
             _camera = camera;
             _initialPivot = _pivot = initialPivot;
-            _position = _camera.Position.AsVector3D();
-            _originalPosition = _camera.Position.AsVector3D();
-            var up = _camera.UpDirection.AsVector3D();
-            var forward = _camera.LookDirection.AsVector3D();
+            _position = _camera.Position.AsVector3();
+            _originalPosition = _camera.Position.AsVector3();
+            _up = Vector3.Normalize(_camera.UpDirection.AsVector3());
+            _forward = Vector3.Normalize(_camera.LookDirection.AsVector3());
 
-            _originalUp = up;
-            _originalForward = forward;
-            _rotation = CreateRotationQuaternion(up, forward);
-        }
-
-        private Quaternion CreateRotationQuaternion(Vector3D up, Vector3D forward)
-        {
-            var left = Vector3D.Cross(up, forward);
-            var mat = new Matrix3x3();
-            mat[1, 1] = forward.X;
-            mat[2, 1] = forward.Y;
-            mat[3, 1] = forward.Z;
-            mat[1, 2] = left.X;
-            mat[2, 2] = left.Y;
-            mat[3, 2] = left.Z;
-            mat[1, 3] = up.X;
-            mat[2, 3] = up.Y;
-            mat[3, 3] = up.Z;
-            return new Quaternion(mat);
+            _originalUp = _up;
+            _originalForward = _forward;
         }
 
         public void Pan(float x, float y)
         {
-            var up = _rotation.GetMatrix() * new Vector3D(0, 1, 0) ;
-            var right = _rotation.GetMatrix() * new Vector3D(1, 0, 0);
-            _position += up * y + right * x;
-            _pivot += up * y + right * x;
+            var right = Vector3.Cross(_up, _forward);
+            _position += _up * y + right * x;
+            _pivot += _up * y + right * x;
             
             _camera.Position = _position.AsPoint3D();
             var lookDir = (_pivot - _position);
-            lookDir.Normalize();
+            lookDir = Vector3.Normalize(lookDir);
             _camera.LookDirection = lookDir.AsMVector3D();
             
             Debug.WriteLine($"Camera position: {_camera.Position}. dir: {_camera.LookDirection} Pivot {_pivot}");
@@ -66,20 +45,16 @@ namespace FBXViewer
 
         public void Zoom(in float delta)
         {
-            var forward = _rotation.GetMatrix() * new Vector3D(0, 0, 1);
-            forward.Normalize();
-            
-            _position += forward * delta;
+            _position += _forward * delta;
             _camera.Position = _position.AsPoint3D();
             
-            Debug.WriteLine($"Camera position: {_camera.Position}. Forward: {forward}");
+            Debug.WriteLine($"Camera position: {_camera.Position}. Forward: {_forward}");
         }
 
         public void Reset()
         {
             Debug.WriteLine("Resetting camera");
-            _position = (_camera.Position = _originalPosition.AsPoint3D()).AsVector3D();
-            _rotation = CreateRotationQuaternion(_originalUp, _originalForward);
+            _position = (_camera.Position = _originalPosition.AsPoint3D()).AsVector3();
             _camera.LookDirection = _originalForward.AsMVector3D();
             _camera.UpDirection = _originalUp.AsMVector3D();
         }

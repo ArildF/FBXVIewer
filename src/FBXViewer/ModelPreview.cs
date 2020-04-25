@@ -1,14 +1,15 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 using Assimp;
-using Vector3D = Assimp.Vector3D;
 using MVector3D = System.Windows.Media.Media3D.Vector3D;
+using Vector = System.Windows.Vector;
 
 namespace FBXViewer
 {
@@ -68,11 +69,11 @@ namespace FBXViewer
             var viewPort = new Viewport3D();
             viewPort.Children.Add(modelVisual);
 
-            var center = geometry.Bounds.Location.AsVector3D() + (geometry.Bounds.Size.AsVector3D() / 2);
+            var center = geometry.Bounds.Location.AsVector3() + (geometry.Bounds.Size.AsVector3() / 2);
             var biggestExtent = new[] {geometry.Bounds.SizeX, geometry.Bounds.SizeY, geometry.Bounds.SizeZ}
                 .OrderByDescending(s => s).First();
             var cameraOffset = biggestExtent * 2f;
-            var cameraPosition = center + new Vector3D(0, 0, (float)+cameraOffset);
+            var cameraPosition = center + new Vector3(0, 0, (float)+cameraOffset);
             var lookDir = (center - cameraPosition);
             
             Debug.WriteLine($"center: {center}, cameraPosition: {cameraPosition}, lookDir: {lookDir}");
@@ -132,7 +133,7 @@ namespace FBXViewer
 
         private void MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            var delta = e.Delta * -0.5f;
+            var delta = e.Delta * 0.5f;
             _camera.Zoom(delta);
         }
 
@@ -178,8 +179,8 @@ namespace FBXViewer
             }
             protected override void DoMouseDrag(Vector delta)
             {
-                delta *= 20;
-                Outer._camera.Pan((float) -delta.X, (float) delta.Y);
+                delta *= 50;
+                Outer._camera.Pan((float) delta.X, (float) delta.Y);
             }
         }
     }
