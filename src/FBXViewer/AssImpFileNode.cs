@@ -4,7 +4,7 @@ using Assimp;
 
 namespace FBXViewer
 {
-    public class AssImpFile : BaseNode
+    public class AssImpFileNode : BaseNode
     {
         private AssimpContext _context;
         private Scene _scene;
@@ -14,7 +14,7 @@ namespace FBXViewer
         private readonly Func<List<Material>, MaterialsNode> _materialsFactory;
         private readonly Func<List<EmbeddedTexture>, TexturesNode> _texturesFactory;
 
-        public AssImpFile(Func<List<Mesh>, MeshesNode> meshesFactory, Func<List<Material>, MaterialsNode> materialsFactory, 
+        public AssImpFileNode(Func<List<Mesh>, MeshesNode> meshesFactory, Func<List<Material>, MaterialsNode> materialsFactory, 
             Func<List<EmbeddedTexture>, TexturesNode> texturesFactory)
         {
             _meshesFactory = meshesFactory;

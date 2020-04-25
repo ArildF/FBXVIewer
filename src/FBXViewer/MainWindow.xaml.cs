@@ -21,11 +21,11 @@ namespace FBXViewer
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly Func<AssImpFile> _fileFactory;
-        private AssImpFile _file;
+        private readonly Func<AssImpFileNode> _fileFactory;
+        private AssImpFileNode _fileNode;
         private readonly object _dummyTag = new object();
 
-        public MainWindow(Func<AssImpFile> fileFactory)
+        public MainWindow(Func<AssImpFileNode> fileFactory)
         {
             _fileFactory = fileFactory;
             InitializeComponent();
@@ -42,9 +42,9 @@ namespace FBXViewer
 
         private void OpenFile(string fileName)
         {
-            _file = _fileFactory();
-            _file.Load(fileName);
-            TreeView.Items.Add(NodeToTreeViewItem(_file));
+            _fileNode = _fileFactory();
+            _fileNode.Load(fileName);
+            TreeView.Items.Add(NodeToTreeViewItem(_fileNode));
         }
 
         private object NodeToTreeViewItem(INode node)
