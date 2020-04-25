@@ -63,7 +63,7 @@ namespace FBXViewer
         public void Orbit(Vector delta)
         {
             var rotation = System.Numerics.Quaternion.CreateFromYawPitchRoll(
-                (float) delta.X, (float) delta.Y, 0);
+                -(float) delta.X, (float) delta.Y, 0);
             var dirFromPivot = _position - _pivot;
             var newDir = Vector3.Transform(dirFromPivot, rotation);
             var newPosition = _pivot + newDir;

@@ -73,22 +73,24 @@ namespace FBXViewer
             var biggestExtent = new[] {geometry.Bounds.SizeX, geometry.Bounds.SizeY, geometry.Bounds.SizeZ}
                 .OrderByDescending(s => s).First();
             var cameraOffset = biggestExtent * 2f;
-            var cameraPosition = center + new Vector3(0, 0, (float)+cameraOffset);
-            var lookDir = (center - cameraPosition);
+            var cameraPosition = center + new Vector3(0, 0, (float)cameraOffset);
+            var lookDir = Vector3.Normalize(center - cameraPosition);
             
             Debug.WriteLine($"center: {center}, cameraPosition: {cameraPosition}, lookDir: {lookDir}");
 
             var perspectiveCamera = new PerspectiveCamera(
-                new Point3D(cameraPosition.X, cameraPosition.Y, cameraPosition.Z),
-                lookDir.AsMVector3D(), new MVector3D(0, 1, 0), 39.6f);
+                cameraPosition.AsPoint3D(),
+                lookDir.AsMVector3D(), new MVector3D(0, 1, 0), 45);
 
             _camera = new Camera(perspectiveCamera, center);
             
             
             var light = new PointLight(Colors.Cornsilk, perspectiveCamera.Position){};
             group.Children.Add(light);
-            group.Children.Add(new AmbientLight(Color.FromRgb(0x20, 0x20, 0x20)));
-
+            // Debug.WriteLine($"Light position {light.Position}");
+            // group.Children.Add(new AmbientLight(Color.FromRgb(0x20, 0x20, 0x20)));
+            // group.Children.Add(new AmbientLight(Colors.White));
+            
             viewPort.Camera = perspectiveCamera;
 
             var border = new Border {Background = Brushes.Black};
@@ -139,7 +141,7 @@ namespace FBXViewer
 
         private void MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            var delta = e.Delta * 0.5f;
+            var delta = e.Delta * 0.25f;
             _camera.Zoom(delta);
         }
 
