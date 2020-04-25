@@ -24,7 +24,7 @@ namespace FBXViewer
             _cameraLight = cameraLight;
             _initialPivot = _pivot = initialPivot;
             MoveCamera(_camera.Position);
-            _originalPosition = _camera.Position.AsVector3();
+            _position = _originalPosition = _camera.Position.AsVector3();
             _up = Vector3.Normalize(_camera.UpDirection.AsVector3());
             _forward = Vector3.Normalize(_camera.LookDirection.AsVector3());
 
