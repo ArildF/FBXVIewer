@@ -126,6 +126,11 @@ namespace FBXViewer
                 _dragHandler = new PanDragHandler(this, e);
                 Element.CaptureMouse();
             }
+            else if (e.MiddleButton == MouseButtonState.Pressed && Keyboard.IsKeyDown(Key.LeftCtrl))
+            {
+                _dragHandler = new DollyHandler(this, e);
+                Element.CaptureMouse();
+            }
             else if (e.MiddleButton == MouseButtonState.Pressed)
             {
                 _dragHandler = new OrbitHandler(this, e);
@@ -200,6 +205,18 @@ namespace FBXViewer
             protected override void DoMouseDrag(Vector delta)
             {
                 Outer._camera.Orbit(delta);
+            }
+        }
+        
+        private class DollyHandler : DragHandlerBase
+        {
+            public DollyHandler(ModelPreview outer, MouseEventArgs args) : base(outer, args)
+            {
+            }
+
+            protected override void DoMouseDrag(Vector delta)
+            {
+                Outer._camera.Dolly(delta.Y * -15);
             }
         }
     }

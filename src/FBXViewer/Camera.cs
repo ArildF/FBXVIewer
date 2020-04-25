@@ -85,5 +85,11 @@ namespace FBXViewer
             MoveCamera(_position.AsPoint3D());
             _camera.LookDirection = _forward.AsMVector3D();
         }
+
+        public void Dolly(double deltaY)
+        {
+            _position += _forward * (float)deltaY;
+            MoveCamera(_position.AsPoint3D());
+        }
     }
 }
