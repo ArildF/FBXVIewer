@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Numerics;
 using System.Windows.Media.Media3D;
+using Vector = System.Windows.Vector;
 
 namespace FBXViewer
 {
@@ -59,5 +60,18 @@ namespace FBXViewer
             _camera.UpDirection = _originalUp.AsMVector3D();
         }
 
+        public void Orbit(Vector delta)
+        {
+            var rotation = System.Numerics.Quaternion.CreateFromYawPitchRoll(
+                (float) delta.X, (float) delta.Y, 0);
+            var dirFromPivot = _position - _pivot;
+            var newDir = Vector3.Transform(dirFromPivot, rotation);
+            var newPosition = _pivot + newDir;
+            _forward = Vector3.Normalize(-newDir);
+            _position = newPosition;
+
+            _camera.Position = _position.AsPoint3D();
+            _camera.LookDirection = _forward.AsMVector3D();
+        }
     }
 }
