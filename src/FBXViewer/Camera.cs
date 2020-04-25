@@ -8,6 +8,7 @@ namespace FBXViewer
     public class Camera
     {
         private readonly ProjectionCamera _camera;
+        private readonly PointLightBase _cameraLight;
         private readonly Vector3 _initialPivot;
         private Vector3 _position;
         private readonly Vector3 _originalForward;
@@ -17,11 +18,12 @@ namespace FBXViewer
         private Vector3 _forward;
         private Vector3 _up;
 
-        public Camera(ProjectionCamera camera, Vector3 initialPivot)
+        public Camera(ProjectionCamera camera, Vector3 initialPivot, PointLightBase cameraLight = null)
         {
             _camera = camera;
+            _cameraLight = cameraLight;
             _initialPivot = _pivot = initialPivot;
-            _position = _camera.Position.AsVector3();
+            MoveCamera(_camera.Position);
             _originalPosition = _camera.Position.AsVector3();
             _up = Vector3.Normalize(_camera.UpDirection.AsVector3());
             _forward = Vector3.Normalize(_camera.LookDirection.AsVector3());
@@ -35,8 +37,8 @@ namespace FBXViewer
             var right = Vector3.Cross(_up, _forward);
             _position += _up * y + right * x;
             _pivot += _up * y + right * x;
-            
-            _camera.Position = _position.AsPoint3D();
+
+            MoveCamera(_position.AsPoint3D());
             var lookDir = (_pivot - _position);
             lookDir = Vector3.Normalize(lookDir);
             _camera.LookDirection = lookDir.AsMVector3D();
@@ -44,10 +46,19 @@ namespace FBXViewer
             Debug.WriteLine($"Camera position: {_camera.Position}. dir: {_camera.LookDirection} Pivot {_pivot}");
         }
 
+        private void MoveCamera(Point3D point3D)
+        {
+            _camera.Position = point3D;
+            if (_cameraLight != null)
+            {
+                _cameraLight.Position = point3D;
+            }
+        }
+
         public void Zoom(in float delta)
         {
             _position += _forward * delta;
-            _camera.Position = _position.AsPoint3D();
+            MoveCamera(_position.AsPoint3D());
             
             Debug.WriteLine($"Camera position: {_camera.Position}. Forward: {_forward}");
         }
@@ -62,15 +73,16 @@ namespace FBXViewer
 
         public void Orbit(Vector delta)
         {
+            delta *= -1;
             var rotation = System.Numerics.Quaternion.CreateFromYawPitchRoll(
-                -(float) delta.X, (float) delta.Y, 0);
+                (float) delta.X, (float) delta.Y, 0);
             var dirFromPivot = _position - _pivot;
             var newDir = Vector3.Transform(dirFromPivot, rotation);
             var newPosition = _pivot + newDir;
             _forward = Vector3.Normalize(-newDir);
             _position = newPosition;
 
-            _camera.Position = _position.AsPoint3D();
+            MoveCamera(_position.AsPoint3D());
             _camera.LookDirection = _forward.AsMVector3D();
         }
     }

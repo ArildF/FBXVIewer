@@ -82,11 +82,11 @@ namespace FBXViewer
                 cameraPosition.AsPoint3D(),
                 lookDir.AsMVector3D(), new MVector3D(0, 1, 0), 45);
 
-            _camera = new Camera(perspectiveCamera, center);
             
             
             var light = new PointLight(Colors.Cornsilk, perspectiveCamera.Position){};
             group.Children.Add(light);
+            _camera = new Camera(perspectiveCamera, center, light);
             // Debug.WriteLine($"Light position {light.Position}");
             // group.Children.Add(new AmbientLight(Color.FromRgb(0x20, 0x20, 0x20)));
             // group.Children.Add(new AmbientLight(Colors.White));
