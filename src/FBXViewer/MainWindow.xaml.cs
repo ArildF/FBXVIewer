@@ -40,7 +40,7 @@ namespace FBXViewer
             }
         }
 
-        private void OpenFile(string fileName)
+        public void OpenFile(string fileName)
         {
             _fileNode = _fileFactory();
             _fileNode.Load(fileName);

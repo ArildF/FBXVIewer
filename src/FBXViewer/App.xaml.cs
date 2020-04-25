@@ -18,6 +18,10 @@ namespace FBXViewer
             var container = WindsorBootstrapper.Bootstrap();
             var window = container.Resolve<MainWindow>();
             window.Show();
+            if (e.Args.Length == 1)
+            {
+                window.OpenFile(e.Args[0]);
+            }
         }
     }
 }
