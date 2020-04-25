@@ -87,6 +87,7 @@ namespace FBXViewer
             
             var light = new PointLight(Colors.Cornsilk, perspectiveCamera.Position){};
             group.Children.Add(light);
+            group.Children.Add(new AmbientLight(Color.FromRgb(0x20, 0x20, 0x20)));
 
             viewPort.Camera = perspectiveCamera;
 
