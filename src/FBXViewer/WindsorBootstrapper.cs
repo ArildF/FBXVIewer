@@ -13,6 +13,8 @@ namespace FBXViewer
             container.Register(Classes.FromAssemblyInThisApplication(typeof(WindsorBootstrapper).Assembly)
                 .BasedOn<INode>().LifestyleTransient());
             container.Register(Component.For<MainWindow>().ImplementedBy<MainWindow>());
+            container.Register(Component.For<MainWindowViewModel>());
+            container.Register(Component.For<TreeNodeViewModel>().LifestyleTransient());
             container.Kernel.AddFacility<TypedFactoryFacility>();
 
             return container;

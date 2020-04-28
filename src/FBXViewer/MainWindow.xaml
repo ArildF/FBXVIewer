@@ -14,16 +14,30 @@
                 </MenuItem>
             </Menu>
             <Grid DockPanel.Dock="Bottom">
+                
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*"></ColumnDefinition>
                     <ColumnDefinition Width="1*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <TreeView x:Name="TreeView"
-                          Grid.Column="0"
-                          TreeViewItem.Expanded="TreeView_OnExpanded"
-                          TreeViewItem.Selected="TreeView_OnSelected">
+                <TreeView Grid.Column="0"
+                          ItemsSource="{Binding RootNodes}">
+                    <TreeView.Resources>
+                        <Style TargetType="TreeViewItem">
+                            <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay}"/>
+                        </Style>
+                    </TreeView.Resources>
+
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate DataType="local:TreeNodeViewModel"
+                                                  ItemsSource="{Binding Children}">
+                            <DockPanel MaxHeight="16">
+                                <TextBlock Text="{Binding Text}"></TextBlock>
+                                <ContentControl Content="{Binding PreviewThumbnail}"/>
+                            </DockPanel>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
                 </TreeView>
-                <ContentControl x:Name="PreviewContent" Grid.Column="1"/>
+                <ContentControl Content="{Binding Preview}" Grid.Column="1"/>
             </Grid>
         </DockPanel>
     </Grid>

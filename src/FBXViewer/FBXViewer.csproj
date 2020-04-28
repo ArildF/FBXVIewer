@@ -9,6 +9,7 @@
     <ItemGroup>
       <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
       <PackageReference Include="Castle.Windsor" Version="5.0.1" />
+      <PackageReference Include="ReactiveUI" Version="11.3.8" />
     </ItemGroup>
 
 </Project>
