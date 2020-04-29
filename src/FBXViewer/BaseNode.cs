@@ -8,6 +8,10 @@ namespace FBXViewer
         private INode[] _children;
         public abstract string Text { get; }
         public abstract bool HasChildren { get; }
+        public virtual bool SupportsMultiSelect => false;
+        public virtual bool ShouldShow { get; set; }
+        public virtual bool IsSelected { get; set; }
+
         public IEnumerable<INode> GetChildren()
         {
             _children ??= CreateChildren().ToArray();

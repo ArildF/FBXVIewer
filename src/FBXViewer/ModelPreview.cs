@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
@@ -13,15 +14,52 @@ using Vector = System.Windows.Vector;
 
 namespace FBXViewer
 {
-    internal class ModelPreview
+    public class ModelPreview
     {
         private readonly Camera _camera;
         private IDragHandler _dragHandler;
+        private Viewport3D _viewPort;
+        private PerspectiveCamera _perspectiveCamera;
 
-        public UIElement Element { get; private set; }
+        public UIElement Element { get; }
+        
+        private readonly Dictionary<Mesh, ModelVisual3D> _meshes = new Dictionary<Mesh,ModelVisual3D>();
 
-        public ModelPreview(Mesh mesh)
+        public ModelPreview()
         {
+            _viewPort = new Viewport3D();
+
+            var center = Vector3.Zero;
+            
+
+            _perspectiveCamera = new PerspectiveCamera(
+                center.AsPoint3D(),
+                new Vector3(0, 0, 1).AsMVector3D(), 
+                new MVector3D(0, 1, 0), 45);
+            
+            var lightGroup = new Model3DGroup();
+            var light = new PointLight(Colors.Cornsilk, _perspectiveCamera.Position){};
+            lightGroup.Children.Add(light);
+            _viewPort.Children.Add(new ModelVisual3D{Content = lightGroup});
+            _camera = new Camera(_perspectiveCamera, center, light);
+            
+            _viewPort.Camera = _perspectiveCamera;
+
+            var border = new Border {Background = Brushes.Black};
+            border.AddHandler(UIElement.PreviewMouseWheelEvent, new MouseWheelEventHandler(MouseWheel), true);
+            border.AddHandler(UIElement.PreviewMouseMoveEvent, new MouseEventHandler(MouseMove), true);
+            border.AddHandler(UIElement.PreviewMouseDownEvent, new MouseButtonEventHandler(MouseDown), true);
+            border.AddHandler(UIElement.PreviewMouseUpEvent, new MouseButtonEventHandler(MouseUp), true);
+            border.AddHandler(UIElement.PreviewKeyDownEvent, new KeyEventHandler(KeyDown), true);
+            border.Child = _viewPort;
+
+            Element = border;
+        }
+
+        public void LoadMesh(Mesh mesh)
+        {
+            UnloadMesh(mesh);
+            
             var geometry = new MeshGeometry3D
             {
                 Positions = new Point3DCollection(
@@ -64,11 +102,10 @@ namespace FBXViewer
             var group = new Model3DGroup();
             group.Children.Add(geometryModel);
 
-            var modelVisual = new ModelVisual3D {Content = @group};
-
-            var viewPort = new Viewport3D();
-            viewPort.Children.Add(modelVisual);
-
+            var modelVisual = new ModelVisual3D {Content = @group}; 
+            _viewPort.Children.Add(modelVisual);
+            _meshes[mesh] = modelVisual;
+            
             var center = geometry.Bounds.Location.AsVector3() + (geometry.Bounds.Size.AsVector3() / 2);
             var biggestExtent = new[] {geometry.Bounds.SizeX, geometry.Bounds.SizeY, geometry.Bounds.SizeZ}
                 .OrderByDescending(s => s).First();
@@ -76,32 +113,16 @@ namespace FBXViewer
             var cameraPosition = center + new Vector3(0, 0, (float)cameraOffset);
             var lookDir = Vector3.Normalize(center - cameraPosition);
             
-            Debug.WriteLine($"center: {center}, cameraPosition: {cameraPosition}, lookDir: {lookDir}");
+            _camera.MoveTo(cameraPosition, lookDir, center);
+        }
 
-            var perspectiveCamera = new PerspectiveCamera(
-                cameraPosition.AsPoint3D(),
-                lookDir.AsMVector3D(), new MVector3D(0, 1, 0), 45);
-
-            
-            
-            var light = new PointLight(Colors.Cornsilk, perspectiveCamera.Position){};
-            group.Children.Add(light);
-            _camera = new Camera(perspectiveCamera, center, light);
-            // Debug.WriteLine($"Light position {light.Position}");
-            // group.Children.Add(new AmbientLight(Color.FromRgb(0x20, 0x20, 0x20)));
-            // group.Children.Add(new AmbientLight(Colors.White));
-            
-            viewPort.Camera = perspectiveCamera;
-
-            var border = new Border {Background = Brushes.Black};
-            border.AddHandler(UIElement.PreviewMouseWheelEvent, new MouseWheelEventHandler(MouseWheel), true);
-            border.AddHandler(UIElement.PreviewMouseMoveEvent, new MouseEventHandler(MouseMove), true);
-            border.AddHandler(UIElement.PreviewMouseDownEvent, new MouseButtonEventHandler(MouseDown), true);
-            border.AddHandler(UIElement.PreviewMouseUpEvent, new MouseButtonEventHandler(MouseUp), true);
-            border.AddHandler(UIElement.PreviewKeyDownEvent, new KeyEventHandler(KeyDown), true);
-            border.Child = viewPort;
-
-            Element = border;
+        public void UnloadMesh(Mesh mesh)
+        {
+            if (_meshes.TryGetValue(mesh, out var modelVisual3D))
+            {
+                _viewPort.Children.Remove(modelVisual3D);
+                _meshes.Remove(mesh);
+            }
         }
 
         private void KeyDown(object sender, KeyEventArgs e)
@@ -154,7 +175,7 @@ namespace FBXViewer
         {
             void MouseDrag(MouseEventArgs args);
         }
-        
+
         private abstract class DragHandlerBase : IDragHandler
         {
             protected readonly ModelPreview Outer;
@@ -196,6 +217,7 @@ namespace FBXViewer
                 Outer._camera.Pan((float) delta.X, (float) delta.Y);
             }
         }
+
         private class OrbitHandler : DragHandlerBase
         {
             public OrbitHandler(ModelPreview outer, MouseEventArgs args) : base(outer, args)
@@ -207,7 +229,7 @@ namespace FBXViewer
                 Outer._camera.Orbit(delta);
             }
         }
-        
+
         private class DollyHandler : DragHandlerBase
         {
             public DollyHandler(ModelPreview outer, MouseEventArgs args) : base(outer, args)

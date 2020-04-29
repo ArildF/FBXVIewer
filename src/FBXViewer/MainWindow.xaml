@@ -25,12 +25,15 @@
                         <Style TargetType="TreeViewItem">
                             <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay}"/>
                         </Style>
+                        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
                     </TreeView.Resources>
 
                     <TreeView.ItemTemplate>
                         <HierarchicalDataTemplate DataType="local:TreeNodeViewModel"
                                                   ItemsSource="{Binding Children}">
                             <DockPanel MaxHeight="16">
+                                <CheckBox Visibility="{Binding IsMultiSelect, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                          IsChecked="{Binding IsChecked}"/>
                                 <TextBlock Text="{Binding Text}"></TextBlock>
                                 <ContentControl Content="{Binding PreviewThumbnail}"/>
                             </DockPanel>

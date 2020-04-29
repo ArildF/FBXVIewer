@@ -5,7 +5,7 @@ using Assimp;
 
 namespace FBXViewer
 {
-    public class MaterialsNode : INode
+    public class MaterialsNode : BaseNode
     {
         private readonly List<Material> _materials;
         private readonly Func<Material, MaterialNode> _materialFactory;
@@ -16,9 +16,10 @@ namespace FBXViewer
             _materialFactory = materialFactory;
         }
 
-        public string Text => "Materials";
-        public bool HasChildren => _materials.Any();
-        public IEnumerable<INode> GetChildren()
+        public override string Text => "Materials";
+        public override bool HasChildren => _materials.Any();
+
+        protected override IEnumerable<INode> CreateChildren()
         {
             foreach (var material in _materials)
             {
@@ -26,12 +27,12 @@ namespace FBXViewer
             }
         }
 
-        public object GetPreview()
+        public override object GetPreview()
         {
             return null;
         }
 
-        public object GetPreviewThumbnail()
+        public override object GetPreviewThumbnail()
         {
             return null;
         }

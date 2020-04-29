@@ -37,6 +37,7 @@ namespace FBXViewer
             set
             {
                 _isSelected = value;
+                _node.IsSelected = value;
                 if (value)
                 {
                     _mainWindowViewModel.Selected = this;
@@ -46,6 +47,8 @@ namespace FBXViewer
         public object Preview => _node.GetPreview();
         public string Text => _node.Text;
         public object PreviewThumbnail => _node.GetPreviewThumbnail();
+
+        public bool IsMultiSelect => _node.SupportsMultiSelect;
 
         public List<TreeNodeViewModel> Children
         {
@@ -58,6 +61,12 @@ namespace FBXViewer
                 }
                 return _children;
             }
+        }
+
+        public bool IsChecked
+        {
+            get => _node.ShouldShow;
+            set => _node.ShouldShow = value;
         }
     }
 }

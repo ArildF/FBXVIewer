@@ -6,6 +6,9 @@ namespace FBXViewer
     {
         string Text { get; }
         bool HasChildren { get; }
+        bool SupportsMultiSelect { get; }
+        bool ShouldShow { get; set; }
+        bool IsSelected { get; set; }
         IEnumerable<INode> GetChildren();
         object GetPreview();
         object GetPreviewThumbnail();
