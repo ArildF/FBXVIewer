@@ -11,6 +11,7 @@ using System.Windows.Media.Media3D;
 using Assimp;
 using MVector3D = System.Windows.Media.Media3D.Vector3D;
 using Vector = System.Windows.Vector;
+using Vector3D = Assimp.Vector3D;
 
 namespace FBXViewer
 {
@@ -103,7 +104,9 @@ namespace FBXViewer
             group.Children.Add(geometryModel);
 
             var modelVisual = new ModelVisual3D {Content = @group}; 
-            _viewPort.Children.Add(modelVisual);
+            // _viewPort.Children.Add(modelVisual);
+            var wireFrame = CreateWireFrame(mesh);
+            _viewPort.Children.Add(wireFrame);
             _meshes[mesh] = modelVisual;
             
             var center = geometry.Bounds.Location.AsVector3() + (geometry.Bounds.Size.AsVector3() / 2);
@@ -114,6 +117,109 @@ namespace FBXViewer
             var lookDir = Vector3.Normalize(center - cameraPosition);
             
             _camera.MoveTo(cameraPosition, lookDir, center);
+        }
+
+        private ModelVisual3D CreateWireFrame(Mesh mesh)
+        {
+            
+            
+            var set = new HashSet<(int, int)>();
+            var edgesFrom = mesh.Faces.SelectMany(FindEdgesFromFace)
+                .ToLookup(p => p.Item1);
+            // var otherWay = pairs.Select(p => (First: p.Last, Last: p.First));
+            // var edgesFrom = pairs.Concat(otherWay).ToLookup(p => p.First);
+                
+            var points = new Point3DCollection();
+            var tris = new Int32Collection();
+            foreach (var meshFace in mesh.Faces)
+            {
+                foreach (var edge in meshFace.Indices.Pairs().Concat(new[]{(meshFace.Indices.Last(), meshFace.Indices.First())}))
+                {
+                    if (set.Contains(edge))
+                    {
+                        continue;
+                    }
+
+                    var v1 = mesh.Vertices[edge.Item1].AsVector3();
+                    var v2 = mesh.Vertices[edge.Item2].AsVector3();
+                    
+                    var edgeVector = (v2 - v1);
+                    var normalVector = edgesFrom[edge.Item1].Where(e => e != edge)
+                        .Select(e => (mesh.Vertices[e.Item2] - mesh.Vertices[e.Item1]).AsVector3())
+                        .Select(v => Vector3.Cross(edgeVector, v)).Average();
+                    normalVector = Vector3.Normalize(normalVector);
+                    var sideVector = Vector3.Normalize(Vector3.Cross(edgeVector, normalVector));
+
+                    var p1 = v1 - sideVector * 0.1f;
+                    var p2 = v2 - sideVector * 0.1f;
+                    var p3 = v2 + sideVector * 0.1f;
+                    var p4 = v1 + sideVector * 0.1f;
+
+                    var i1 = points.Count;
+                    var i2 = i1 + 1;
+                    var i3 = i2 + 1;
+                    var i4 = i3 + 1;
+                    
+                    points.Add(p1.AsPoint3D());
+                    points.Add(p2.AsPoint3D());
+                    points.Add(p3.AsPoint3D());
+                    points.Add(p4.AsPoint3D());
+                    
+                    tris.Add(i1);
+                    tris.Add(i2);
+                    tris.Add(i3);
+                    tris.Add(i1);
+                    tris.Add(i3);
+                    tris.Add(i4);
+                    
+                    tris.Add(i1);
+                    tris.Add(i3);
+                    tris.Add(i2);
+                    tris.Add(i1);
+                    tris.Add(i4);
+                    tris.Add(i3);
+                    
+                    set.Add(edge);
+                }
+            }
+            var geometry = new MeshGeometry3D
+            {
+                Positions = points,
+                Normals = new Vector3DCollection(),
+                TriangleIndices = tris
+            };
+
+            var geometryModel = new GeometryModel3D
+            {
+                Material = new MaterialGroup
+                {
+                    Children = new MaterialCollection
+                    {
+                        new DiffuseMaterial(Brushes.White),
+                        // new SpecularMaterial(Brushes.Red, 1)
+                    }
+                },
+                Geometry = geometry,
+            };
+
+
+            var group = new Model3DGroup();
+            group.Children.Add(geometryModel);
+
+            var modelVisual = new ModelVisual3D {Content = @group};
+            return modelVisual;
+        }
+
+        private IEnumerable<(int, int)> FindEdgesFromFace(Face arg)
+        {
+            foreach (var valueTuple in arg.Indices.Pairs())
+            {
+                yield return valueTuple;
+                yield return (valueTuple.Last, valueTuple.First);
+            }
+
+            yield return (arg.Indices.Last(), arg.Indices.First());
+            yield return (arg.Indices.First(), arg.Indices.Last());
         }
 
         public void UnloadMesh(Mesh mesh)

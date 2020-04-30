@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Windows.Media.Media3D;
 using Vector3D = Assimp.Vector3D;
@@ -22,6 +24,11 @@ namespace FBXViewer
         public static Vector3 AsVector3(this MVector3D self)
         {
             return new Vector3((float)self.X, (float)self.Y, (float)self.Z);
+        }
+        
+        public static Vector3 AsVector3(this Vector3D self)
+        {
+            return new Vector3(self.X, self.Y, self.Z);
         }
         
         public static Vector3 AsVector3(this Size3D self)
@@ -57,6 +64,19 @@ namespace FBXViewer
         public static Vector3 Right(this Quaternion self)
         {
             return Vector3.Transform(Vector3.UnitX, self);
+        }
+
+        public static Vector3 Average(this IEnumerable<Vector3> self)
+        {
+            var count = self.Count();
+            Vector3 result = Vector3.Zero;
+            foreach (var vector3 in self)
+            {
+                result += vector3;
+            }
+
+            result /= count;
+            return result;
         }
         
         public static Quaternion ToLookRotation(this Vector3 forward, Vector3 up)
