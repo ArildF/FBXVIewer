@@ -24,8 +24,19 @@ namespace FBXViewer
 
         public UIElement Element { get; }
         
-        private readonly Dictionary<Mesh, ModelVisual3D> _meshes = new Dictionary<Mesh,ModelVisual3D>();
+        private readonly Dictionary<Mesh, MeshEntry> _meshes = new Dictionary<Mesh,MeshEntry>();
 
+        private struct MeshEntry
+        {
+            public ModelVisual3D ModelMesh;
+            public ModelVisual3D WireframeMesh;
+
+            public MeshEntry(ModelVisual3D modelMesh, ModelVisual3D wireframeMesh)
+            {
+                ModelMesh = modelMesh;
+                WireframeMesh = wireframeMesh;
+            }
+        }
         public ModelPreview()
         {
             _viewPort = new Viewport3D();
@@ -107,7 +118,7 @@ namespace FBXViewer
             // _viewPort.Children.Add(modelVisual);
             var wireFrame = CreateWireFrame(mesh);
             _viewPort.Children.Add(wireFrame);
-            _meshes[mesh] = modelVisual;
+            _meshes[mesh] = new MeshEntry(modelVisual, wireFrame);
             
             var center = geometry.Bounds.Location.AsVector3() + (geometry.Bounds.Size.AsVector3() / 2);
             var biggestExtent = new[] {geometry.Bounds.SizeX, geometry.Bounds.SizeY, geometry.Bounds.SizeZ}
@@ -121,39 +132,37 @@ namespace FBXViewer
 
         private ModelVisual3D CreateWireFrame(Mesh mesh)
         {
-            
-            
             var set = new HashSet<(int, int)>();
-            var edgesFrom = mesh.Faces.SelectMany(FindEdgesFromFace)
-                .ToLookup(p => p.Item1);
-            // var otherWay = pairs.Select(p => (First: p.Last, Last: p.First));
-            // var edgesFrom = pairs.Concat(otherWay).ToLookup(p => p.First);
                 
             var points = new Point3DCollection();
             var tris = new Int32Collection();
             foreach (var meshFace in mesh.Faces)
             {
-                foreach (var edge in meshFace.Indices.Pairs().Concat(new[]{(meshFace.Indices.Last(), meshFace.Indices.First())}))
+                for(int i = 0; i < meshFace.Indices.Count; i++)
                 {
+                    var edge = (meshFace.Indices[i], meshFace.Indices[(i + 1) % meshFace.Indices.Count]);
                     if (set.Contains(edge))
                     {
                         continue;
                     }
 
+                    var thirdVertex = meshFace.Indices[(i + 2) % meshFace.Indices.Count];
+
                     var v1 = mesh.Vertices[edge.Item1].AsVector3();
                     var v2 = mesh.Vertices[edge.Item2].AsVector3();
+                    var v3 = mesh.Vertices[thirdVertex].AsVector3();
                     
                     var edgeVector = (v2 - v1);
-                    var normalVector = edgesFrom[edge.Item1].Where(e => e != edge)
-                        .Select(e => (mesh.Vertices[e.Item2] - mesh.Vertices[e.Item1]).AsVector3())
-                        .Select(v => Vector3.Cross(edgeVector, v)).Average();
+                    var otherEdgeVector = v3 - v1;
+                    var normalVector = Vector3.Cross(otherEdgeVector, edgeVector);
                     normalVector = Vector3.Normalize(normalVector);
                     var sideVector = Vector3.Normalize(Vector3.Cross(edgeVector, normalVector));
 
-                    var p1 = v1 - sideVector * 0.1f;
-                    var p2 = v2 - sideVector * 0.1f;
-                    var p3 = v2 + sideVector * 0.1f;
-                    var p4 = v1 + sideVector * 0.1f;
+                    var width = 0.05f;
+                    var p1 = v1 - sideVector * width;
+                    var p2 = v2 - sideVector * width;
+                    var p3 = v2 + sideVector * width;
+                    var p4 = v1 + sideVector * width;
 
                     var i1 = points.Count;
                     var i2 = i1 + 1;
@@ -171,13 +180,6 @@ namespace FBXViewer
                     tris.Add(i1);
                     tris.Add(i3);
                     tris.Add(i4);
-                    
-                    tris.Add(i1);
-                    tris.Add(i3);
-                    tris.Add(i2);
-                    tris.Add(i1);
-                    tris.Add(i4);
-                    tris.Add(i3);
                     
                     set.Add(edge);
                 }
@@ -224,9 +226,10 @@ namespace FBXViewer
 
         public void UnloadMesh(Mesh mesh)
         {
-            if (_meshes.TryGetValue(mesh, out var modelVisual3D))
+            if (_meshes.TryGetValue(mesh, out var entry))
             {
-                _viewPort.Children.Remove(modelVisual3D);
+                _viewPort.Children.Remove(entry.ModelMesh);
+                _viewPort.Children.Remove(entry.WireframeMesh);
                 _meshes.Remove(mesh);
             }
         }
