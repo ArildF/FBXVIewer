@@ -15,7 +15,7 @@ namespace FBXViewer
         {
             var ofd = new OpenFileDialog
             {
-                Filter = textureFileName + "|" + textureFileName
+                Filter = textureFileName + "|" + "*.*"
             };
             if (ofd.ShowDialog(_mainWindow) == true)
             {
