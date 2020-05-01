@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FBXViewer"
         mc:Ignorable="d"
-        Title="MainWindow">
+        Title="FBX Viewer">
     <Grid>
         <DockPanel LastChildFill="True">
             <Menu DockPanel.Dock="Top">

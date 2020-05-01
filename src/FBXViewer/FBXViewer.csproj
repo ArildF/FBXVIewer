@@ -12,4 +12,16 @@
       <PackageReference Include="ReactiveUI" Version="11.3.8" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Page Update="MeshPreviewSettings.xaml">
+        <Generator></Generator>
+      </Page>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="MeshPreviewSettings.xaml.cs">
+        <DependentUpon>MeshPreviewSettings.xaml</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
 </Project>

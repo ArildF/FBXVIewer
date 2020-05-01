@@ -27,6 +27,8 @@ namespace FBXViewer
         private readonly Dictionary<Mesh, MeshEntry> _meshes = new Dictionary<Mesh,MeshEntry>();
         private readonly Model3DGroup _meshModelGroup;
         private Model3DGroup _wireFrameModelGroup;
+        private ModelVisual3D _visualMesh;
+        private ModelVisual3D _visualWireframe;
 
         private struct MeshEntry
         {
@@ -62,20 +64,31 @@ namespace FBXViewer
             _meshModelGroup = new Model3DGroup();
             _wireFrameModelGroup = new Model3DGroup();
 
-            var visualMesh = new ModelVisual3D {Content = _meshModelGroup};
-            var visualWireframe = new ModelVisual3D {Content = _wireFrameModelGroup};
-            _viewPort.Children.Add(visualMesh);
-            _viewPort.Children.Add(visualWireframe);
+            _visualMesh = new ModelVisual3D {Content = _meshModelGroup};
+            _visualWireframe = new ModelVisual3D {Content = _wireFrameModelGroup};
+            _viewPort.Children.Add(_visualMesh);
+            _viewPort.Children.Add(_visualWireframe);
 
             var border = new Border {Background = Brushes.Black};
-            border.AddHandler(UIElement.PreviewMouseWheelEvent, new MouseWheelEventHandler(MouseWheel), true);
-            border.AddHandler(UIElement.PreviewMouseMoveEvent, new MouseEventHandler(MouseMove), true);
-            border.AddHandler(UIElement.PreviewMouseDownEvent, new MouseButtonEventHandler(MouseDown), true);
-            border.AddHandler(UIElement.PreviewMouseUpEvent, new MouseButtonEventHandler(MouseUp), true);
-            border.AddHandler(UIElement.PreviewKeyDownEvent, new KeyEventHandler(KeyDown), true);
             border.Child = _viewPort;
+            
+            var grid = new Grid();
+            grid.RowDefinitions.Add(new RowDefinition {Height = new GridLength(4, GridUnitType.Star)});
+            grid.RowDefinitions.Add(new RowDefinition {Height = new GridLength(1, GridUnitType.Star)});
 
-            Element = border;
+            grid.Children.Add(border);
+            border.SetValue(Grid.RowSpanProperty, 2);
+
+            var settings = new MeshPreviewSettings(this);
+            grid.Children.Add(settings);
+            settings.SetValue(Grid.RowProperty, 1);
+
+            grid.AddHandler(UIElement.PreviewMouseWheelEvent, new MouseWheelEventHandler(MouseWheel), true);
+            grid.AddHandler(UIElement.PreviewMouseMoveEvent, new MouseEventHandler(MouseMove), true);
+            grid.AddHandler(UIElement.PreviewMouseDownEvent, new MouseButtonEventHandler(MouseDown), true);
+            grid.AddHandler(UIElement.PreviewMouseUpEvent, new MouseButtonEventHandler(MouseUp), true);
+            grid.AddHandler(UIElement.PreviewKeyDownEvent, new KeyEventHandler(KeyDown), true);
+            Element = grid;
         }
 
         public void LoadMesh(Mesh mesh)
@@ -357,6 +370,29 @@ namespace FBXViewer
             protected override void DoMouseDrag(Vector delta)
             {
                 Outer._camera.Dolly(delta.Y * -15);
+            }
+        }
+
+        public void ToggleWireFrame(in bool wireFrameEnabled)
+        {
+           ToggleElement(wireFrameEnabled, _visualWireframe); 
+        }
+
+        public void ToggleMesh(in bool meshEnabled)
+        {
+            ToggleElement(meshEnabled, _visualMesh);
+        }
+
+        private void ToggleElement(bool enabled, ModelVisual3D visual)
+        {
+            if (enabled && !_viewPort.Children.Contains(visual))
+            {
+                _viewPort.Children.Add(visual);
+            }
+
+            if (!enabled)
+            {
+                _viewPort.Children.Remove(visual);
             }
         }
     }
