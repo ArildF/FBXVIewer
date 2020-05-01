@@ -25,16 +25,18 @@ namespace FBXViewer
         public UIElement Element { get; }
         
         private readonly Dictionary<Mesh, MeshEntry> _meshes = new Dictionary<Mesh,MeshEntry>();
+        private readonly Model3DGroup _meshModelGroup;
+        private Model3DGroup _wireFrameModelGroup;
 
         private struct MeshEntry
         {
-            public ModelVisual3D ModelMesh;
-            public ModelVisual3D WireframeMesh;
+            public Model3DGroup ModelGroup;
+            public Model3DGroup WireframeGroup;
 
-            public MeshEntry(ModelVisual3D modelMesh, ModelVisual3D wireframeMesh)
+            public MeshEntry(Model3DGroup modelGroup, Model3DGroup wireframeGroup)
             {
-                ModelMesh = modelMesh;
-                WireframeMesh = wireframeMesh;
+                ModelGroup = modelGroup;
+                WireframeGroup = wireframeGroup;
             }
         }
         public ModelPreview()
@@ -56,6 +58,14 @@ namespace FBXViewer
             _camera = new Camera(_perspectiveCamera, center, light);
             
             _viewPort.Camera = _perspectiveCamera;
+            
+            _meshModelGroup = new Model3DGroup();
+            _wireFrameModelGroup = new Model3DGroup();
+
+            var visualMesh = new ModelVisual3D {Content = _meshModelGroup};
+            var visualWireframe = new ModelVisual3D {Content = _wireFrameModelGroup};
+            _viewPort.Children.Add(visualMesh);
+            _viewPort.Children.Add(visualWireframe);
 
             var border = new Border {Background = Brushes.Black};
             border.AddHandler(UIElement.PreviewMouseWheelEvent, new MouseWheelEventHandler(MouseWheel), true);
@@ -113,12 +123,11 @@ namespace FBXViewer
 
             var group = new Model3DGroup();
             group.Children.Add(geometryModel);
+            _meshModelGroup.Children.Add(group);
 
-            var modelVisual = new ModelVisual3D {Content = @group}; 
-            // _viewPort.Children.Add(modelVisual);
             var wireFrame = CreateWireFrame(mesh);
-            _viewPort.Children.Add(wireFrame);
-            _meshes[mesh] = new MeshEntry(modelVisual, wireFrame);
+            _wireFrameModelGroup.Children.Add(wireFrame);
+            _meshes[mesh] = new MeshEntry(group, wireFrame);
             
             var center = geometry.Bounds.Location.AsVector3() + (geometry.Bounds.Size.AsVector3() / 2);
             var biggestExtent = new[] {geometry.Bounds.SizeX, geometry.Bounds.SizeY, geometry.Bounds.SizeZ}
@@ -130,7 +139,7 @@ namespace FBXViewer
             _camera.MoveTo(cameraPosition, lookDir, center);
         }
 
-        private ModelVisual3D CreateWireFrame(Mesh mesh)
+        private Model3DGroup CreateWireFrame(Mesh mesh)
         {
             var set = new HashSet<(int, int)>();
                 
@@ -208,8 +217,8 @@ namespace FBXViewer
             var group = new Model3DGroup();
             group.Children.Add(geometryModel);
 
-            var modelVisual = new ModelVisual3D {Content = @group};
-            return modelVisual;
+            return group;
+
         }
 
         private IEnumerable<(int, int)> FindEdgesFromFace(Face arg)
@@ -228,8 +237,8 @@ namespace FBXViewer
         {
             if (_meshes.TryGetValue(mesh, out var entry))
             {
-                _viewPort.Children.Remove(entry.ModelMesh);
-                _viewPort.Children.Remove(entry.WireframeMesh);
+                _meshModelGroup.Children.Remove(entry.ModelGroup);
+                _wireFrameModelGroup.Children.Remove(entry.WireframeGroup);
                 _meshes.Remove(mesh);
             }
         }
