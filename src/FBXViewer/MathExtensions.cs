@@ -82,7 +82,7 @@ namespace FBXViewer
 
         public static Point AsUvPoint(this Vector3D self)
         {
-            return new Point(self.X, self.Y);
+            return new Point(self.X, 1-self.Y);
         }
         
         public static Quaternion ToLookRotation(this Vector3 forward, Vector3 up)
