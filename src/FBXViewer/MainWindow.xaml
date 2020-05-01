@@ -16,7 +16,8 @@
             <Grid DockPanel.Dock="Bottom">
                 
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                    <ColumnDefinition Width="0.5*"></ColumnDefinition>
+                    <ColumnDefinition Width="5"></ColumnDefinition>
                     <ColumnDefinition Width="1*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <TreeView Grid.Column="0"
@@ -40,7 +41,8 @@
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>
                 </TreeView>
-                <ContentControl Content="{Binding Preview}" Grid.Column="1"/>
+                <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"/>
+                <ContentControl Content="{Binding Preview}" Grid.Column="2"/>
             </Grid>
         </DockPanel>
     </Grid>
