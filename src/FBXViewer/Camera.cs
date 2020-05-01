@@ -111,5 +111,13 @@ namespace FBXViewer
            CalculateRotation();
            _pivot = pivot;
         }
+
+        public void MovePivotTo(Point3D pointHit)
+        {
+            var delta = pointHit.AsVector3() - _pivot;
+            var newPosition = _position + delta;
+            var lookDir = pointHit.AsVector3() - newPosition;
+            MoveTo(newPosition, lookDir, pointHit.AsVector3());
+        }
     }
 }

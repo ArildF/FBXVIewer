@@ -88,9 +88,32 @@ namespace FBXViewer
             grid.AddHandler(UIElement.PreviewMouseWheelEvent, new MouseWheelEventHandler(MouseWheel), true);
             grid.AddHandler(UIElement.PreviewMouseMoveEvent, new MouseEventHandler(MouseMove), true);
             grid.AddHandler(UIElement.PreviewMouseDownEvent, new MouseButtonEventHandler(MouseDown), true);
+            grid.AddHandler(UIElement.PreviewMouseLeftButtonDownEvent, new MouseButtonEventHandler(DoubleClick), true);
             grid.AddHandler(UIElement.PreviewMouseUpEvent, new MouseButtonEventHandler(MouseUp), true);
             grid.AddHandler(UIElement.PreviewKeyDownEvent, new KeyEventHandler(KeyDown), true);
             Element = grid;
+        }
+
+        private void DoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+            {
+                var mousePos = e.GetPosition(_viewPort);
+                var hitParams = new PointHitTestParameters(mousePos);
+                VisualTreeHelper.HitTest(_viewPort, null, result =>
+                {
+                    Debug.WriteLine($"Hit something! {result.VisualHit}");
+                    
+                    var rayMeshResult = 
+                        result as RayMeshGeometry3DHitTestResult;
+                    if (rayMeshResult != null)
+                    {
+                        _camera.MovePivotTo(rayMeshResult.PointHit);
+                        Debug.WriteLine($"Impact at {rayMeshResult.MeshHit}. {rayMeshResult.PointHit}");
+                    }
+                    return HitTestResultBehavior.Stop;
+                }, hitParams);
+            }
         }
 
         public void LoadMesh(Mesh mesh)
