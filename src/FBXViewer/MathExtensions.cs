@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Windows;
 using System.Windows.Media.Media3D;
 using Vector3D = Assimp.Vector3D;
 using MVector3D = System.Windows.Media.Media3D.Vector3D;
@@ -77,6 +78,11 @@ namespace FBXViewer
 
             result /= count;
             return result;
+        }
+
+        public static Point AsUvPoint(this Vector3D self)
+        {
+            return new Point(self.X, self.Y);
         }
         
         public static Quaternion ToLookRotation(this Vector3 forward, Vector3 up)

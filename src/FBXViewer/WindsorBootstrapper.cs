@@ -16,6 +16,8 @@ namespace FBXViewer
             container.Register(Component.For<MainWindowViewModel>());
             container.Register(Component.For<TreeNodeViewModel>().LifestyleTransient());
             container.Register(Component.For<ModelPreview>().LifestyleSingleton());
+            container.Register(Component.For<TextureProvider>().LifestyleSingleton());
+            container.Register(Component.For<TextureSearcher>().LifestyleSingleton());
             
             container.Kernel.AddFacility<TypedFactoryFacility>();
 

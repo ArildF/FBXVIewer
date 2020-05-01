@@ -17,6 +17,7 @@ namespace FBXViewer
 {
     public class ModelPreview
     {
+        private readonly TextureProvider _textureProvider;
         private readonly Camera _camera;
         private IDragHandler _dragHandler;
         private Viewport3D _viewPort;
@@ -41,8 +42,9 @@ namespace FBXViewer
                 WireframeGroup = wireframeGroup;
             }
         }
-        public ModelPreview()
+        public ModelPreview(TextureProvider textureProvider)
         {
+            _textureProvider = textureProvider;
             _viewPort = new Viewport3D();
 
             var center = Vector3.Zero;
@@ -94,6 +96,9 @@ namespace FBXViewer
         public void LoadMesh(Mesh mesh)
         {
             UnloadMesh(mesh);
+
+            var textureCoords = mesh.TextureCoordinateChannelCount > 0 
+                ? mesh.TextureCoordinateChannels[0].Select(uv => uv.AsUvPoint()) : null;
             
             var geometry = new MeshGeometry3D
             {
@@ -101,7 +106,8 @@ namespace FBXViewer
                     mesh.Vertices.Select(v => new Point3D(v.X, v.Y, v.Z))),
                 Normals = new Vector3DCollection(
                     mesh.Normals.Select(n => new MVector3D(n.X, n.Y, n.Z))),
-                TriangleIndices = new Int32Collection()
+                TriangleIndices = new Int32Collection(),
+                TextureCoordinates = textureCoords != null ? new PointCollection(textureCoords) : null
             };
             foreach (var face in mesh.Faces)
             {
@@ -120,13 +126,16 @@ namespace FBXViewer
                 }
             }
 
+            var diffuse = _textureProvider.GetDiffuseTexture(mesh);
+            var brush = diffuse != null ? new ImageBrush(diffuse) : (Brush)Brushes.Pink ; 
+
             var geometryModel = new GeometryModel3D
             {
                 Material = new MaterialGroup
                 {
                     Children = new MaterialCollection
                     {
-                        new DiffuseMaterial(Brushes.Pink),
+                        new DiffuseMaterial(brush),
                         // new SpecularMaterial(Brushes.Red, 1)
                     }
                 },
