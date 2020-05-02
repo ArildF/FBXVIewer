@@ -68,6 +68,11 @@ namespace FBXViewer
                 return null;
             }
 
+            if (String.IsNullOrEmpty(material.TextureDiffuse.FilePath))
+            {
+                yield break;
+            }
+
             var source = LoadIfExists(material.TextureDiffuse.FilePath);
             if (source != null)
             {
