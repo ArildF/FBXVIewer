@@ -30,7 +30,6 @@ namespace FBXViewer
         private Model3DGroup _wireFrameModelGroup;
         private ModelVisual3D _visualMesh;
         private ModelVisual3D _visualWireframe;
-        private TextBox _textBox;
 
         private struct MeshEntry
         {
@@ -43,7 +42,7 @@ namespace FBXViewer
                 WireframeGroup = wireframeGroup;
             }
         }
-        public ModelPreview(TextureProvider textureProvider)
+        public ModelPreview(TextureProvider textureProvider, MainWindow mainWindow)
         {
             _textureProvider = textureProvider;
             _viewPort = new Viewport3D();
@@ -86,15 +85,12 @@ namespace FBXViewer
             grid.Children.Add(settings);
             settings.SetValue(Grid.RowProperty, 1);
 
-            _textBox = new TextBox {Width = 0, Height = 0};
-            grid.Children.Add(_textBox);
-
             grid.AddHandler(UIElement.PreviewMouseWheelEvent, new MouseWheelEventHandler(MouseWheel), true);
             grid.AddHandler(UIElement.PreviewMouseMoveEvent, new MouseEventHandler(MouseMove), true);
             grid.AddHandler(UIElement.PreviewMouseDownEvent, new MouseButtonEventHandler(MouseDown), true);
             grid.AddHandler(UIElement.PreviewMouseLeftButtonDownEvent, new MouseButtonEventHandler(DoubleClick), true);
             grid.AddHandler(UIElement.PreviewMouseUpEvent, new MouseButtonEventHandler(MouseUp), true);
-            grid.AddHandler(UIElement.PreviewKeyDownEvent, new KeyEventHandler(KeyDown), true);
+            mainWindow.AddHandler(UIElement.PreviewKeyDownEvent, new KeyEventHandler(KeyDown), true);
             Element = grid;
         }
 
@@ -329,7 +325,6 @@ namespace FBXViewer
 
         private void MouseMove(object sender, MouseEventArgs e)
         {
-            Keyboard.Focus(_textBox);
             _dragHandler?.MouseDrag(e);
         }
 
