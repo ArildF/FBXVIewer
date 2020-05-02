@@ -11,7 +11,6 @@ using System.Windows.Media.Media3D;
 using Assimp;
 using MVector3D = System.Windows.Media.Media3D.Vector3D;
 using Vector = System.Windows.Vector;
-using Vector3D = Assimp.Vector3D;
 
 namespace FBXViewer
 {
@@ -20,16 +19,15 @@ namespace FBXViewer
         private readonly TextureProvider _textureProvider;
         private readonly Camera _camera;
         private IDragHandler _dragHandler;
-        private Viewport3D _viewPort;
-        private PerspectiveCamera _perspectiveCamera;
+        private readonly Viewport3D _viewPort;
 
         public UIElement Element { get; }
         
         private readonly Dictionary<Mesh, MeshEntry> _meshes = new Dictionary<Mesh,MeshEntry>();
         private readonly Model3DGroup _meshModelGroup;
         private Model3DGroup _wireFrameModelGroup;
-        private ModelVisual3D _visualMesh;
-        private ModelVisual3D _visualWireframe;
+        private ModelVisual3D _visual;
+        private Model3DGroup _allModelGroup;
 
         private struct MeshEntry
         {
@@ -50,26 +48,29 @@ namespace FBXViewer
             var center = Vector3.Zero;
             
 
-            _perspectiveCamera = new PerspectiveCamera(
+            var perspectiveCamera = new PerspectiveCamera(
                 center.AsPoint3D(),
                 new Vector3(0, 0, 1).AsMVector3D(), 
                 new MVector3D(0, 1, 0), 45);
             
             var lightGroup = new Model3DGroup();
-            var light = new PointLight(Colors.Cornsilk, _perspectiveCamera.Position){};
+            var light = new PointLight(Colors.Cornsilk, perspectiveCamera.Position);
             lightGroup.Children.Add(light);
             _viewPort.Children.Add(new ModelVisual3D{Content = lightGroup});
-            _camera = new Camera(_perspectiveCamera, center, light);
+            _camera = new Camera(perspectiveCamera, center, light);
             
-            _viewPort.Camera = _perspectiveCamera;
+            _viewPort.Camera = perspectiveCamera;
             
             _meshModelGroup = new Model3DGroup();
             _wireFrameModelGroup = new Model3DGroup();
+            
+            _allModelGroup = new Model3DGroup();
+            _allModelGroup.Children.Add(_meshModelGroup);
+            _allModelGroup.Children.Add(_wireFrameModelGroup);
 
-            _visualMesh = new ModelVisual3D {Content = _meshModelGroup};
-            _visualWireframe = new ModelVisual3D {Content = _wireFrameModelGroup};
-            _viewPort.Children.Add(_visualMesh);
-            _viewPort.Children.Add(_visualWireframe);
+            _visual = new ModelVisual3D {Content = _allModelGroup};
+            
+            _viewPort.Children.Add(_visual);
 
             var border = new Border {Background = Brushes.Black};
             border.Child = _viewPort;
@@ -122,26 +123,18 @@ namespace FBXViewer
 
             var textureCoords = mesh.TextureCoordinateChannelCount > 0 
                 ? mesh.TextureCoordinateChannels[0].Select(uv => uv.AsUvPoint()) : null;
-            
-            var geometry = new MeshGeometry3D
-            {
-                Positions = new Point3DCollection(
-                    mesh.Vertices.Select(v => new Point3D(v.X, v.Y, v.Z))),
-                Normals = new Vector3DCollection(
-                    mesh.Normals.Select(n => new MVector3D(n.X, n.Y, n.Z))),
-                TriangleIndices = new Int32Collection(),
-                TextureCoordinates = textureCoords != null ? new PointCollection(textureCoords) : null
-            };
+
+            var triangleIndices = new List<int>(mesh.FaceCount * 4);
             foreach (var face in mesh.Faces)
             {
-                geometry.TriangleIndices.Add(face.Indices[0]);
-                geometry.TriangleIndices.Add(face.Indices[1]);
-                geometry.TriangleIndices.Add(face.Indices[2]);
+                triangleIndices.Add(face.Indices[0]);
+                triangleIndices.Add(face.Indices[1]);
+                triangleIndices.Add(face.Indices[2]);
                 if (face.IndexCount == 4)
                 {
-                    geometry.TriangleIndices.Add(face.Indices[0]);
-                    geometry.TriangleIndices.Add(face.Indices[2]);
-                    geometry.TriangleIndices.Add(face.Indices[3]);
+                    triangleIndices.Add(face.Indices[0]);
+                    triangleIndices.Add(face.Indices[2]);
+                    triangleIndices.Add(face.Indices[3]);
                 }
                 if (face.IndexCount > 4)
                 {
@@ -149,6 +142,15 @@ namespace FBXViewer
                 }
             }
 
+            var geometry = new MeshGeometry3D
+            {
+                Positions = new Point3DCollection(
+                    mesh.Vertices.Select(v => new Point3D(v.X, v.Y, v.Z))),
+                Normals = new Vector3DCollection(
+                    mesh.Normals.Select(n => new MVector3D(n.X, n.Y, n.Z))),
+                TriangleIndices = new Int32Collection(triangleIndices),
+                TextureCoordinates = textureCoords != null ? new PointCollection(textureCoords) : null
+            };
             var diffuse = _textureProvider.GetDiffuseTexture(mesh);
             var brush = diffuse != null ? new ImageBrush(diffuse) : (Brush)Brushes.Pink ; 
 
@@ -188,8 +190,8 @@ namespace FBXViewer
         {
             var set = new HashSet<(int, int)>();
                 
-            var points = new Point3DCollection();
-            var tris = new Int32Collection();
+            var points = new List<Point3D>();
+            var tris = new List<int>();
             foreach (var meshFace in mesh.Faces)
             {
                 for(int i = 0; i < meshFace.Indices.Count; i++)
@@ -240,9 +242,9 @@ namespace FBXViewer
             }
             var geometry = new MeshGeometry3D
             {
-                Positions = points,
+                Positions = new Point3DCollection(points),
                 Normals = new Vector3DCollection(),
-                TriangleIndices = tris
+                TriangleIndices = new Int32Collection(tris)
             };
 
             var geometryModel = new GeometryModel3D
@@ -264,18 +266,6 @@ namespace FBXViewer
 
             return group;
 
-        }
-
-        private IEnumerable<(int, int)> FindEdgesFromFace(Face arg)
-        {
-            foreach (var valueTuple in arg.Indices.Pairs())
-            {
-                yield return valueTuple;
-                yield return (valueTuple.Last, valueTuple.First);
-            }
-
-            yield return (arg.Indices.Last(), arg.Indices.First());
-            yield return (arg.Indices.First(), arg.Indices.Last());
         }
 
         public void UnloadMesh(Mesh mesh)
@@ -407,24 +397,24 @@ namespace FBXViewer
 
         public void ToggleWireFrame(in bool wireFrameEnabled)
         {
-           ToggleElement(wireFrameEnabled, _visualWireframe); 
+           ToggleElement(wireFrameEnabled, _wireFrameModelGroup); 
         }
 
         public void ToggleMesh(in bool meshEnabled)
         {
-            ToggleElement(meshEnabled, _visualMesh);
+            ToggleElement(meshEnabled, _meshModelGroup);
         }
 
-        private void ToggleElement(bool enabled, ModelVisual3D visual)
+        private void ToggleElement(bool enabled, Model3DGroup group)
         {
-            if (enabled && !_viewPort.Children.Contains(visual))
+            if (enabled && !_allModelGroup.Children.Contains(group))
             {
-                _viewPort.Children.Add(visual);
+                _allModelGroup.Children.Add(group);
             }
 
             if (!enabled)
             {
-                _viewPort.Children.Remove(visual);
+                _allModelGroup.Children.Remove(group);
             }
         }
     }
