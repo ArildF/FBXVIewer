@@ -23,6 +23,14 @@ namespace FBXViewer
                 .ToProperty(this, vm => vm.Preview);
         }
 
+        private string _errorText;
+
+        public string ErrorText
+        {
+            get => _errorText;
+            set => this.RaiseAndSetIfChanged(ref _errorText, value);
+        }
+
         private readonly ObservableCollection<TreeNodeViewModel> _rootNodes = new ObservableCollection<TreeNodeViewModel>();
         public ObservableCollection<TreeNodeViewModel> RootNodes
         {
@@ -45,9 +53,16 @@ namespace FBXViewer
         
         public void Load(string fileName)
         {
-            var fileNode = _fileFactory();
-            fileNode.Load(fileName);
-            RootNodes.Add(_nodeFactory(fileNode));
+            try
+            {
+                var fileNode = _fileFactory();
+                fileNode.Load(fileName);
+                RootNodes.Add(_nodeFactory(fileNode));
+            }
+            catch (Exception e)
+            {
+                ErrorText += $"{DateTime.Now} {e}";
+            }
         }
     }
 }

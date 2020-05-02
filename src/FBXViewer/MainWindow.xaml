@@ -13,7 +13,11 @@
                     <MenuItem Header="_Open" Click="Open_OnClick" />
                 </MenuItem>
             </Menu>
-            <Grid DockPanel.Dock="Bottom">
+            <TextBox DockPanel.Dock="Bottom" Text="{Binding ErrorText}" 
+                     Height="100"
+                     Foreground="Red" Background="Black"
+                     VerticalScrollBarVisibility="Auto"/>
+            <Grid >
                 
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="0.5*"></ColumnDefinition>
