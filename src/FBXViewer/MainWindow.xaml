@@ -38,7 +38,7 @@
                                                   ItemsSource="{Binding Children}">
                             <DockPanel MaxHeight="16">
                                 <CheckBox Visibility="{Binding IsMultiSelect, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                          IsChecked="{Binding IsChecked}"/>
+                                          IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
                                 <TextBlock Text="{Binding Text}"></TextBlock>
                                 <ContentControl Content="{Binding PreviewThumbnail}"/>
                             </DockPanel>

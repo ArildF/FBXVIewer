@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Assimp;
+using ReactiveUI;
 
 namespace FBXViewer
 {
@@ -36,7 +37,7 @@ namespace FBXViewer
                     {
                         _modelPreview.LoadMesh(_mesh);
                     }
-                    else if (!ShouldShow)
+                    else if (!IsChecked)
                     {
                        _modelPreview.UnloadMesh(_mesh); 
                     }
@@ -44,17 +45,17 @@ namespace FBXViewer
             }
         }
 
-        private bool _shouldShow;
+        private bool _isChecked;
 
-        public override bool ShouldShow
+        public override bool IsChecked
         {
-            get => _shouldShow;
+            get => _isChecked;
             set
             {
-                if (value != _shouldShow)
+                if (value != _isChecked)
                 {
-                    _shouldShow = value;
-                    if (_shouldShow)
+                    this.RaiseAndSetIfChanged(ref _isChecked, value);
+                    if (_isChecked)
                     {
                         _modelPreview.LoadMesh(_mesh);
                     }

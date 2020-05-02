@@ -1,15 +1,16 @@
 using System.Collections.Generic;
 using System.Linq;
+using ReactiveUI;
 
 namespace FBXViewer
 {
-    public abstract class BaseNode : INode
+    public abstract class BaseNode : ReactiveObject, INode
     {
         private INode[] _children;
         public abstract string Text { get; }
         public abstract bool HasChildren { get; }
         public virtual bool SupportsMultiSelect => false;
-        public virtual bool ShouldShow { get; set; }
+        public virtual bool IsChecked { get; set; }
         public virtual bool IsSelected { get; set; }
 
         public IEnumerable<INode> GetChildren()

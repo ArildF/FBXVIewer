@@ -5,7 +5,7 @@ using ReactiveUI;
 
 namespace FBXViewer
 {
-    public class TreeNodeViewModel
+    public class TreeNodeViewModel : ReactiveObject
     {
         private readonly MainWindowViewModel _mainWindowViewModel;
         private readonly INode _node;
@@ -23,6 +23,9 @@ namespace FBXViewer
             {
                 _children.Add(Dummy);
             }
+
+            _isChecked = _node.WhenAnyValue(n => n.IsChecked)
+                .ToProperty(this, vm => vm.IsChecked);
         }
 
         private TreeNodeViewModel()
@@ -63,10 +66,11 @@ namespace FBXViewer
             }
         }
 
+        private readonly ObservableAsPropertyHelper<bool> _isChecked;
         public bool IsChecked
         {
-            get => _node.ShouldShow;
-            set => _node.ShouldShow = value;
+            get => _isChecked.Value;
+            set => _node.IsChecked = value;
         }
     }
 }
