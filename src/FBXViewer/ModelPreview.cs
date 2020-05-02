@@ -30,6 +30,7 @@ namespace FBXViewer
         private Model3DGroup _wireFrameModelGroup;
         private ModelVisual3D _visualMesh;
         private ModelVisual3D _visualWireframe;
+        private TextBox _textBox;
 
         private struct MeshEntry
         {
@@ -84,6 +85,9 @@ namespace FBXViewer
             var settings = new MeshPreviewSettings(this);
             grid.Children.Add(settings);
             settings.SetValue(Grid.RowProperty, 1);
+
+            _textBox = new TextBox {Width = 0, Height = 0};
+            grid.Children.Add(_textBox);
 
             grid.AddHandler(UIElement.PreviewMouseWheelEvent, new MouseWheelEventHandler(MouseWheel), true);
             grid.AddHandler(UIElement.PreviewMouseMoveEvent, new MouseEventHandler(MouseMove), true);
@@ -180,8 +184,8 @@ namespace FBXViewer
             var cameraOffset = biggestExtent * 2f;
             var cameraPosition = center + new Vector3(0, 0, (float)cameraOffset);
             var lookDir = Vector3.Normalize(center - cameraPosition);
-            
-            _camera.MoveTo(cameraPosition, lookDir, center);
+
+            _camera.MoveTo(cameraPosition, lookDir, center, true);
         }
 
         private Model3DGroup CreateWireFrame(Mesh mesh)
@@ -325,6 +329,7 @@ namespace FBXViewer
 
         private void MouseMove(object sender, MouseEventArgs e)
         {
+            Keyboard.Focus(_textBox);
             _dragHandler?.MouseDrag(e);
         }
 
