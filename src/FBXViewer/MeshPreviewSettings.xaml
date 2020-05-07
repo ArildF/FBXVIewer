@@ -26,18 +26,21 @@
     </UserControl.Resources>
     <Grid Margin="30 30 30 30">
         <StackPanel Orientation="Horizontal">
-            <StackPanel Orientation="Vertical">
-                <StackPanel Orientation="Horizontal">
-                    <Label>Wireframe</Label><CheckBox IsChecked="{Binding WireFrameEnabled}"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Label>Mesh</Label><CheckBox IsChecked="{Binding MeshEnabled}" />
-                </StackPanel>
-            </StackPanel>
             <Grid>
-                <Grid.Resources>
-                    
-                </Grid.Resources>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Label>Wireframe</Label>
+                <CheckBox Grid.Column="1" Grid.Row="0" IsChecked="{Binding WireFrameEnabled}"/>
+                <Label Grid.Row="1" Grid.Column="0">Mesh</Label>
+                <CheckBox Grid.Column="1" Grid.Row="1" IsChecked="{Binding MeshEnabled}" />
+            </Grid>
+            <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                     <ColumnDefinition/>
