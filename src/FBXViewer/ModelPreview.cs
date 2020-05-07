@@ -5,6 +5,7 @@ using System.Linq;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
@@ -25,9 +26,8 @@ namespace FBXViewer
         
         private readonly Dictionary<Mesh, MeshEntry> _meshes = new Dictionary<Mesh,MeshEntry>();
         private readonly Model3DGroup _meshModelGroup;
-        private Model3DGroup _wireFrameModelGroup;
-        private ModelVisual3D _visual;
-        private Model3DGroup _allModelGroup;
+        private readonly Model3DGroup _wireFrameModelGroup;
+        private readonly Model3DGroup _allModelGroup;
 
         private struct MeshEntry
         {
@@ -67,17 +67,22 @@ namespace FBXViewer
             _allModelGroup = new Model3DGroup();
             _allModelGroup.Children.Add(_meshModelGroup);
             _allModelGroup.Children.Add(_wireFrameModelGroup);
-
-            _visual = new ModelVisual3D {Content = _allModelGroup};
             
-            _viewPort.Children.Add(_visual);
+            var rotation = new RotateTransform3D();
+            var quaternionRotation = new QuaternionRotation3D();
+            rotation.Rotation = quaternionRotation;
+            _allModelGroup.Transform = rotation;
+            
+            var visual = new ModelVisual3D {Content = _allModelGroup};
+            
+            _viewPort.Children.Add(visual);
 
             var border = new Border {Background = Brushes.Black};
             border.Child = _viewPort;
             
             var grid = new Grid();
             grid.RowDefinitions.Add(new RowDefinition {Height = new GridLength(4, GridUnitType.Star)});
-            grid.RowDefinitions.Add(new RowDefinition {Height = new GridLength(1, GridUnitType.Star)});
+            grid.RowDefinitions.Add(new RowDefinition {Height = new GridLength(1, GridUnitType.Auto)});
 
             grid.Children.Add(border);
             border.SetValue(Grid.RowSpanProperty, 2);
@@ -85,6 +90,12 @@ namespace FBXViewer
             var settings = new MeshPreviewSettings(this);
             grid.Children.Add(settings);
             settings.SetValue(Grid.RowProperty, 1);
+            
+            var binding = new Binding("Rotation");
+            binding.Source = settings.DataContext;
+            BindingOperations.SetBinding(quaternionRotation, QuaternionRotation3D.QuaternionProperty,
+                binding);
+            
 
             grid.AddHandler(UIElement.PreviewMouseWheelEvent, new MouseWheelEventHandler(MouseWheel), true);
             grid.AddHandler(UIElement.PreviewMouseMoveEvent, new MouseEventHandler(MouseMove), true);

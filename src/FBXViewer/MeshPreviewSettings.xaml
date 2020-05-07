@@ -18,6 +18,11 @@
             <Setter Property="Margin" Value="10 0 10 0"></Setter>
 
         </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="MinWidth" Value="50"/>
+            <Setter Property="TextAlignment" Value="Right"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
     </UserControl.Resources>
     <Grid Margin="30 30 30 30">
         <StackPanel Orientation="Horizontal">
@@ -29,6 +34,28 @@
                     <Label>Mesh</Label><CheckBox IsChecked="{Binding MeshEnabled}" />
                 </StackPanel>
             </StackPanel>
+            <Grid>
+                <Grid.Resources>
+                    
+                </Grid.Resources>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Label>X rotation</Label>
+                <TextBox Text="{Binding XRotation, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="0"/>
+                
+                <Label Grid.Row="1" Grid.Column="0">Y rotation</Label>
+                <TextBox Text="{Binding YRotation, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="1"/>
+                
+                <Label Grid.Column="0" Grid.Row="2">Z rotation</Label>
+                <TextBox Text="{Binding ZRotation, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="2"/>
+            </Grid>
         </StackPanel>
 
     </Grid>
