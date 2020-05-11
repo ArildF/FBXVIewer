@@ -74,6 +74,7 @@ namespace FBXViewer
             _position = _originalPosition;
             _rotation = _originalRotation;
             _pivot = _initialPivot;
+            _camera.UpDirection = _rotation.Up().AsMVector3D();
             MoveTo(_position, _pivot - _position, _pivot);
         }
 
