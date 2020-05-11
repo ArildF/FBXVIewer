@@ -81,7 +81,7 @@ namespace FBXViewer
         public void Orbit(Vector delta)
         {
             _rotation = Quaternion.CreateFromAxisAngle(Vector3.Transform(Vector3.UnitX, _rotation), (float) delta.Y) * _rotation;
-            _rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, (float) delta.X) * _rotation;
+            _rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, (float) -delta.X) * _rotation;
             _rotation = Quaternion.Normalize(_rotation);
             
             var distanceFromOrigin = (_position - _pivot).Length();
