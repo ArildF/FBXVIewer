@@ -79,23 +79,18 @@ namespace FBXViewer
 
         public void Orbit(Vector delta)
         {
-            delta *= -1;
-            var deltaRotation = Quaternion.Normalize(Quaternion.CreateFromYawPitchRoll(
-                (float) delta.X, (float) delta.Y, 0));
+            _rotation = Quaternion.CreateFromAxisAngle(Vector3.Transform(Vector3.UnitX, _rotation), (float) delta.Y) * _rotation;
+            _rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, (float) delta.X) * _rotation;
+            _rotation = Quaternion.Normalize(_rotation);
             
-            // _rotation *= deltaRotation;
-            // _rotation = Quaternion.Normalize(_rotation);
-            // var distance = (_pivot - _position).Length();
-            // var newPosition = _pivot + Vector3.Transform(-Vector3.UnitZ * distance, _rotation);
-            var positionFromOrigin = (_position - _pivot);
-            positionFromOrigin = Vector3.Transform(positionFromOrigin, deltaRotation);
-            var newPosition = positionFromOrigin + _pivot;
-            
-            _position = newPosition;
-            _rotation = (_pivot - _position).ToLookRotation(Vector3.UnitY);
+            var distanceFromOrigin = (_position - _pivot).Length();
+            var newUnitPosition = Vector3.Transform(-Vector3.UnitZ, _rotation);
+
+            _position = _pivot + newUnitPosition * distanceFromOrigin;
 
             MoveCamera(_position.AsPoint3D());
             _camera.LookDirection = _rotation.Forward().AsMVector3D();
+            _camera.UpDirection = _rotation.Up().AsMVector3D();
         }
 
         public void Dolly(double deltaY)
