@@ -357,8 +357,7 @@ namespace FBXViewer
             {
                 var timeNow = DateTime.Now;
                 var newPos = args.GetPosition(Outer.Element);
-                var deltaTime = (timeNow - _time).TotalSeconds;
-                var delta = (newPos - _pos) * deltaTime;
+                var delta = (newPos - _pos) * 0.01;
 
                 _time = timeNow;
                 _pos = newPos;
