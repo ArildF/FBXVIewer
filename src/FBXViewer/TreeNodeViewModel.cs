@@ -10,15 +10,16 @@ namespace FBXViewer
         private readonly MainWindowViewModel _mainWindowViewModel;
         private readonly INode _node;
         private readonly Func<INode, TreeNodeViewModel> _nodeFactory;
-        private readonly List<TreeNodeViewModel> _children = new List<TreeNodeViewModel>();
+        private readonly List<object> _children = new List<object>();
 
-        private static readonly TreeNodeViewModel Dummy = new TreeNodeViewModel();
+        private static readonly object Dummy = new object();
         
         public TreeNodeViewModel(MainWindowViewModel mainWindowViewModel, INode node, Func<INode, TreeNodeViewModel> nodeFactory)
         {
             _mainWindowViewModel = mainWindowViewModel;
             _node = node;
             _nodeFactory = nodeFactory;
+            
             if (node.HasChildren)
             {
                 _children.Add(Dummy);
@@ -26,11 +27,6 @@ namespace FBXViewer
 
             _isChecked = _node.WhenAnyValue(n => n.IsChecked)
                 .ToProperty(this, vm => vm.IsChecked);
-        }
-
-        private TreeNodeViewModel()
-        {
-            
         }
 
         private bool _isSelected;
@@ -47,13 +43,13 @@ namespace FBXViewer
                 }
             }
         }
-        public object Preview => _node.GetPreview();
-        public string Text => _node.Text;
-        public object PreviewThumbnail => _node.GetPreviewThumbnail();
+        public object? Preview => _node.GetPreview();
+        public string Text => _node.Text ?? "";
+        public object? PreviewThumbnail => _node.GetPreviewThumbnail();
 
         public bool IsMultiSelect => _node.SupportsMultiSelect;
 
-        public List<TreeNodeViewModel> Children
+        public List<object> Children
         {
             get
             {

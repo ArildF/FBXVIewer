@@ -14,10 +14,10 @@ namespace FBXViewer
 
         private TextureSearcher _textureSearcher;
 
-        private Scene _currentScene;
-        private string _fileName;
+        private Scene? _currentScene;
+        private string? _fileName;
         
-        private List<string> _searchDirectories = new List<string>();
+        private readonly List<string> _searchDirectories = new List<string>();
 
         public TextureProvider(TextureSearcher textureSearcher)
         {
@@ -29,9 +29,9 @@ namespace FBXViewer
             _fileName = filename;
             _currentScene = scene;
         }
-        public ImageSource GetDiffuseTexture(Mesh mesh)
+        public ImageSource? GetDiffuseTexture(Mesh mesh)
         {
-            if (mesh.MaterialIndex < _currentScene.MaterialCount)
+            if (mesh.MaterialIndex < _currentScene?.MaterialCount)
             {
                 var material = _currentScene.Materials[mesh.MaterialIndex];
                 var texture = _currentScene.Textures.FirstOrDefault(
@@ -58,7 +58,7 @@ namespace FBXViewer
         }
         private IEnumerable<ImageSource> DoTryLoadFromDisk(Material material)
         {
-            ImageSource LoadIfExists(string path)
+            ImageSource? LoadIfExists(string path)
             {
                 if (File.Exists(path))
                 {
@@ -83,10 +83,13 @@ namespace FBXViewer
 
             var fbxDirectory = Path.GetDirectoryName(_fileName);
 
-            source = LoadIfExists(Path.Combine(fbxDirectory, textureFileName));
-            if (source != null)
+            if (fbxDirectory != null)
             {
-                yield return source;
+                source = LoadIfExists(Path.Combine(fbxDirectory, textureFileName));
+                if (source != null)
+                {
+                    yield return source;
+                }
             }
 
             foreach (var searchDirectory in _searchDirectories)
@@ -103,8 +106,11 @@ namespace FBXViewer
             if (source != null)
             {
                 var directory = Path.GetDirectoryName(searchPath);
-                _searchDirectories.Add(directory);
-                yield return source;
+                if (directory != null)
+                {
+                    _searchDirectories.Add(directory);
+                    yield return source;
+                }
             }
         }
     }

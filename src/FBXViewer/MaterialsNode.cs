@@ -27,12 +27,12 @@ namespace FBXViewer
             }
         }
 
-        public override object GetPreview()
+        public override object? GetPreview()
         {
             return null;
         }
 
-        public override object GetPreviewThumbnail()
+        public override object? GetPreviewThumbnail()
         {
             return null;
         }

@@ -22,7 +22,7 @@ namespace FBXViewer
         public override string Text => _typeName;
         public override bool HasChildren => true;
 
-        public override object GetPreview()
+        public override object? GetPreview()
         {
             if (!File.Exists(_textureSlot.FilePath))
             {

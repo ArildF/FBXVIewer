@@ -23,7 +23,7 @@ namespace FBXViewer
                 .ToProperty(this, vm => vm.Preview);
         }
 
-        private string _errorText;
+        private string _errorText = "";
 
         public string ErrorText
         {
@@ -37,20 +37,17 @@ namespace FBXViewer
             get => _rootNodes;
         }
 
-        private TreeNodeViewModel _selected;
-        public TreeNodeViewModel Selected
+        private TreeNodeViewModel? _selected;
+        public TreeNodeViewModel? Selected
         {
             get => _selected;
             set => this.RaiseAndSetIfChanged(ref _selected, value);
         }
 
-        private ObservableAsPropertyHelper<object> _preview;
+        private readonly ObservableAsPropertyHelper<object?> _preview;
 
-        public object Preview
-        {
-            get => _preview.Value;
-        }
-        
+        public object? Preview => _preview.Value;
+
         public void Load(string fileName)
         {
             try

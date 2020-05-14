@@ -8,7 +8,7 @@ namespace FBXViewer
 {
     public static class Extensions
     {
-        public static object GetValueSafe(this PropertyInfo pi, object obj)
+        public static object? GetValueSafe(this PropertyInfo pi, object obj)
         {
             try
             {
@@ -21,7 +21,7 @@ namespace FBXViewer
                 return null;
             }
         }
-        public static object GetValueSafe(this FieldInfo fi, object obj)
+        public static object? GetValueSafe(this FieldInfo fi, object obj)
         {
             try
             {

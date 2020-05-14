@@ -6,8 +6,8 @@ namespace FBXViewer
 {
     public abstract class BaseNode : ReactiveObject, INode
     {
-        private INode[] _children;
-        public abstract string Text { get; }
+        private INode[]? _children;
+        public abstract string? Text { get; }
         public abstract bool HasChildren { get; }
         public virtual bool SupportsMultiSelect => false;
         public virtual bool IsChecked { get; set; }
@@ -19,12 +19,12 @@ namespace FBXViewer
             return _children;
         }
 
-        public virtual object GetPreview()
+        public virtual object? GetPreview()
         {
             return null;
         }
 
-        public virtual object GetPreviewThumbnail()
+        public virtual object? GetPreviewThumbnail()
         {
             return GetPreview();
         }

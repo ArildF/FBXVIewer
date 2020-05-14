@@ -9,7 +9,7 @@ namespace FBXViewer
     public class Camera
     {
         private readonly ProjectionCamera _camera;
-        private readonly PointLightBase _cameraLight;
+        private readonly PointLightBase? _cameraLight;
         private Vector3 _initialPivot;
         private Vector3 _position;
         private Vector3 _originalPosition;
@@ -17,7 +17,7 @@ namespace FBXViewer
         private Quaternion _rotation;
         private Quaternion _originalRotation;
 
-        public Camera(ProjectionCamera camera, Vector3 initialPivot, PointLightBase cameraLight = null)
+        public Camera(ProjectionCamera camera, Vector3 initialPivot, PointLightBase? cameraLight = null)
         {
             _camera = camera;
             _cameraLight = cameraLight;

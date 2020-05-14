@@ -6,9 +6,9 @@ namespace FBXViewer
 {
     public class AssImpFileNode : BaseNode
     {
-        private AssimpContext _context;
-        private Scene _scene;
-        private string _fileName;
+        private AssimpContext? _context;
+        private Scene? _scene;
+        private string? _fileName;
 
         private readonly Func<List<Mesh>, MeshesNode> _meshesFactory;
         private readonly Func<List<Material>, MaterialsNode> _materialsFactory;
@@ -32,10 +32,14 @@ namespace FBXViewer
             _textureProvider.LoadScene(_fileName, _scene);
         }
 
-        public override string Text => _fileName;
+        public override string? Text => _fileName;
         public override bool HasChildren => true;
         protected override IEnumerable<INode> CreateChildren()
         {
+            if (_scene == null)
+            {
+               yield break;
+            }
             yield return _meshesFactory(_scene.Meshes);
             yield return _texturesFactory(_scene.Textures);
             yield return _materialsFactory(_scene.Materials);

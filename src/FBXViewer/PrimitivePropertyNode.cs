@@ -5,9 +5,9 @@ namespace FBXViewer
     internal class PrimitivePropertyNode : BaseNode
     {
         private readonly string _propName;
-        private readonly object _value;
+        private readonly object? _value;
 
-        public PrimitivePropertyNode(string propName, object value)
+        public PrimitivePropertyNode(string propName, object? value)
         {
             _propName = propName;
             _value = value;

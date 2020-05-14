@@ -19,7 +19,7 @@ namespace FBXViewer
     {
         private readonly TextureProvider _textureProvider;
         private readonly Camera _camera;
-        private IDragHandler _dragHandler;
+        private IDragHandler? _dragHandler;
         private readonly Viewport3D _viewPort;
 
         public UIElement Element { get; }

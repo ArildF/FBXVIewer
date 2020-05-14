@@ -18,7 +18,7 @@ namespace FBXViewer
 
         public override bool SupportsMultiSelect => true;
 
-        public override object GetPreviewThumbnail()
+        public override object? GetPreviewThumbnail()
         {
             return null;
         }
