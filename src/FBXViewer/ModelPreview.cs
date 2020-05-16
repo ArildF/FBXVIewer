@@ -339,7 +339,7 @@ namespace FBXViewer
 
         private void MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            var delta = e.Delta * 0.25f;
+            var delta = e.Delta * 0.10f;
             _camera.Zoom(delta);
         }
 
