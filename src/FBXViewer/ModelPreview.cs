@@ -163,7 +163,15 @@ namespace FBXViewer
                 TextureCoordinates = textureCoords != null ? new PointCollection(textureCoords) : null
             };
             var diffuse = _textureProvider.GetDiffuseTexture(mesh);
-            var brush = diffuse != null ? new ImageBrush(diffuse) : (Brush)Brushes.Pink ; 
+            
+            // the ViewPortUnits is very important, or the brush will map MaxU x MaxV to 1 x 1
+            // see https://books.google.no/books?id=ubgRAAAAQBAJ&pg=PA582&lpg=PA582
+            // TileMode also seems necessary
+            var brush = diffuse != null ? new ImageBrush(diffuse)
+            {
+                ViewportUnits = BrushMappingMode.Absolute,
+                TileMode = TileMode.Tile
+            } : (Brush)Brushes.Pink ; 
 
             var geometryModel = new GeometryModel3D
             {
