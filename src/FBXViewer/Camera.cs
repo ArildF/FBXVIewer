@@ -10,7 +10,7 @@ namespace FBXViewer
     {
         private readonly ProjectionCamera _camera;
         private readonly PointLightBase? _cameraLight;
-        private Vector3 _initialPivot;
+        private Vector3 _originalPivot;
         private Vector3 _position;
         private Vector3 _originalPosition;
         private Vector3 _pivot;
@@ -21,7 +21,7 @@ namespace FBXViewer
         {
             _camera = camera;
             _cameraLight = cameraLight;
-            _initialPivot = _pivot = initialPivot;
+            _originalPivot = _pivot = initialPivot;
             MoveCamera(_camera.Position);
             _position = _originalPosition = _camera.Position.AsVector3();
             _rotation = CalculateRotation();
@@ -68,12 +68,12 @@ namespace FBXViewer
             Debug.WriteLine($"Camera position: {_camera.Position}. Forward: {_rotation.Forward()}");
         }
 
-        public void Reset()
+        public void ResetToDefault()
         {
             Debug.WriteLine("Resetting camera");
             _position = _originalPosition;
             _rotation = _originalRotation;
-            _pivot = _initialPivot;
+            _pivot = _originalPivot;
             _camera.UpDirection = _rotation.Up().AsMVector3D();
             MoveTo(_position, _pivot - _position, _pivot);
         }
@@ -100,20 +100,13 @@ namespace FBXViewer
             MoveCamera(_position.AsPoint3D());
         }
 
-        public void MoveTo(Vector3 position, Vector3 lookDir, Vector3 pivot, bool storeAsOriginal = false)
+        public void MoveTo(Vector3 position, Vector3 lookDir, Vector3 pivot)
         {
             _position = position;
            MoveCamera(position.AsPoint3D());
            _camera.LookDirection = lookDir.AsMVector3D();
            _rotation = CalculateRotation();
            _pivot = pivot;
-           if (storeAsOriginal)
-           {
-               _originalPosition = position;
-               _originalRotation = _rotation;
-               _initialPivot = _pivot;
-           }
-
         }
 
         public void MovePivotTo(Point3D pointHit)
@@ -122,6 +115,21 @@ namespace FBXViewer
             var newPosition = _position + delta;
             var lookDir = pointHit.AsVector3() - newPosition;
             MoveTo(newPosition, lookDir, pointHit.AsVector3());
+        }
+
+        public void ResetTo(Vector3 cameraPosition, Vector3 pivot)
+        {
+            _position = cameraPosition;
+            _pivot = pivot;
+            var lookDir = pivot - cameraPosition;
+            _rotation = lookDir.ToLookRotation(Vector3.UnitY);
+            MoveCamera(_position.AsPoint3D());
+            _camera.LookDirection = _rotation.Forward().AsMVector3D();
+            _camera.UpDirection = _rotation.Up().AsMVector3D();
+
+            _originalPosition = _position;
+            _originalRotation = _rotation;
+            _originalPivot = pivot;
         }
     }
 }

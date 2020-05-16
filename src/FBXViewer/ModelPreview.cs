@@ -200,9 +200,8 @@ namespace FBXViewer
                 .OrderByDescending(s => s).First();
             var cameraOffset = biggestExtent * 2f;
             var cameraPosition = center + new Vector3(0, 0, (float)cameraOffset);
-            var lookDir = Vector3.Normalize(center - cameraPosition);
 
-            _camera.MoveTo(cameraPosition, lookDir, center, true);
+            _camera.ResetTo(cameraPosition, center);
         }
 
         private Model3DGroup CreateWireFrame(Mesh mesh)
@@ -302,7 +301,7 @@ namespace FBXViewer
             Debug.WriteLine($"Key down {e.Key}");
             if (e.Key == Key.Decimal)
             {
-                _camera.Reset();
+                _camera.ResetToDefault();
             }
         }
 
