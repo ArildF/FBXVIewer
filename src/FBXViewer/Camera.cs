@@ -24,18 +24,11 @@ namespace FBXViewer
             _originalPivot = _pivot = initialPivot;
             MoveCamera(_camera.Position);
             _position = _originalPosition = _camera.Position.AsVector3();
-            _rotation = CalculateRotation();
+            _rotation = (_pivot - _position).ToLookRotation(Vector3.UnitY);
 
             _originalRotation = _rotation;
             
             Debug.WriteLine($"Forward {Vector3.Transform(new Vector3(0, 0, 1), _rotation)}");
-        }
-
-        private Quaternion CalculateRotation()
-        {
-            var up = Vector3.Normalize(_camera.UpDirection.AsVector3());
-            var forward = Vector3.Normalize(_camera.LookDirection.AsVector3());
-            return forward.ToLookRotation(up);
         }
 
         public void Pan(float x, float y)
@@ -74,8 +67,9 @@ namespace FBXViewer
             _position = _originalPosition;
             _rotation = _originalRotation;
             _pivot = _originalPivot;
+            MoveTo(_position, _pivot);
             _camera.UpDirection = _rotation.Up().AsMVector3D();
-            MoveTo(_position, _pivot - _position, _pivot);
+            _camera.LookDirection = _rotation.Forward().AsMVector3D();
         }
 
         public void Orbit(Vector delta)
@@ -100,12 +94,14 @@ namespace FBXViewer
             MoveCamera(_position.AsPoint3D());
         }
 
-        public void MoveTo(Vector3 position, Vector3 lookDir, Vector3 pivot)
+        public void MoveTo(Vector3 position, Vector3 pivot)
         {
+            var lookDir = pivot - position;
             _position = position;
+            _rotation = lookDir.ToLookRotation(_rotation.Up());
            MoveCamera(position.AsPoint3D());
-           _camera.LookDirection = lookDir.AsMVector3D();
-           _rotation = CalculateRotation();
+           _camera.LookDirection = _rotation.Forward().AsMVector3D();
+           _camera.UpDirection = _rotation.Up().AsMVector3D();
            _pivot = pivot;
         }
 
@@ -114,7 +110,7 @@ namespace FBXViewer
             var delta = pointHit.AsVector3() - _pivot;
             var newPosition = _position + delta;
             var lookDir = pointHit.AsVector3() - newPosition;
-            MoveTo(newPosition, lookDir, pointHit.AsVector3());
+            MoveTo(newPosition,pointHit.AsVector3());
         }
 
         public void ResetTo(Vector3 cameraPosition, Vector3 pivot)
