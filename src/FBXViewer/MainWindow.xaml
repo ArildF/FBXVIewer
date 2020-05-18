@@ -5,6 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FBXViewer"
         mc:Ignorable="d"
+        Background="{DynamicResource Background}"
+        Icon="Art/Icon.jpg"
         Title="FBX Viewer">
     <Grid>
         <DockPanel LastChildFill="True">
@@ -15,7 +17,7 @@
             </Menu>
             <TextBox DockPanel.Dock="Bottom" Text="{Binding ErrorText}" 
                      Height="100"
-                     Foreground="Red" Background="Black"
+                     Foreground="Red"
                      VerticalScrollBarVisibility="Auto"/>
             <Grid >
                 
@@ -38,9 +40,10 @@
                                                   ItemsSource="{Binding Children}">
                             <DockPanel MaxHeight="16">
                                 <CheckBox Visibility="{Binding IsMultiSelect, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                          IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
-                                <TextBlock Text="{Binding Text}"></TextBlock>
-                                <ContentControl Content="{Binding PreviewThumbnail}"/>
+                                          IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                          VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Text}" VerticalAlignment="Center"/>
+                                <ContentControl Content="{Binding PreviewThumbnail}" VerticalAlignment="Center"/>
                             </DockPanel>
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>

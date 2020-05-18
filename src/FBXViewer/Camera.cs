@@ -109,7 +109,6 @@ namespace FBXViewer
         {
             var delta = pointHit.AsVector3() - _pivot;
             var newPosition = _position + delta;
-            var lookDir = pointHit.AsVector3() - newPosition;
             MoveTo(newPosition,pointHit.AsVector3());
         }
 

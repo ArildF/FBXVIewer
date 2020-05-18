@@ -4,6 +4,28 @@
              xmlns:local="clr-namespace:FBXViewer"
              >
     <Application.Resources>
-         
+        <SolidColorBrush x:Key="Background" Color="#FF383838"/>
+        <SolidColorBrush x:Key="Foreground" Color="#DDDDDD"/>
+        
+        <Style TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{DynamicResource Foreground}"/>
+        </Style>
+        
+        <Style TargetType="ContentControl">
+            <Setter Property="Background" Value="{DynamicResource Background}"></Setter>
+        </Style>
+        
+        <Style TargetType="Window">
+            <Setter Property="Background" Value="{DynamicResource Background}"/>
+        </Style>
+        
+        <Style TargetType="TreeView">
+            <Setter Property="Background" Value="{DynamicResource Background}"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="{DynamicResource Background}"/>
+        </Style>
     </Application.Resources>
 </Application>
