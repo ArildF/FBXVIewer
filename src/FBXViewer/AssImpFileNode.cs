@@ -14,14 +14,16 @@ namespace FBXViewer
         private readonly Func<List<Material>, MaterialsNode> _materialsFactory;
         private readonly Func<List<EmbeddedTexture>, TexturesNode> _texturesFactory;
         private readonly TextureProvider _textureProvider;
+        private readonly MaterialProvider _materialProvider;
 
         public AssImpFileNode(Func<List<Mesh>, MeshesNode> meshesFactory, Func<List<Material>, MaterialsNode> materialsFactory, 
-            Func<List<EmbeddedTexture>, TexturesNode> texturesFactory, TextureProvider textureProvider)
+            Func<List<EmbeddedTexture>, TexturesNode> texturesFactory, TextureProvider textureProvider, MaterialProvider materialProvider)
         {
             _meshesFactory = meshesFactory;
             _materialsFactory = materialsFactory;
             _texturesFactory = texturesFactory;
             _textureProvider = textureProvider;
+            _materialProvider = materialProvider;
         }
 
         public void Load(string fileName)
@@ -30,6 +32,7 @@ namespace FBXViewer
             _fileName = fileName;
             _scene = _context.ImportFile(fileName);
             _textureProvider.LoadScene(_fileName, _scene);
+            _materialProvider.Load(_scene);
         }
 
         public override string? Text => _fileName;

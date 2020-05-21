@@ -22,7 +22,6 @@ namespace FBXViewer
 
         public override bool SupportsMultiSelect => true;
         private bool _shouldShow;
-        private string _text;
 
         public override bool IsChecked 
         {
@@ -50,7 +49,9 @@ namespace FBXViewer
             {
                 foreach (var mesh in _meshes)
                 {
-                    yield return _meshNodeFactory(mesh);
+                    var meshNode = _meshNodeFactory(mesh);
+                    meshNode.IsSubMesh = true;
+                    yield return meshNode;
                 }
 
                 yield break;

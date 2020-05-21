@@ -9,11 +9,13 @@ namespace FBXViewer
     {
         private readonly Mesh _mesh;
         private readonly ModelPreview _modelPreview;
+        private readonly MaterialProvider _materialProvider;
 
-        public MeshNode(Mesh mesh, ModelPreview modelPreview)
+        public MeshNode(Mesh mesh, ModelPreview modelPreview, MaterialProvider materialProvider)
         {
             _mesh = mesh;
             _modelPreview = modelPreview;
+            _materialProvider = materialProvider;
         }
 
         public override bool SupportsMultiSelect => true;
@@ -45,6 +47,8 @@ namespace FBXViewer
             }
         }
 
+        public bool IsSubMesh { get; set; }
+
         private bool _isChecked;
 
         public override bool IsChecked
@@ -72,7 +76,10 @@ namespace FBXViewer
             return _modelPreview.Element;
         }
 
-        public override string Text => $"Mesh '{_mesh.Name}'";
+        public override string Text => IsSubMesh 
+            ? _materialProvider.GetByIndex(_mesh.MaterialIndex)?.Name ?? "?"
+            : $"Mesh '{_mesh.Name}'";
+        
         public override bool HasChildren => true;
         protected override IEnumerable<INode> CreateChildren()
         {
