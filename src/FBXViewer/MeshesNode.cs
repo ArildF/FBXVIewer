@@ -36,16 +36,16 @@ namespace FBXViewer
             }
         }
 
-        public override string Text => IsSubmeshParent 
+        public override string Text => IsSubMeshParent 
             ? _meshes.FirstOrDefault()?.Name ?? "?"
             : "Meshes";
         
         public override bool HasChildren => _meshes.Any();
-        public bool IsSubmeshParent { get; set; }
+        public bool IsSubMeshParent { get; set; }
 
         protected override IEnumerable<INode> CreateChildren()
         {
-            if (IsSubmeshParent)
+            if (IsSubMeshParent)
             {
                 foreach (var mesh in _meshes)
                 {
@@ -65,7 +65,7 @@ namespace FBXViewer
                 if (grouping.Count() > 1)
                 {
                     var subMeshes = _meshesFactory(grouping.ToList());
-                    subMeshes.IsSubmeshParent = true;
+                    subMeshes.IsSubMeshParent = true;
                     yield return subMeshes;
                 }
                 else
