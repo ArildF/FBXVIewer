@@ -10,15 +10,19 @@ namespace FBXViewer
     {
         private readonly List<Mesh> _meshes;
         private readonly Func<Mesh, MeshNode> _meshNodeFactory;
+        private readonly Func<List<Mesh>, MeshesNode> _meshesFactory;
 
-        public MeshesNode(List<Mesh> sceneMeshes, Func<Mesh, MeshNode> meshNodeFactory)
+        public MeshesNode(List<Mesh> sceneMeshes, Func<Mesh, MeshNode> meshNodeFactory, 
+            Func<List<Mesh>, MeshesNode> meshesFactory)
         {
             _meshes = sceneMeshes;
             _meshNodeFactory = meshNodeFactory;
+            _meshesFactory = meshesFactory;
         }
 
         public override bool SupportsMultiSelect => true;
         private bool _shouldShow;
+        private string _text;
 
         public override bool IsChecked 
         {
@@ -33,13 +37,40 @@ namespace FBXViewer
             }
         }
 
-    public override string Text => "Meshes";
+        public override string Text => IsSubmeshParent 
+            ? _meshes.FirstOrDefault()?.Name ?? "?"
+            : "Meshes";
+        
         public override bool HasChildren => _meshes.Any();
+        public bool IsSubmeshParent { get; set; }
+
         protected override IEnumerable<INode> CreateChildren()
         {
-            foreach (var mesh in _meshes)
+            if (IsSubmeshParent)
             {
-                yield return _meshNodeFactory(mesh);
+                foreach (var mesh in _meshes)
+                {
+                    yield return _meshNodeFactory(mesh);
+                }
+
+                yield break;
+            }
+            
+            var groupedByName = _meshes.GroupBy(m => m.Name)
+                .OrderBy(g => g.Key);
+            
+            foreach (var grouping in groupedByName)
+            {
+                if (grouping.Count() > 1)
+                {
+                    var subMeshes = _meshesFactory(grouping.ToList());
+                    subMeshes.IsSubmeshParent = true;
+                    yield return subMeshes;
+                }
+                else
+                {
+                    yield return _meshNodeFactory(grouping.First());
+                }
             }
         }
     }
