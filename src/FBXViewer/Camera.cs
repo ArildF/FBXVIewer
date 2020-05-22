@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Numerics;
 using System.Windows.Media.Media3D;
@@ -125,6 +126,30 @@ namespace FBXViewer
             _originalPosition = _position;
             _originalRotation = _rotation;
             _originalPivot = pivot;
+        }
+
+        public void MoveToView(View view)
+        {
+            var distanceFromPivot = (_pivot - _position).Length();
+            var (position, up) = view switch
+            {
+                View.Front => (_pivot + Vector3.UnitZ * distanceFromPivot, Vector3.UnitY),
+                View.Back => (_pivot - Vector3.UnitZ * distanceFromPivot, Vector3.UnitY),
+                View.Right => (_pivot + Vector3.UnitX * distanceFromPivot, Vector3.UnitY),
+                View.Left => (_pivot - Vector3.UnitX * distanceFromPivot, Vector3.UnitY),
+                View.Top => (_pivot + Vector3.UnitY * distanceFromPivot, -Vector3.UnitZ),
+                View.Bottom => (_pivot - Vector3.UnitY * distanceFromPivot, Vector3.UnitZ),
+                _ => throw new ArgumentException(nameof(view)),
+            };
+
+            var lookDir = _pivot - position;
+            _rotation = lookDir.ToLookRotation(up);
+            _position = position;
+            MoveCamera(_position.AsPoint3D());
+
+            _camera.Position = _position.AsPoint3D();
+            _camera.LookDirection = lookDir.AsMVector3D();
+            _camera.UpDirection = _rotation.Up().AsMVector3D();
         }
     }
 }

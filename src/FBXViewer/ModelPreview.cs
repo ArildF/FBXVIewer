@@ -303,7 +303,24 @@ namespace FBXViewer
             {
                 _camera.ResetToDefault();
             }
+
+            View? view = (e.Key, Keyboard.Modifiers) switch
+            {
+                (Key.NumPad1, ModifierKeys.None) => View.Front,
+                (Key.NumPad1, ModifierKeys.Control) => View.Back,
+                (Key.NumPad3, ModifierKeys.None) => View.Right,
+                (Key.NumPad3, ModifierKeys.Control) => View.Left,
+                (Key.NumPad7, ModifierKeys.None) => View.Top,
+                (Key.NumPad7, ModifierKeys.Control) => View.Bottom,
+                _ => null,
+            };
+            if (view != null)
+            {
+                _camera.MoveToView(view.Value);
+            }
         }
+
+        
 
         private void MouseUp(object sender, MouseEventArgs e)
         {
