@@ -1,7 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Reactive.Linq;
-using Microsoft.Win32;
 using ReactiveUI;
 
 namespace FBXViewer
@@ -52,6 +51,7 @@ namespace FBXViewer
         {
             try
             {
+                RootNodes.Clear();
                 var fileNode = _fileFactory();
                 fileNode.Load(fileName);
                 RootNodes.Add(_nodeFactory(fileNode));
