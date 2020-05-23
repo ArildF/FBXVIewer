@@ -4,10 +4,10 @@ namespace FBXViewer
 {
     public partial class MeshPreviewSettings : UserControl
     {
-        public MeshPreviewSettings(ModelPreview preview)
+        public MeshPreviewSettings(MeshPreviewSettingsViewModel vm)
         {
             InitializeComponent();
-            DataContext = new MeshPreviewSettingsViewModel(preview);
+            DataContext = vm;
         }
     }
 }

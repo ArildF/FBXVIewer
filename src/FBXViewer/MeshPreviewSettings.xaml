@@ -13,51 +13,60 @@
         </Style>
         <Style TargetType="CheckBox">
             <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="Margin" Value="10 0 10 0"></Setter>
+            <Setter Property="Margin" Value="10 0 10 0" />
 
         </Style>
         <Style TargetType="TextBox">
-            <Setter Property="MinWidth" Value="55"/>
-            <Setter Property="TextAlignment" Value="Right"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="MinWidth" Value="55" />
+            <Setter Property="TextAlignment" Value="Right" />
+            <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
     </UserControl.Resources>
     <Grid Margin="30 30 30 30">
-        <StackPanel Orientation="Horizontal">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <Label>Wireframe</Label>
-                <CheckBox Grid.Column="1" Grid.Row="0" IsChecked="{Binding WireFrameEnabled}"/>
-                <Label Grid.Row="1" Grid.Column="0">Mesh</Label>
-                <CheckBox Grid.Column="1" Grid.Row="1" IsChecked="{Binding MeshEnabled}" />
-            </Grid>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <Label>X rotation</Label>
-                <TextBox Text="{Binding XRotation, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="0"/>
+        <DockPanel LastChildFill="True">
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Label>Wireframe</Label>
+                    <CheckBox Grid.Column="1" Grid.Row="0" IsChecked="{Binding WireFrameEnabled}" />
+                    <Label Grid.Row="1" Grid.Column="0">Mesh</Label>
+                    <CheckBox Grid.Column="1" Grid.Row="1" IsChecked="{Binding MeshEnabled}" />
+                </Grid>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Label>X rotation</Label>
+                    <TextBox Text="{Binding XRotation, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1"
+                             Grid.Row="0" />
+
+                    <Label Grid.Row="1" Grid.Column="0">Y rotation</Label>
+                    <TextBox Text="{Binding YRotation, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1"
+                             Grid.Row="1" />
+
+                    <Label Grid.Column="0" Grid.Row="2">Z rotation</Label>
+                    <TextBox Text="{Binding ZRotation, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1"
+                             Grid.Row="2" />
+                </Grid>
                 
-                <Label Grid.Row="1" Grid.Column="0">Y rotation</Label>
-                <TextBox Text="{Binding YRotation, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="1"/>
-                
-                <Label Grid.Column="0" Grid.Row="2">Z rotation</Label>
-                <TextBox Text="{Binding ZRotation, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="2"/>
+            </StackPanel>
+            <Grid>
+                <Label Content="{Binding CameraType}" VerticalAlignment="Top" HorizontalAlignment="Right"/>
             </Grid>
-        </StackPanel>
+        </DockPanel>
 
     </Grid>
 </UserControl>

@@ -28,6 +28,8 @@ namespace FBXViewer
         private readonly Model3DGroup _meshModelGroup;
         private readonly Model3DGroup _wireFrameModelGroup;
         private readonly Model3DGroup _allModelGroup;
+        private readonly WpfCamera _wpfCamera;
+        private readonly MeshPreviewSettingsViewModel _settingsViewModel;
 
         private struct MeshEntry
         {
@@ -46,20 +48,16 @@ namespace FBXViewer
             _viewPort = new Viewport3D();
 
             var center = Vector3.Zero;
-            
 
-            var perspectiveCamera = new PerspectiveCamera(
-                center.AsPoint3D(),
-                new Vector3(0, 0, 1).AsMVector3D(), 
-                new MVector3D(0, 1, 0), 45);
+
+            _wpfCamera = new WpfCamera(_viewPort, center);
             
             var lightGroup = new Model3DGroup();
-            var light = new PointLight(Colors.Cornsilk, perspectiveCamera.Position);
+            var light = new PointLight(Colors.Cornsilk, _wpfCamera.Position);
             lightGroup.Children.Add(light);
             _viewPort.Children.Add(new ModelVisual3D{Content = lightGroup});
-            _camera = new Camera(perspectiveCamera, center, light);
+            _camera = new Camera(_wpfCamera, center, light);
             
-            _viewPort.Camera = perspectiveCamera;
             
             _meshModelGroup = new Model3DGroup();
             _wireFrameModelGroup = new Model3DGroup();
@@ -87,7 +85,8 @@ namespace FBXViewer
             grid.Children.Add(border);
             border.SetValue(Grid.RowSpanProperty, 2);
 
-            var settings = new MeshPreviewSettings(this);
+            _settingsViewModel = new MeshPreviewSettingsViewModel(this);
+            var settings = new MeshPreviewSettings(_settingsViewModel);
             grid.Children.Add(settings);
             settings.SetValue(Grid.RowProperty, 1);
             
@@ -317,6 +316,12 @@ namespace FBXViewer
             if (view != null)
             {
                 _camera.MoveToView(view.Value);
+            }
+
+            if (e.Key == Key.NumPad5)
+            {
+                _wpfCamera.TogglePerspectiveOrthographic();
+                _settingsViewModel.CameraType = _wpfCamera.IsOrthographic ? "Orthographic" : "Perspective";
             }
         }
 

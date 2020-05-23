@@ -70,6 +70,17 @@ namespace FBXViewer
             }
         }
 
+        private string _cameraType = "Perspective";
+
+        public string CameraType
+        {
+            get => _cameraType;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _cameraType, value);
+            }
+        }
+
         private bool _meshEnabled;
 
         public bool MeshEnabled
