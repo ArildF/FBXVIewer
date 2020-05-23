@@ -19,6 +19,7 @@ namespace FBXViewer
             container.Register(Component.For<TextureProvider>().LifestyleSingleton());
             container.Register(Component.For<TextureSearcher>().LifestyleSingleton());
             container.Register(Component.For<MaterialProvider>().LifestyleSingleton());
+            container.Register(Component.For<Coroutines>().LifestyleSingleton());
             
             container.Kernel.AddFacility<TypedFactoryFacility>();
 

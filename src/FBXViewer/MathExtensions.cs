@@ -67,6 +67,16 @@ namespace FBXViewer
             return Vector3.Transform(Vector3.UnitX, self);
         }
 
+        public static float AngleTo(this Quaternion q1, Quaternion q2)
+        {
+            bool IsEqualish(float dot)
+            {
+                return (double) dot > 0.999998986721039;
+            }
+            var dot = Quaternion.Dot(q1, q2);
+            return IsEqualish(dot) ? 0.0f : (float) ((double) Math.Acos(Math.Min(Math.Abs((float)dot), 1f)) * 2.0 * 57.2957801818848);
+        }
+
         public static Vector3 Average(this IEnumerable<Vector3> self)
         {
             var count = self.Count();

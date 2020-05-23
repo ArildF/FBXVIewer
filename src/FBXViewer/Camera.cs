@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Diagnostics;
 using System.Numerics;
 using System.Windows.Media.Media3D;
@@ -11,6 +12,7 @@ namespace FBXViewer
     {
         private readonly WpfCamera _camera;
         private readonly PointLightBase? _cameraLight;
+        private readonly Coroutines _coroutines;
         private Vector3 _originalPivot;
         private Vector3 _position;
         private Vector3 _originalPosition;
@@ -18,39 +20,77 @@ namespace FBXViewer
         private Quaternion _rotation;
         private Quaternion _originalRotation;
 
-        public Camera(WpfCamera camera, Vector3 initialPivot, PointLightBase? cameraLight = null)
+        public Camera(WpfCamera camera, Vector3 initialPivot, Coroutines coroutines, PointLightBase? cameraLight = null)
         {
             _camera = camera;
             _cameraLight = cameraLight;
+            _coroutines = coroutines;
             _originalPivot = _pivot = initialPivot;
             _position = _originalPosition = _camera.Position.AsVector3();
             _rotation = (_pivot - _position).ToLookRotation(Vector3.UnitY);
-            MoveCamera(_position, _rotation.Forward(), _rotation.Up());
+            MoveCamera(_position, _rotation);
 
             _originalRotation = _rotation;
         }
 
         public void Pan(float x, float y)
         {
-            _position += _rotation.Up() * y + _rotation.Right() * x;
+            var position = _position + _rotation.Up() * y + _rotation.Right() * x;
             _pivot += _rotation.Up() * y + _rotation.Right() * x;
 
-            MoveCamera(_position, _rotation.Forward(), _rotation.Up());
+            MoveCamera(position, _rotation);
         }
 
-        private void MoveCamera(Vector3 position, Vector3 lookDirection, Vector3 upDirection)
+        private void MoveCamera(Vector3 position, Quaternion rotation, bool animate = false)
         {
-            _camera.Move(position, lookDirection, upDirection);
-            if (_cameraLight != null)
+            if (!animate)
             {
-                _cameraLight.Position = position.AsPoint3D();
+                _position = position;
+                _rotation = rotation;
+                _camera.Move(position, _rotation.Forward(), _rotation.Up());
+                if (_cameraLight != null)
+                {
+                    _cameraLight.Position = position.AsPoint3D();
+                }
             }
+            else
+            {
+                _coroutines.StartCoroutine(AnimateCamera(position, rotation));
+            }
+        }
+
+        private IEnumerator AnimateCamera(Vector3 position, Quaternion rotation)
+        {
+            var angle = rotation.AngleTo(_rotation);
+            var totalTime = (0.1f * angle) / 90;
+            Debug.WriteLine($"Total time: {totalTime}");
+            var time = 0.0f;
+            var originalPosition = _position;
+            var originalRotation = _rotation;
+            var targetRotation = rotation;
+            var distanceFromOrigin = (_position - _pivot).Length();
+            while (time < totalTime)
+            {
+                var lerpFactor = time / totalTime;
+                
+                var newRotation = Quaternion.Slerp(originalRotation, targetRotation, lerpFactor);
+                
+                var newUnitPosition = Vector3.Transform(-Vector3.UnitZ, newRotation);
+                var newPosition = _pivot + newUnitPosition * distanceFromOrigin;
+                
+                MoveCamera(newPosition, newRotation);
+
+                time += (float)_coroutines.DeltaTime;
+                
+                yield return null;
+            }
+            MoveCamera(position, rotation);
         }
 
         public void Zoom(in float delta)
         {
-            _position += _rotation.Forward() * delta;
-            MoveCamera(_position, _rotation.Forward(), _rotation.Up());
+            var position = _position + _rotation.Forward() * delta;
+            MoveCamera(position, _rotation);
             _camera.AdjustWidth(-delta);
         }
 
@@ -65,31 +105,30 @@ namespace FBXViewer
 
         public void Orbit(Vector delta)
         {
-            _rotation = Quaternion.CreateFromAxisAngle(Vector3.Transform(Vector3.UnitX, _rotation), (float) delta.Y) * _rotation;
-            _rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, (float) -delta.X) * _rotation;
-            _rotation = Quaternion.Normalize(_rotation);
+            var rotation = Quaternion.CreateFromAxisAngle(Vector3.Transform(Vector3.UnitX, _rotation), (float) delta.Y) * _rotation;
+            rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, (float) -delta.X) * rotation;
+            rotation = Quaternion.Normalize(rotation);
             
             var distanceFromOrigin = (_position - _pivot).Length();
-            var newUnitPosition = Vector3.Transform(-Vector3.UnitZ, _rotation);
+            var newUnitPosition = Vector3.Transform(-Vector3.UnitZ, rotation);
 
-            _position = _pivot + newUnitPosition * distanceFromOrigin;
+            var position = _pivot + newUnitPosition * distanceFromOrigin;
 
-            MoveCamera(_position, _rotation.Forward(), _rotation.Up());
+            MoveCamera(position, rotation);
         }
 
         public void Dolly(double deltaY)
         {
-            _position += _rotation.Forward() * (float)deltaY;
-            MoveCamera(_position, _rotation.Forward(), _rotation.Up());
+            var position = _position + _rotation.Forward() * (float)deltaY;
+            MoveCamera(position, _rotation);
             _camera.AdjustWidth((float) deltaY);
         }
 
         public void MoveTo(Vector3 position, Vector3 pivot)
         {
             var lookDir = pivot - position;
-            _position = position;
-            _rotation = lookDir.ToLookRotation(_rotation.Up());
-           MoveCamera(position, _rotation.Forward(), _rotation.Up());
+            var rotation = lookDir.ToLookRotation(_rotation.Up());
+           MoveCamera(position, rotation);
            _pivot = pivot;
         }
 
@@ -102,11 +141,10 @@ namespace FBXViewer
 
         public void ResetTo(Vector3 cameraPosition, Vector3 pivot)
         {
-            _position = cameraPosition;
             _pivot = pivot;
             var lookDir = pivot - cameraPosition;
-            _rotation = lookDir.ToLookRotation(Vector3.UnitY);
-            MoveCamera(_position, _rotation.Forward(), _rotation.Up());
+            var rotation = lookDir.ToLookRotation(Vector3.UnitY);
+            MoveCamera(cameraPosition, rotation);
 
             _originalPosition = _position;
             _originalRotation = _rotation;
@@ -128,9 +166,8 @@ namespace FBXViewer
             };
 
             var lookDir = _pivot - position;
-            _rotation = lookDir.ToLookRotation(up);
-            _position = position;
-            MoveCamera(_position, _rotation.Forward(), _rotation.Up());
+            var rotation = lookDir.ToLookRotation(up);
+            MoveCamera(position, rotation, animate: true);
         }
     }
 }

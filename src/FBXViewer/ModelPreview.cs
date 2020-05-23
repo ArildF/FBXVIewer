@@ -42,7 +42,7 @@ namespace FBXViewer
                 WireframeGroup = wireframeGroup;
             }
         }
-        public ModelPreview(TextureProvider textureProvider, MainWindow mainWindow)
+        public ModelPreview(TextureProvider textureProvider, MainWindow mainWindow, Coroutines coroutines)
         {
             _textureProvider = textureProvider;
             _viewPort = new Viewport3D();
@@ -56,7 +56,7 @@ namespace FBXViewer
             var light = new PointLight(Colors.Cornsilk, _wpfCamera.Position);
             lightGroup.Children.Add(light);
             _viewPort.Children.Add(new ModelVisual3D{Content = lightGroup});
-            _camera = new Camera(_wpfCamera, center, light);
+            _camera = new Camera(_wpfCamera, center, coroutines, light);
             
             
             _meshModelGroup = new Model3DGroup();
