@@ -11,13 +11,16 @@ namespace FBXViewer
         private readonly List<Mesh> _meshes;
         private readonly Func<Mesh, MeshNode> _meshNodeFactory;
         private readonly Func<List<Mesh>, MeshesNode> _meshesFactory;
+        private readonly Func<IEnumerable<IGrouping<string, MeshAnimationAttachment>>, ShapeKeysNode> _shapeKeysNodeFactory;
 
         public MeshesNode(List<Mesh> sceneMeshes, Func<Mesh, MeshNode> meshNodeFactory, 
-            Func<List<Mesh>, MeshesNode> meshesFactory)
+            Func<List<Mesh>, MeshesNode> meshesFactory, 
+            Func<IEnumerable<IGrouping<string, MeshAnimationAttachment>>, ShapeKeysNode> shapeKeysNodeFactory)
         {
             _meshes = sceneMeshes;
             _meshNodeFactory = meshNodeFactory;
             _meshesFactory = meshesFactory;
+            _shapeKeysNodeFactory = shapeKeysNodeFactory;
         }
 
         public override bool SupportsMultiSelect => true;
@@ -53,6 +56,10 @@ namespace FBXViewer
                     meshNode.IsSubMesh = true;
                     yield return meshNode;
                 }
+
+                var keys = _meshes.SelectMany(m => m.MeshAnimationAttachments)
+                    .GroupBy(at => at.Name);
+                yield return _shapeKeysNodeFactory(keys);
 
                 yield break;
             }
