@@ -11,7 +11,7 @@
     <Window.Resources>
         <DataTemplate DataType="{x:Type local:ShapeKeyViewModel}">
             <StackPanel Orientation="Horizontal">
-                <Slider Maximum="1" Minimum="-1" Value="{Binding Value}" VerticalAlignment="Bottom"
+                <Slider Maximum="1" Minimum="0" Value="{Binding Value}" VerticalAlignment="Bottom"
                         HorizontalAlignment="Left"
                         Margin="0 40 0 0" Width="200"/>
                 <TextBlock Text="{Binding Value, Mode=OneWay, StringFormat=0.00}" Margin="0 40 0 0"/>

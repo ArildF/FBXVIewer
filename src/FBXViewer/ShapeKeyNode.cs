@@ -6,21 +6,30 @@ namespace FBXViewer
     public class ShapeKeyNode : BaseNode
     {
         private readonly IGrouping<string, ShapeKey> _attachment;
+        private readonly ModelPreview _preview;
         private readonly ShapeKeyViewModel _viewModel;
-        private double _value;
+        private float _value;
 
-        public ShapeKeyNode(IGrouping<string, ShapeKey> attachment)
+        public ShapeKeyNode(IGrouping<string, ShapeKey> attachment, ModelPreview preview)
         {
             _attachment = attachment;
+            _preview = preview;
             _viewModel = new ShapeKeyViewModel(this);
         }
 
         public override object UIDataContext => _viewModel;
 
-        public double Value
+        public float Value
         {
             get => _value;
-            set => _value = value;
+            set
+            {
+                _value = value;
+                foreach (var key in _attachment)
+                {
+                    _preview.SetShapeKeyWeight(key.Mesh, _value, key.Attachment);
+                }
+            }
         }
 
         public override string? Text => _attachment.Key;

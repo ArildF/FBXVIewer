@@ -13,7 +13,7 @@ namespace FBXViewer
             _value = _node.Value;
         }
         
-        public double Value
+        public float Value
         {
             get => _node.Value;
             set

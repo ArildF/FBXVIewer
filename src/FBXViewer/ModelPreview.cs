@@ -35,12 +35,17 @@ namespace FBXViewer
         {
             public Model3DGroup ModelGroup;
             public Model3DGroup WireframeGroup;
+            public MeshGeometry3D Geometry;
+            public MeshGeometry3D WireFrameGeometry;
 
-            public MeshEntry(Model3DGroup modelGroup, Model3DGroup wireframeGroup)
+            public MeshEntry(Model3DGroup modelGroup, Model3DGroup wireframeGroup, MeshGeometry3D geometry, MeshGeometry3D wireFrameGeometry)
             {
                 ModelGroup = modelGroup;
                 WireframeGroup = wireframeGroup;
+                Geometry = geometry;
+                WireFrameGeometry = wireFrameGeometry;
             }
+
         }
         public ModelPreview(TextureProvider textureProvider, MainWindow mainWindow, Coroutines coroutines)
         {
@@ -190,9 +195,9 @@ namespace FBXViewer
             group.Children.Add(geometryModel);
             _meshModelGroup.Children.Add(group);
 
-            var wireFrame = CreateWireFrame(mesh);
+            var (wireFrame, wireFrameGeometry) = CreateWireFrame(mesh);
             _wireFrameModelGroup.Children.Add(wireFrame);
-            _meshes[mesh] = new MeshEntry(group, wireFrame);
+            _meshes[mesh] = new MeshEntry(group, wireFrame, geometry, wireFrameGeometry);
             
             var center = geometry.Bounds.Location.AsVector3() + (geometry.Bounds.Size.AsVector3() / 2);
             var biggestExtent = new[] {geometry.Bounds.SizeX, geometry.Bounds.SizeY, geometry.Bounds.SizeZ}
@@ -203,7 +208,32 @@ namespace FBXViewer
             _camera.ResetTo(cameraPosition, center);
         }
 
-        private Model3DGroup CreateWireFrame(Mesh mesh)
+        public void SetShapeKeyWeight(Mesh mesh, float weight, MeshAnimationAttachment attachment)
+        {
+            if (!_meshes.TryGetValue(mesh, out var entry))
+            {
+                return;
+            }
+
+            var positions = entry.Geometry.Positions;
+            var normals = entry.Geometry.Normals;
+            for (int i = 0; i < attachment.VertexCount; i++)
+            {
+                var newPos = Vector3.Lerp(
+                    mesh.Vertices[i].AsVector3(),
+                    attachment.Vertices[i].AsVector3(),
+                    weight);
+                positions[i] = newPos.AsPoint3D();
+
+                var newNormal = Vector3.Lerp(
+                    mesh.Normals[i].AsVector3(),
+                    attachment.Normals[i].AsVector3(),
+                    weight);
+                normals[i] = newNormal.AsMVector3D();
+            }
+        }
+
+        private (Model3DGroup, MeshGeometry3D) CreateWireFrame(Mesh mesh)
         {
             var set = new HashSet<(int, int)>();
                 
@@ -281,7 +311,7 @@ namespace FBXViewer
             var group = new Model3DGroup();
             group.Children.Add(geometryModel);
 
-            return group;
+            return (group, geometry);
 
         }
 
