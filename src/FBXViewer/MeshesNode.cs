@@ -11,11 +11,11 @@ namespace FBXViewer
         private readonly List<Mesh> _meshes;
         private readonly Func<Mesh, MeshNode> _meshNodeFactory;
         private readonly Func<List<Mesh>, MeshesNode> _meshesFactory;
-        private readonly Func<IEnumerable<IGrouping<string, MeshAnimationAttachment>>, ShapeKeysNode> _shapeKeysNodeFactory;
+        private readonly Func<IEnumerable<IGrouping<string, ShapeKey>>, ShapeKeysNode> _shapeKeysNodeFactory;
 
         public MeshesNode(List<Mesh> sceneMeshes, Func<Mesh, MeshNode> meshNodeFactory, 
             Func<List<Mesh>, MeshesNode> meshesFactory, 
-            Func<IEnumerable<IGrouping<string, MeshAnimationAttachment>>, ShapeKeysNode> shapeKeysNodeFactory)
+            Func<IEnumerable<IGrouping<string, ShapeKey>>, ShapeKeysNode> shapeKeysNodeFactory)
         {
             _meshes = sceneMeshes;
             _meshNodeFactory = meshNodeFactory;
@@ -57,8 +57,9 @@ namespace FBXViewer
                     yield return meshNode;
                 }
 
-                var keys = _meshes.SelectMany(m => m.MeshAnimationAttachments)
-                    .GroupBy(at => at.Name);
+                var keys = (from mesh in _meshes
+                    from at in mesh.MeshAnimationAttachments
+                    select new ShapeKey(mesh, at)).GroupBy(s => s.Attachment.Name);
                 yield return _shapeKeysNodeFactory(keys);
 
                 yield break;

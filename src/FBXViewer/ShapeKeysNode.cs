@@ -1,17 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Assimp;
 
 namespace FBXViewer
 {
     public class ShapeKeysNode : BaseNode
     {
-        private readonly List<IGrouping<string, MeshAnimationAttachment>> _keys;
-        private readonly Func<IGrouping<string, MeshAnimationAttachment>, ShapeKeyNode> _shapeKeyNodeFactory;
+        private readonly List<IGrouping<string, ShapeKey>> _keys;
+        private readonly Func<IGrouping<string, ShapeKey>, ShapeKeyNode> _shapeKeyNodeFactory;
 
-        public ShapeKeysNode(IEnumerable<IGrouping<string, MeshAnimationAttachment>> keys,
-            Func<IGrouping<string, MeshAnimationAttachment>, ShapeKeyNode> shapeKeyNodeFactory)
+        public ShapeKeysNode(IEnumerable<IGrouping<string, ShapeKey>> keys,
+            Func<IGrouping<string, ShapeKey>, ShapeKeyNode> shapeKeyNodeFactory)
         {
             _keys = keys.ToList();
             _shapeKeyNodeFactory = shapeKeyNodeFactory;

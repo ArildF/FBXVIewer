@@ -1,14 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
-using Assimp;
 
 namespace FBXViewer
 {
     public class ShapeKeyNode : BaseNode
     {
-        private readonly IGrouping<string, MeshAnimationAttachment> _attachment;
+        private readonly IGrouping<string, ShapeKey> _attachment;
 
-        public ShapeKeyNode(IGrouping<string, MeshAnimationAttachment> attachment)
+        public ShapeKeyNode(IGrouping<string, ShapeKey> attachment)
         {
             _attachment = attachment;
         }
