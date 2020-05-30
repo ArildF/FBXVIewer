@@ -13,6 +13,8 @@ namespace FBXViewer
         public virtual bool IsChecked { get; set; }
         public virtual bool IsSelected { get; set; }
 
+        public virtual object? UIDataContext => null;
+
         public IEnumerable<INode> GetChildren()
         {
             _children ??= CreateChildren().ToArray();

@@ -47,6 +47,8 @@ namespace FBXViewer
         public string Text => _node.Text ?? "";
         public object? PreviewThumbnail => _node.GetPreviewThumbnail();
 
+        public object? UIDataContext => _node.UIDataContext;
+
         public bool IsMultiSelect => _node.SupportsMultiSelect;
 
         public List<object> Children

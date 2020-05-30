@@ -8,6 +8,17 @@
         Background="{DynamicResource Background}"
         Icon="Art/Icon.jpg"
         Title="FBX Viewer">
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type local:ShapeKeyViewModel}">
+            <StackPanel Orientation="Horizontal">
+                <Slider Maximum="1" Minimum="-1" Value="{Binding Value}" VerticalAlignment="Bottom"
+                        HorizontalAlignment="Left"
+                        Margin="0 40 0 0" Width="200"/>
+                <TextBlock Text="{Binding Value, Mode=OneWay, StringFormat=0.00}" Margin="0 40 0 0"/>
+            </StackPanel>
+            <!-- <Rectangle Fill="Brown"></Rectangle> -->
+        </DataTemplate>
+    </Window.Resources>
     <Grid>
         <DockPanel LastChildFill="True">
             <Menu DockPanel.Dock="Top">
@@ -38,13 +49,17 @@
                     <TreeView.ItemTemplate>
                         <HierarchicalDataTemplate DataType="local:TreeNodeViewModel"
                                                   ItemsSource="{Binding Children}">
-                            <DockPanel MaxHeight="16">
-                                <CheckBox Visibility="{Binding IsMultiSelect, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                          IsChecked="{Binding IsChecked, Mode=TwoWay}"
-                                          VerticalAlignment="Center"/>
-                                <TextBlock Text="{Binding Text}" VerticalAlignment="Center"/>
-                                <ContentControl Content="{Binding PreviewThumbnail}" VerticalAlignment="Center"/>
-                            </DockPanel>
+                            <Grid>
+                                <DockPanel MaxHeight="16">
+                                    <CheckBox
+                                        Visibility="{Binding IsMultiSelect, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                        IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                        VerticalAlignment="Top" />
+                                    <TextBlock Text="{Binding Text}" VerticalAlignment="Top" />
+                                    <ContentControl Content="{Binding PreviewThumbnail}" VerticalAlignment="Top" />
+                                </DockPanel>
+                                <ContentControl Content="{Binding UIDataContext}" HorizontalAlignment="Stretch"/>
+                            </Grid>
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>
                 </TreeView>
