@@ -144,17 +144,27 @@ namespace FBXViewer.Wpf
             var normals = entry.Geometry.Normals;
             for (int i = 0; i < attachment.VertexCount; i++)
             {
-                var newPos = Vector3.Lerp(
-                    mesh.Vertices[i].AsVector3(),
-                    attachment.Vertices[i].AsVector3(),
-                    weight);
-                positions[i] = newPos.AsPoint3D();
+                var oldPos = mesh.Vertices[i].AsVector3();
+                var keyPos = attachment.Vertices[i].AsVector3();
+                if ((keyPos - oldPos).LengthSquared() > 0.001)
+                {
+                    var newPos = Vector3.Lerp(
+                        oldPos,
+                        keyPos,
+                        weight);
+                    positions[i] = newPos.AsPoint3D();
+                }
 
-                var newNormal = Vector3.Lerp(
-                    mesh.Normals[i].AsVector3(),
-                    attachment.Normals[i].AsVector3(),
-                    weight);
-                normals[i] = newNormal.AsMVector3D();
+                var oldNormal = mesh.Normals[i].AsVector3();
+                var keyNormal = attachment.Normals[i].AsVector3();
+                if ((keyNormal - oldNormal).LengthSquared() > 0.001)
+                {
+                    var newNormal = Vector3.Lerp(
+                        oldNormal,
+                        keyNormal,
+                        weight);
+                    normals[i] = newNormal.AsMVector3D();
+                }
             }
         }
 
