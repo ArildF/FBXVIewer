@@ -56,7 +56,7 @@ namespace FBXViewer
             Element = grid;
         }
 
-        private void DoubleClick(object sender, MouseButtonEventArgs e)
+        private void DoubleClick(object? sender, MouseButtonEventArgs e)
         {
             if (e.Clicks == 2)
             {
@@ -67,13 +67,7 @@ namespace FBXViewer
                 }
             }
         }
-
-       
-
-    
         
-        
-
         private void KeyDown(object sender, KeyEventArgs e)
         {
             Debug.WriteLine($"Key down {e.Key}");
@@ -109,7 +103,6 @@ namespace FBXViewer
         private void MouseUp(object? sender, MouseButtonEventArgs mouseButtonEventArgs)
         {
             _dragHandler = null;
-            Element.ReleaseMouseCapture();
         }
 
         private void MouseDown(object? sender, MouseButtonEventArgs e)
@@ -119,27 +112,23 @@ namespace FBXViewer
             if (isMiddle && Keyboard.IsKeyDown(Key.LeftShift))
             {
                 _dragHandler = new PanDragHandler(this, e.Position);
-                // Element.CaptureMouse();
             }
             else if (isMiddle && Keyboard.IsKeyDown(Key.LeftCtrl))
             {
                 _dragHandler = new DollyHandler(this, e.Position);
-                // Element.CaptureMouse();
             }
             else if (isMiddle)
             {
                 _dragHandler = new OrbitHandler(this, e.Position);
-                // Element.CaptureMouse();
             }
-
         }
 
-        private void MouseMove(object sender, MouseMoveEventArgs e)
+        private void MouseMove(object? sender, MouseMoveEventArgs e)
         {
             _dragHandler?.MouseDrag(e.Position);
         }
 
-        private void MouseWheel(object sender, MouseWheelEventArgs e)
+        private void MouseWheel(object? sender, MouseWheelEventArgs e)
         {
             Debug.WriteLine("Mousewheel");
             var delta = e.Delta * 0.10f;

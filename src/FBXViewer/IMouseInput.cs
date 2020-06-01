@@ -1,6 +1,5 @@
 using System;
 using System.Windows;
-using System.Windows.Forms;
 using System.Windows.Input;
 
 namespace FBXViewer
@@ -25,6 +24,7 @@ namespace FBXViewer
         public int Clicks { get; }
         public MouseButton MouseButton { get; }
         public Point Position { get; }
+
     }
 
     public class MouseMoveEventArgs

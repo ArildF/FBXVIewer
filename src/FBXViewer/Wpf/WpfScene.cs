@@ -58,7 +58,10 @@ namespace FBXViewer.Wpf
 
             _viewPort.Children.Add(visual);
 
-            Visual = _viewPort;
+            var border = new Border{Background = Brushes.Black};
+            border.Child = _viewPort;
+            Visual = border;
+            MouseInput = new WpfMouseInput(border);
         }
 
         public void LoadMesh(Mesh mesh)
