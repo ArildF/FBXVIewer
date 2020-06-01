@@ -1,14 +1,11 @@
-using System.Drawing;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms.Integration;
-using System.Windows.Media;
 using Assimp;
 using OpenGL;
 using Brushes = System.Windows.Media.Brushes;
 using Quaternion = System.Windows.Media.Media3D.Quaternion;
-using Color = System.Windows.Media.Color;
 using PrimitiveType = OpenGL.PrimitiveType;
 
 namespace FBXViewer.OpenGL
@@ -17,7 +14,10 @@ namespace FBXViewer.OpenGL
     {
         public OpenGLScene()
         {
-            var glControl = new GlControl();
+            var glControl = new GlControl
+            {
+                Animation = true
+            };
             glControl.ContextCreated += GlControlOnContextCreated;
             glControl.Render += GlControlOnRender;
 
@@ -27,6 +27,8 @@ namespace FBXViewer.OpenGL
             var winformsHost = new WindowsFormsHost();
             winformsHost.Child = glControl;
 
+            MouseInput = new WinFormsMouseInput(glControl);
+            
             grid.Children.Add(winformsHost);
 
             Visual = grid;
@@ -39,15 +41,13 @@ namespace FBXViewer.OpenGL
         public UIElement Visual { get; }
         public ILight? CameraLight { get; }
 
-        private Vector3[] _verts = new[]
-        {
-            new Vector3(0, 0, 0),
-            new Vector3(0.5f, 1, 0),
-            new Vector3(1.0f, 0, 0),
+        private Vector3[] _verts = {
+            new Vector3(-0.5f, -0.5f, 0),
+            new Vector3(0, 0.5f, 0),
+            new Vector3(0.5f, -.5f, 0),
         };
 
-        private float[] _colors = new[]
-        {
+        private float[] _colors = {
             1f, 0f, 0f,
             1f, 1f, 0f,
             0f, 1f, 0f
@@ -125,5 +125,7 @@ namespace FBXViewer.OpenGL
         public void SetRootRotation(Quaternion quaternion)
         {
         }
+
+        public IMouseInput MouseInput { get; }
     }
 }

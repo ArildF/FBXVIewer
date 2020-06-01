@@ -18,5 +18,7 @@ namespace FBXViewer
         void ToggleWireFrame(in bool wireFrameEnabled);
         void ToggleMesh(in bool meshEnabled);
         void SetRootRotation(Quaternion quaternion);
+        
+        IMouseInput MouseInput { get; }
     }
 }

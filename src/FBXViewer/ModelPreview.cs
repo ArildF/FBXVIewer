@@ -3,10 +3,11 @@ using System.Linq;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using Assimp;
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using KeyEventHandler = System.Windows.Input.KeyEventHandler;
 using MVector3D = System.Windows.Media.Media3D.Vector3D;
 using Vector = System.Windows.Vector;
 
@@ -35,27 +36,31 @@ namespace FBXViewer
             grid.RowDefinitions.Add(new RowDefinition {Height = new GridLength(1, GridUnitType.Auto)});
 
             grid.Children.Add(border);
-            border.SetValue(Grid.RowSpanProperty, 2);
+            border.SetValue(Grid.RowSpanProperty, 1);
 
             _settingsViewModel = new MeshPreviewSettingsViewModel(scene);
             var settings = new MeshPreviewSettings(_settingsViewModel);
             grid.Children.Add(settings);
             settings.SetValue(Grid.RowProperty, 1);
-            
-            grid.AddHandler(UIElement.PreviewMouseWheelEvent, new MouseWheelEventHandler(MouseWheel), true);
-            grid.AddHandler(UIElement.PreviewMouseMoveEvent, new MouseEventHandler(MouseMove), true);
-            grid.AddHandler(UIElement.PreviewMouseDownEvent, new MouseButtonEventHandler(MouseDown), true);
-            grid.AddHandler(UIElement.PreviewMouseLeftButtonDownEvent, new MouseButtonEventHandler(DoubleClick), true);
-            grid.AddHandler(UIElement.PreviewMouseUpEvent, new MouseButtonEventHandler(MouseUp), true);
+
+            var input = scene.MouseInput;
+
+            input.MouseWheel += MouseWheel;
+            input.MouseMove += MouseMove;
+            input.MouseDown += MouseDown;
+            input.MouseUp += MouseUp;
+
+            input.MouseDown += DoubleClick;
+              
             mainWindow.AddHandler(UIElement.PreviewKeyDownEvent, new KeyEventHandler(KeyDown), true);
             Element = grid;
         }
 
         private void DoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (e.ClickCount == 2)
+            if (e.Clicks == 2)
             {
-                var mousePos = e.GetPosition(Element);
+                var mousePos = e.Position;
                 if (_scene.RayCast(mousePos.AsVector2(), out RayCastResult result))
                 {
                     _camera.MovePivotTo(result.PointHit);
@@ -101,46 +106,49 @@ namespace FBXViewer
 
         
 
-        private void MouseUp(object sender, MouseEventArgs e)
+        private void MouseUp(object? sender, MouseButtonEventArgs mouseButtonEventArgs)
         {
             _dragHandler = null;
             Element.ReleaseMouseCapture();
         }
 
-        private void MouseDown(object sender, MouseEventArgs e)
+        private void MouseDown(object? sender, MouseButtonEventArgs e)
         {
-            if (e.MiddleButton == MouseButtonState.Pressed && Keyboard.IsKeyDown(Key.LeftShift))
+            Debug.WriteLine($"Mouse down: {e.MouseButton} {e.Position}");
+            bool isMiddle = e.MouseButton == MouseButton.Middle;
+            if (isMiddle && Keyboard.IsKeyDown(Key.LeftShift))
             {
-                _dragHandler = new PanDragHandler(this, e);
-                Element.CaptureMouse();
+                _dragHandler = new PanDragHandler(this, e.Position);
+                // Element.CaptureMouse();
             }
-            else if (e.MiddleButton == MouseButtonState.Pressed && Keyboard.IsKeyDown(Key.LeftCtrl))
+            else if (isMiddle && Keyboard.IsKeyDown(Key.LeftCtrl))
             {
-                _dragHandler = new DollyHandler(this, e);
-                Element.CaptureMouse();
+                _dragHandler = new DollyHandler(this, e.Position);
+                // Element.CaptureMouse();
             }
-            else if (e.MiddleButton == MouseButtonState.Pressed)
+            else if (isMiddle)
             {
-                _dragHandler = new OrbitHandler(this, e);
-                Element.CaptureMouse();
+                _dragHandler = new OrbitHandler(this, e.Position);
+                // Element.CaptureMouse();
             }
 
         }
 
-        private void MouseMove(object sender, MouseEventArgs e)
+        private void MouseMove(object sender, MouseMoveEventArgs e)
         {
-            _dragHandler?.MouseDrag(e);
+            _dragHandler?.MouseDrag(e.Position);
         }
 
         private void MouseWheel(object sender, MouseWheelEventArgs e)
         {
+            Debug.WriteLine("Mousewheel");
             var delta = e.Delta * 0.10f;
             _camera.Zoom(delta);
         }
 
         private interface IDragHandler
         {
-            void MouseDrag(MouseEventArgs args);
+            void MouseDrag(Point point);
         }
 
         private abstract class DragHandlerBase : IDragHandler
@@ -148,15 +156,15 @@ namespace FBXViewer
             protected readonly ModelPreview Outer;
             private Point _pos;
 
-            protected DragHandlerBase(ModelPreview outer, MouseEventArgs args)
+            protected DragHandlerBase(ModelPreview outer, Point point)
             {
-                _pos = args.GetPosition(outer.Element);
+                _pos = point;
                 Outer = outer;
             }
 
-            public void MouseDrag(MouseEventArgs args)
+            public void MouseDrag(Point point)
             {
-                var newPos = args.GetPosition(Outer.Element);
+                var newPos = point;
                 var delta = (newPos - _pos) * 0.01;
 
                 _pos = newPos;
@@ -170,7 +178,7 @@ namespace FBXViewer
 
         private class PanDragHandler : DragHandlerBase
         {
-            public PanDragHandler(ModelPreview outer, MouseEventArgs mouseEventArgs) : base(outer, mouseEventArgs)
+            public PanDragHandler(ModelPreview outer, Point point) : base(outer, point)
             {
             }
             protected override void DoMouseDrag(Vector delta)
@@ -182,7 +190,7 @@ namespace FBXViewer
 
         private class OrbitHandler : DragHandlerBase
         {
-            public OrbitHandler(ModelPreview outer, MouseEventArgs args) : base(outer, args)
+            public OrbitHandler(ModelPreview outer, Point point) : base(outer, point)
             {
             }
 
@@ -194,7 +202,7 @@ namespace FBXViewer
 
         private class DollyHandler : DragHandlerBase
         {
-            public DollyHandler(ModelPreview outer, MouseEventArgs args) : base(outer, args)
+            public DollyHandler(ModelPreview outer, Point point) : base(outer, point)
             {
             }
 

@@ -192,6 +192,8 @@ namespace FBXViewer.Wpf
             _quaternionRotation.Quaternion = quaternion;
         }
 
+        public IMouseInput MouseInput { get; }
+
         private void ToggleElement(bool enabled, Model3DGroup group)
         {
             if (enabled && !_allModelGroup.Children.Contains(group))
