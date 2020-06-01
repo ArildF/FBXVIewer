@@ -5,11 +5,11 @@ namespace FBXViewer
 {
     public class MeshPreviewSettingsViewModel : ReactiveObject
     {
-        private ModelPreview _modelPreview;
+        private readonly IScene _scene;
 
-        public MeshPreviewSettingsViewModel(ModelPreview modelPreview)
+        public MeshPreviewSettingsViewModel(IScene scene)
         {
-            _modelPreview = modelPreview;
+            _scene = scene;
             _wireFrameEnabled = true;
             _meshEnabled = true;
         }
@@ -22,17 +22,10 @@ namespace FBXViewer
             set
             {
                 this.RaiseAndSetIfChanged(ref _wireFrameEnabled, value);
-                _modelPreview.ToggleWireFrame(_wireFrameEnabled);
+                _scene.ToggleWireFrame(_wireFrameEnabled);
             }
         }
 
-        private Quaternion _rotation;
-
-        public Quaternion Rotation
-        {
-            get => _rotation;
-            set => this.RaiseAndSetIfChanged(ref _rotation, value);
-        }
 
         private float _zRotation;
 
@@ -89,16 +82,16 @@ namespace FBXViewer
             set
             {
                 this.RaiseAndSetIfChanged(ref _meshEnabled, value);
-                _modelPreview.ToggleMesh(_meshEnabled);
+                _scene.ToggleMesh(_meshEnabled);
             }
         }
 
         private void UpdateRotation()
         {
-            Rotation = 
+            _scene.SetRootRotation( 
                 new Quaternion(new Vector3D(1, 0, 0), XRotation) *
                 new Quaternion(new Vector3D(0, 1, 0), YRotation) *
-                new Quaternion(new Vector3D(0, 0, 1), ZRotation);
+                new Quaternion(new Vector3D(0, 0, 1), ZRotation));
         }
     }
 }

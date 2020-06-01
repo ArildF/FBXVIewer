@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Numerics;
-using System.Windows.Media.Media3D;
 using Quaternion = System.Numerics.Quaternion;
 using Vector = System.Windows.Vector;
 
@@ -10,8 +9,8 @@ namespace FBXViewer
 {
     public class Camera
     {
-        private readonly WpfCamera _camera;
-        private readonly PointLightBase? _cameraLight;
+        private readonly IRendererCamera _rendererCamera;
+        private readonly ILight? _cameraLight;
         private readonly Coroutines _coroutines;
         private Vector3 _originalPivot;
         private Vector3 _position;
@@ -20,18 +19,20 @@ namespace FBXViewer
         private Quaternion _rotation;
         private Quaternion _originalRotation;
 
-        public Camera(WpfCamera camera, Vector3 initialPivot, Coroutines coroutines, PointLightBase? cameraLight = null)
+        public Camera(IRendererCamera rendererCamera, Vector3 initialPivot, Coroutines coroutines, ILight? cameraLight = null)
         {
-            _camera = camera;
+            _rendererCamera = rendererCamera;
             _cameraLight = cameraLight;
             _coroutines = coroutines;
             _originalPivot = _pivot = initialPivot;
-            _position = _originalPosition = _camera.Position.AsVector3();
+            _position = _originalPosition = _rendererCamera.Position;
             _rotation = (_pivot - _position).ToLookRotation(Vector3.UnitY);
             MoveCamera(_position, _rotation, _pivot);
 
             _originalRotation = _rotation;
         }
+
+        public bool IsOrthographic => _rendererCamera.IsOrthographic;
 
         public void Pan(float x, float y)
         {
@@ -48,10 +49,10 @@ namespace FBXViewer
                 _position = position;
                 _rotation = rotation;
                 _pivot = pivot;
-                _camera.Move(position, _rotation.Forward(), _rotation.Up());
+                _rendererCamera.Move(position, _rotation.Forward(), _rotation.Up());
                 if (_cameraLight != null)
                 {
-                    _cameraLight.Position = position.AsPoint3D();
+                    _cameraLight.Position = position;
                 }
             }
             else
@@ -96,7 +97,7 @@ namespace FBXViewer
         {
             var position = _position + _rotation.Forward() * delta;
             MoveCamera(position, _rotation, _pivot);
-            _camera.AdjustWidth(-delta);
+            _rendererCamera.AdjustWidth(-delta);
         }
 
         public void ResetToDefault()
@@ -126,7 +127,7 @@ namespace FBXViewer
         {
             var position = _position + _rotation.Forward() * (float)deltaY;
             MoveCamera(position, _rotation, _pivot);
-            _camera.AdjustWidth((float) deltaY);
+            _rendererCamera.AdjustWidth((float) deltaY);
         }
 
         public void MoveTo(Vector3 position, Vector3 pivot)
@@ -136,11 +137,11 @@ namespace FBXViewer
            MoveCamera(position, rotation, pivot, animate: true);
         }
 
-        public void MovePivotTo(Point3D pointHit)
+        public void MovePivotTo(Vector3 point)
         {
-            var delta = pointHit.AsVector3() - _pivot;
+            var delta = point- _pivot;
             var newPosition = _position + delta;
-            MoveTo(newPosition,pointHit.AsVector3());
+            MoveTo(newPosition,point);
         }
 
         public void ResetTo(Vector3 cameraPosition, Vector3 pivot)
@@ -172,6 +173,11 @@ namespace FBXViewer
             var lookDir = _pivot - position;
             var rotation = lookDir.ToLookRotation(up);
             MoveCamera(position, rotation, _pivot, animate: true);
+        }
+
+        public void TogglePerspectiveOrthographic()
+        {
+           _rendererCamera.TogglePerspectiveOrthographic(); 
         }
     }
 }

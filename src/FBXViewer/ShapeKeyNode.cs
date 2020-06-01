@@ -6,14 +6,14 @@ namespace FBXViewer
     public class ShapeKeyNode : BaseNode
     {
         private readonly IGrouping<string, ShapeKey> _attachment;
-        private readonly ModelPreview _preview;
+        private readonly IScene _scene;
         private readonly ShapeKeyViewModel _viewModel;
         private float _value;
 
-        public ShapeKeyNode(IGrouping<string, ShapeKey> attachment, ModelPreview preview)
+        public ShapeKeyNode(IGrouping<string, ShapeKey> attachment, IScene scene)
         {
             _attachment = attachment;
-            _preview = preview;
+            _scene = scene;
             _viewModel = new ShapeKeyViewModel(this);
         }
 
@@ -27,7 +27,7 @@ namespace FBXViewer
                 _value = value;
                 foreach (var key in _attachment)
                 {
-                    _preview.SetShapeKeyWeight(key.Mesh, _value, key.Attachment);
+                    _scene.SetShapeKeyWeight(key.Mesh, _value, key.Attachment);
                 }
             }
         }

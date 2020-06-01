@@ -2,19 +2,18 @@ using System;
 using System.Numerics;
 using System.Windows.Controls;
 using System.Windows.Media.Media3D;
-
 using MVector3D = System.Windows.Media.Media3D.Vector3D;
 
-namespace FBXViewer
+namespace FBXViewer.Wpf
 {
-    public class WpfCamera
+    public class WpfRendererCamera : IRendererCamera
     {
         private readonly Viewport3D _viewPort;
         private readonly PerspectiveCamera _perspectiveCamera;
-        private OrthographicCamera _orthographicCamera;
+        private readonly OrthographicCamera _orthographicCamera;
         private ProjectionCamera _currentCamera;
 
-        public WpfCamera(Viewport3D viewPort, Vector3 center)
+        public WpfRendererCamera(Viewport3D viewPort, Vector3 center)
         {
             _viewPort = viewPort;
             _perspectiveCamera = new PerspectiveCamera(
@@ -30,7 +29,7 @@ namespace FBXViewer
 
         }
 
-        public Point3D Position => _currentCamera.Position;
+        public Vector3 Position => _currentCamera.Position.AsVector3();
 
         public void Move(Vector3 position, Vector3 lookDirection, Vector3 upDirection)
         {

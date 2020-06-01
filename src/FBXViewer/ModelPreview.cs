@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
@@ -8,7 +6,6 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Media3D;
 using Assimp;
 using MVector3D = System.Windows.Media.Media3D.Vector3D;
 using Vector = System.Windows.Vector;
@@ -17,71 +14,21 @@ namespace FBXViewer
 {
     public class ModelPreview
     {
-        private readonly TextureProvider _textureProvider;
         private readonly Camera _camera;
         private IDragHandler? _dragHandler;
-        private readonly Viewport3D _viewPort;
 
         public UIElement Element { get; }
         
-        private readonly Dictionary<Mesh, MeshEntry> _meshes = new Dictionary<Mesh,MeshEntry>();
-        private readonly Model3DGroup _meshModelGroup;
-        private readonly Model3DGroup _wireFrameModelGroup;
-        private readonly Model3DGroup _allModelGroup;
-        private readonly WpfCamera _wpfCamera;
         private readonly MeshPreviewSettingsViewModel _settingsViewModel;
+        private readonly IScene _scene;
 
-        private struct MeshEntry
+        public ModelPreview(MainWindow mainWindow, IScene scene, Coroutines coroutines)
         {
-            public Model3DGroup ModelGroup;
-            public Model3DGroup WireframeGroup;
-            public MeshGeometry3D Geometry;
-            public MeshGeometry3D WireFrameGeometry;
-
-            public MeshEntry(Model3DGroup modelGroup, Model3DGroup wireframeGroup, MeshGeometry3D geometry, MeshGeometry3D wireFrameGeometry)
-            {
-                ModelGroup = modelGroup;
-                WireframeGroup = wireframeGroup;
-                Geometry = geometry;
-                WireFrameGeometry = wireFrameGeometry;
-            }
-
-        }
-        public ModelPreview(TextureProvider textureProvider, MainWindow mainWindow, Coroutines coroutines)
-        {
-            _textureProvider = textureProvider;
-            _viewPort = new Viewport3D();
-
-            var center = Vector3.Zero;
-
-
-            _wpfCamera = new WpfCamera(_viewPort, center);
+            _scene = scene;
+            _camera = new Camera(scene.RendererCamera, Vector3.Zero, coroutines, scene.CameraLight); 
             
-            var lightGroup = new Model3DGroup();
-            var light = new PointLight(Colors.Cornsilk, _wpfCamera.Position);
-            lightGroup.Children.Add(light);
-            _viewPort.Children.Add(new ModelVisual3D{Content = lightGroup});
-            _camera = new Camera(_wpfCamera, center, coroutines, light);
-            
-            
-            _meshModelGroup = new Model3DGroup();
-            _wireFrameModelGroup = new Model3DGroup();
-            
-            _allModelGroup = new Model3DGroup();
-            _allModelGroup.Children.Add(_meshModelGroup);
-            _allModelGroup.Children.Add(_wireFrameModelGroup);
-            
-            var rotation = new RotateTransform3D();
-            var quaternionRotation = new QuaternionRotation3D();
-            rotation.Rotation = quaternionRotation;
-            _allModelGroup.Transform = rotation;
-            
-            var visual = new ModelVisual3D {Content = _allModelGroup};
-            
-            _viewPort.Children.Add(visual);
-
             var border = new Border {Background = Brushes.Black};
-            border.Child = _viewPort;
+            border.Child = scene.Visual;
             
             var grid = new Grid();
             grid.RowDefinitions.Add(new RowDefinition {Height = new GridLength(4, GridUnitType.Star)});
@@ -90,17 +37,11 @@ namespace FBXViewer
             grid.Children.Add(border);
             border.SetValue(Grid.RowSpanProperty, 2);
 
-            _settingsViewModel = new MeshPreviewSettingsViewModel(this);
+            _settingsViewModel = new MeshPreviewSettingsViewModel(scene);
             var settings = new MeshPreviewSettings(_settingsViewModel);
             grid.Children.Add(settings);
             settings.SetValue(Grid.RowProperty, 1);
             
-            var binding = new Binding("Rotation");
-            binding.Source = settings.DataContext;
-            BindingOperations.SetBinding(quaternionRotation, QuaternionRotation3D.QuaternionProperty,
-                binding);
-            
-
             grid.AddHandler(UIElement.PreviewMouseWheelEvent, new MouseWheelEventHandler(MouseWheel), true);
             grid.AddHandler(UIElement.PreviewMouseMoveEvent, new MouseEventHandler(MouseMove), true);
             grid.AddHandler(UIElement.PreviewMouseDownEvent, new MouseButtonEventHandler(MouseDown), true);
@@ -114,216 +55,19 @@ namespace FBXViewer
         {
             if (e.ClickCount == 2)
             {
-                var mousePos = e.GetPosition(_viewPort);
-                var hitParams = new PointHitTestParameters(mousePos);
-                VisualTreeHelper.HitTest(_viewPort, null, result =>
+                var mousePos = e.GetPosition(Element);
+                if (_scene.RayCast(mousePos.AsVector2(), out RayCastResult result))
                 {
-                    Debug.WriteLine($"Hit something! {result.VisualHit}");
-                    
-                    var rayMeshResult = 
-                        result as RayMeshGeometry3DHitTestResult;
-                    if (rayMeshResult != null)
-                    {
-                        _camera.MovePivotTo(rayMeshResult.PointHit);
-                        Debug.WriteLine($"Impact at {rayMeshResult.MeshHit}. {rayMeshResult.PointHit}");
-                    }
-                    return HitTestResultBehavior.Stop;
-                }, hitParams);
-            }
-        }
-
-        public void LoadMesh(Mesh mesh)
-        {
-            UnloadMesh(mesh);
-
-            var textureCoords = mesh.TextureCoordinateChannelCount > 0 
-                ? mesh.TextureCoordinateChannels[0].Select(uv => uv.AsUvPoint()) : null;
-
-            var triangleIndices = new List<int>(mesh.FaceCount * 4);
-            foreach (var face in mesh.Faces)
-            {
-                triangleIndices.Add(face.Indices[0]);
-                triangleIndices.Add(face.Indices[1]);
-                triangleIndices.Add(face.Indices[2]);
-                if (face.IndexCount == 4)
-                {
-                    triangleIndices.Add(face.Indices[0]);
-                    triangleIndices.Add(face.Indices[2]);
-                    triangleIndices.Add(face.Indices[3]);
-                }
-                if (face.IndexCount > 4)
-                {
-                    Debug.WriteLine($"Found {face.IndexCount}gon, only generating quad");
+                    _camera.MovePivotTo(result.PointHit);
                 }
             }
-
-            var geometry = new MeshGeometry3D
-            {
-                Positions = new Point3DCollection(
-                    mesh.Vertices.Select(v => new Point3D(v.X, v.Y, v.Z))),
-                Normals = new Vector3DCollection(
-                    mesh.Normals.Select(n => new MVector3D(n.X, n.Y, n.Z))),
-                TriangleIndices = new Int32Collection(triangleIndices),
-                TextureCoordinates = textureCoords != null ? new PointCollection(textureCoords) : null
-            };
-            var diffuse = _textureProvider.GetDiffuseTexture(mesh);
-            
-            // the ViewPortUnits is very important, or the brush will map MaxU x MaxV to 1 x 1
-            // see https://books.google.no/books?id=ubgRAAAAQBAJ&pg=PA582&lpg=PA582
-            // TileMode also seems necessary
-            var brush = diffuse != null ? new ImageBrush(diffuse)
-            {
-                ViewportUnits = BrushMappingMode.Absolute,
-                TileMode = TileMode.Tile
-            } : (Brush)Brushes.Pink ; 
-
-            var geometryModel = new GeometryModel3D
-            {
-                Material = new MaterialGroup
-                {
-                    Children = new MaterialCollection
-                    {
-                        new DiffuseMaterial(brush),
-                        // new SpecularMaterial(Brushes.Red, 1)
-                    }
-                },
-                Geometry = geometry,
-            };
-
-
-            var group = new Model3DGroup();
-            group.Children.Add(geometryModel);
-            _meshModelGroup.Children.Add(group);
-
-            var (wireFrame, wireFrameGeometry) = CreateWireFrame(mesh);
-            _wireFrameModelGroup.Children.Add(wireFrame);
-            _meshes[mesh] = new MeshEntry(group, wireFrame, geometry, wireFrameGeometry);
-            
-            var center = geometry.Bounds.Location.AsVector3() + (geometry.Bounds.Size.AsVector3() / 2);
-            var biggestExtent = new[] {geometry.Bounds.SizeX, geometry.Bounds.SizeY, geometry.Bounds.SizeZ}
-                .OrderByDescending(s => s).First();
-            var cameraOffset = biggestExtent * 2f;
-            var cameraPosition = center + new Vector3(0, 0, (float)cameraOffset);
-
-            _camera.ResetTo(cameraPosition, center);
         }
 
-        public void SetShapeKeyWeight(Mesh mesh, float weight, MeshAnimationAttachment attachment)
-        {
-            if (!_meshes.TryGetValue(mesh, out var entry))
-            {
-                return;
-            }
+       
 
-            var positions = entry.Geometry.Positions;
-            var normals = entry.Geometry.Normals;
-            for (int i = 0; i < attachment.VertexCount; i++)
-            {
-                var newPos = Vector3.Lerp(
-                    mesh.Vertices[i].AsVector3(),
-                    attachment.Vertices[i].AsVector3(),
-                    weight);
-                positions[i] = newPos.AsPoint3D();
-
-                var newNormal = Vector3.Lerp(
-                    mesh.Normals[i].AsVector3(),
-                    attachment.Normals[i].AsVector3(),
-                    weight);
-                normals[i] = newNormal.AsMVector3D();
-            }
-        }
-
-        private (Model3DGroup, MeshGeometry3D) CreateWireFrame(Mesh mesh)
-        {
-            var set = new HashSet<(int, int)>();
-                
-            var points = new List<Point3D>();
-            var tris = new List<int>();
-            foreach (var meshFace in mesh.Faces)
-            {
-                for(int i = 0; i < meshFace.Indices.Count; i++)
-                {
-                    var edge = (meshFace.Indices[i], meshFace.Indices[(i + 1) % meshFace.Indices.Count]);
-                    if (set.Contains(edge))
-                    {
-                        continue;
-                    }
-
-                    var thirdVertex = meshFace.Indices[(i + 2) % meshFace.Indices.Count];
-
-                    var v1 = mesh.Vertices[edge.Item1].AsVector3();
-                    var v2 = mesh.Vertices[edge.Item2].AsVector3();
-                    var v3 = mesh.Vertices[thirdVertex].AsVector3();
-                    
-                    var edgeVector = (v2 - v1);
-                    var otherEdgeVector = v3 - v1;
-                    var normalVector = Vector3.Cross(otherEdgeVector, edgeVector);
-                    normalVector = Vector3.Normalize(normalVector);
-                    var sideVector = Vector3.Normalize(Vector3.Cross(edgeVector, normalVector));
-
-                    var width = 0.05f;
-                    var p1 = v1 - sideVector * width;
-                    var p2 = v2 - sideVector * width;
-                    var p3 = v2 + sideVector * width;
-                    var p4 = v1 + sideVector * width;
-
-                    var i1 = points.Count;
-                    var i2 = i1 + 1;
-                    var i3 = i2 + 1;
-                    var i4 = i3 + 1;
-                    
-                    points.Add(p1.AsPoint3D());
-                    points.Add(p2.AsPoint3D());
-                    points.Add(p3.AsPoint3D());
-                    points.Add(p4.AsPoint3D());
-                    
-                    tris.Add(i1);
-                    tris.Add(i2);
-                    tris.Add(i3);
-                    tris.Add(i1);
-                    tris.Add(i3);
-                    tris.Add(i4);
-                    
-                    set.Add(edge);
-                }
-            }
-            var geometry = new MeshGeometry3D
-            {
-                Positions = new Point3DCollection(points),
-                Normals = new Vector3DCollection(),
-                TriangleIndices = new Int32Collection(tris)
-            };
-
-            var geometryModel = new GeometryModel3D
-            {
-                Material = new MaterialGroup
-                {
-                    Children = new MaterialCollection
-                    {
-                        new DiffuseMaterial(Brushes.White),
-                        // new SpecularMaterial(Brushes.Red, 1)
-                    }
-                },
-                Geometry = geometry,
-            };
-
-
-            var group = new Model3DGroup();
-            group.Children.Add(geometryModel);
-
-            return (group, geometry);
-
-        }
-
-        public void UnloadMesh(Mesh mesh)
-        {
-            if (_meshes.TryGetValue(mesh, out var entry))
-            {
-                _meshModelGroup.Children.Remove(entry.ModelGroup);
-                _wireFrameModelGroup.Children.Remove(entry.WireframeGroup);
-                _meshes.Remove(mesh);
-            }
-        }
+    
+        
+        
 
         private void KeyDown(object sender, KeyEventArgs e)
         {
@@ -350,8 +94,8 @@ namespace FBXViewer
 
             if (e.Key == Key.NumPad5)
             {
-                _wpfCamera.TogglePerspectiveOrthographic();
-                _settingsViewModel.CameraType = _wpfCamera.IsOrthographic ? "Orthographic" : "Perspective";
+                _camera.TogglePerspectiveOrthographic();
+                _settingsViewModel.CameraType = _camera.IsOrthographic ? "Orthographic" : "Perspective";
             }
         }
 
@@ -403,22 +147,18 @@ namespace FBXViewer
         {
             protected readonly ModelPreview Outer;
             private Point _pos;
-            private DateTime _time;
 
             protected DragHandlerBase(ModelPreview outer, MouseEventArgs args)
             {
                 _pos = args.GetPosition(outer.Element);
                 Outer = outer;
-                _time = DateTime.Now;
             }
 
             public void MouseDrag(MouseEventArgs args)
             {
-                var timeNow = DateTime.Now;
                 var newPos = args.GetPosition(Outer.Element);
                 var delta = (newPos - _pos) * 0.01;
 
-                _time = timeNow;
                 _pos = newPos;
 
                 DoMouseDrag(delta);
@@ -464,27 +204,24 @@ namespace FBXViewer
             }
         }
 
-        public void ToggleWireFrame(in bool wireFrameEnabled)
+        public void LoadMesh(Mesh mesh)
         {
-           ToggleElement(wireFrameEnabled, _wireFrameModelGroup); 
+            _scene.LoadMesh(mesh);
+
+            var bounds = _scene.GetBoundingBox(mesh);
+
+            var center = bounds.Location;
+            var biggestExtent = new[] {bounds.SizeX, bounds.SizeY, bounds.SizeZ}
+                .OrderByDescending(s => s).First();
+            var cameraOffset = biggestExtent * 2f;
+            var cameraPosition = center + new Vector3(0, 0, (float)cameraOffset);
+
+            _camera.ResetTo(cameraPosition, center);
         }
 
-        public void ToggleMesh(in bool meshEnabled)
+        public void UnloadMesh(Mesh mesh)
         {
-            ToggleElement(meshEnabled, _meshModelGroup);
-        }
-
-        private void ToggleElement(bool enabled, Model3DGroup group)
-        {
-            if (enabled && !_allModelGroup.Children.Contains(group))
-            {
-                _allModelGroup.Children.Add(group);
-            }
-
-            if (!enabled)
-            {
-                _allModelGroup.Children.Remove(group);
-            }
+            _scene.UnloadMesh(mesh);
         }
     }
 }

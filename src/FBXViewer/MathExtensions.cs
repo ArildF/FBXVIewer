@@ -67,6 +67,16 @@ namespace FBXViewer
             return Vector3.Transform(Vector3.UnitX, self);
         }
 
+        public static Vector2 AsVector2(this Point point)
+        {
+            return new Vector2((float)point.X, (float)point.Y);
+        }
+
+        public static Point AsPoint(this Vector2 vector)
+        {
+            return new Point(vector.X, vector.Y);
+        }
+
         public static float AngleTo(this Quaternion q1, Quaternion q2)
         {
             bool IsEqualish(float dot)
