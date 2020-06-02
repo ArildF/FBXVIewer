@@ -30,6 +30,10 @@
     <ItemGroup>
       <None Remove="Art\Icon.jpg" />
       <Resource Include="Art\Icon.jpg" />
+      <None Remove="OpenGL\Shaders\VertexShader.glsl" />
+      <Resource Include="OpenGL\Shaders\VertexShader.glsl" />
+      <None Remove="OpenGL\Shaders\FragmentShader.glsl" />
+      <Resource Include="OpenGL\Shaders\FragmentShader.glsl" />
     </ItemGroup>
 
 </Project>

@@ -1,4 +1,8 @@
+using System;
+using System.Diagnostics;
+using System.IO;
 using System.Numerics;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms.Integration;
@@ -54,6 +58,7 @@ namespace FBXViewer.OpenGL
         };
 
         private readonly OpenGLRendererCamera _openGLCamera;
+        private uint _program;
 
 
         private void GlControlOnRender(object? sender, GlControlEventArgs e)
@@ -76,9 +81,10 @@ namespace FBXViewer.OpenGL
                 Gl.VertexPointer(3, VertexPointerType.Float, 0, vertLock.Address);
                 Gl.EnableClientState(EnableCap.VertexArray);
                 
-                Gl.ColorPointer(3, ColorPointerType.Float, 0, colorLock.Address);
-                Gl.EnableClientState(EnableCap.ColorArray);
+                // Gl.ColorPointer(3, ColorPointerType.Float, 0, colorLock.Address);
+                // Gl.EnableClientState(EnableCap.ColorArray);
                 
+                Gl.UseProgram(_program);
                 Gl.DrawArrays(PrimitiveType.Triangles, 0, 3);
                 
             }
@@ -89,6 +95,50 @@ namespace FBXViewer.OpenGL
             Gl.MatrixMode(MatrixMode.Projection);
             Gl.LoadIdentity();
             Gl.MultMatrixd(Matrix4x4d.Perspective(35, 1, 0.1f, 1000));
+
+            CreateShaders();
+        }
+
+        private void CreateShaders()
+        {
+            var fragmentShader = Gl.CreateShader(ShaderType.FragmentShader);
+            var vertexShader = Gl.CreateShader(ShaderType.VertexShader);
+
+            var sb = new StringBuilder(1000);
+            
+            void CompileShader(uint id, string file)
+            {
+                var source = LoadShaderFromResource(file);
+                Gl.ShaderSource(id, new[]{source});
+                Gl.CompileShader(id);
+
+                Gl.GetShader(id, ShaderParameterName.CompileStatus, out int result);
+                Debug.WriteLine($"Compile status: {result == Gl.TRUE}");
+                Gl.GetShaderInfoLog(id, sb.Capacity, out int length, sb);
+                Debug.WriteLine(sb.ToString());
+            }
+            
+            CompileShader(fragmentShader, "FragmentShader.glsl");
+            CompileShader(vertexShader, "VertexShader.glsl");
+
+            _program = Gl.CreateProgram();
+            Gl.AttachShader(_program, fragmentShader);
+            Gl.AttachShader(_program, vertexShader);
+            Gl.LinkProgram(_program);
+            
+            Gl.GetProgram(_program, ProgramProperty.LinkStatus, out int result);
+            Debug.WriteLine($"Link status: {result == Gl.TRUE}");
+            Gl.GetProgramInfoLog(_program, sb.Capacity, out int length, sb);
+        }
+
+        private string LoadShaderFromResource(string file)
+        {
+            var uri = new Uri("/OpenGL/Shaders/" + file, UriKind.Relative);
+            var stream = Application.GetResourceStream(uri);
+            using (var reader = new StreamReader(stream.Stream))
+            {
+                return reader.ReadToEnd();
+            }
         }
 
         public void LoadMesh(Mesh mesh)
