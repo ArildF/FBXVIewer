@@ -59,6 +59,8 @@ namespace FBXViewer.OpenGL
 
         private readonly OpenGLRendererCamera _openGLCamera;
         private uint _program;
+        private uint _vao;
+        private uint _vertexBuffer;
 
 
         private void GlControlOnRender(object? sender, GlControlEventArgs e)
@@ -67,36 +69,35 @@ namespace FBXViewer.OpenGL
 
             int vpx = 0;
             int vpy = 0;
-            int vpw = senderControl.ClientSize.Width;
-            int vph = senderControl.ClientSize.Height;
+            int vpw = senderControl?.ClientSize.Width ?? 1;
+            int vph = senderControl?.ClientSize.Height ?? 1;
 
             Gl.Viewport(vpx, vpy, vpw, vph);
             Gl.Clear(ClearBufferMask.ColorBufferBit);
-            
-            _openGLCamera.OnRender();
 
-            using (var vertLock = new MemoryLock(_verts))
-            using (var colorLock = new MemoryLock(_colors))
-            {
-                Gl.VertexPointer(3, VertexPointerType.Float, 0, vertLock.Address);
-                Gl.EnableClientState(EnableCap.VertexArray);
-                
-                // Gl.ColorPointer(3, ColorPointerType.Float, 0, colorLock.Address);
-                // Gl.EnableClientState(EnableCap.ColorArray);
-                
-                Gl.UseProgram(_program);
-                Gl.DrawArrays(PrimitiveType.Triangles, 0, 3);
-                
-            }
+            var matrix = _openGLCamera.ProjectionMatrix(vpw, vph) * _openGLCamera.ViewMatrix;
+
+            Gl.UseProgram(_program);
+            
+            var location = Gl.GetUniformLocation(_program, "MVP");
+            Gl.BindVertexArray(_vao);
+            Gl.UniformMatrix4f(location, 1, true, matrix);
+            
+            Gl.DrawArrays(PrimitiveType.Triangles, 0, 3);
         }
 
         private void GlControlOnContextCreated(object? sender, GlControlEventArgs e)
         {
-            Gl.MatrixMode(MatrixMode.Projection);
-            Gl.LoadIdentity();
-            Gl.MultMatrixd(Matrix4x4d.Perspective(35, 1, 0.1f, 1000));
-
             CreateShaders();
+            _vao = Gl.GenVertexArray();
+            Gl.BindVertexArray(_vao);
+
+            _vertexBuffer = Gl.GenBuffer();
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer);
+            Gl.BufferData(BufferTarget.ArrayBuffer, (uint) (12 * _verts.Length), _verts, BufferUsage.StaticDraw);
+            
+            Gl.EnableVertexAttribArray(0);
+            Gl.VertexAttribPointer(0, 3, VertexAttribType.Float, false, 0, IntPtr.Zero);
         }
 
         private void CreateShaders()

@@ -1,5 +1,4 @@
 using System.Numerics;
-using OpenGL;
 
 namespace FBXViewer.OpenGL
 {
@@ -33,12 +32,9 @@ namespace FBXViewer.OpenGL
         {
         }
 
-        public void OnRender()
-        {
-            Gl.MatrixMode(MatrixMode.Modelview);
-            Gl.LoadIdentity();
-            Gl.MultMatrixf(Matrix4x4f.LookAtDirection(_position.AsVertex3f(), _lookDirection.AsVertex3f(),
-                _upDirection.AsVertex3f()));
-        }
+        public Matrix4x4 ViewMatrix => Matrix.LookAtDirection(_position, _lookDirection, _upDirection);
+
+        public Matrix4x4 ProjectionMatrix (float width, float height)  
+            => Matrix.PerspectiveProjection(45, width / height, 0.5f, 1000);
     }
 }
