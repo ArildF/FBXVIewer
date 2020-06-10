@@ -60,7 +60,7 @@ namespace FBXViewer.OpenGL
             int vph = senderControl?.ClientSize.Height ?? 1;
 
             Gl.Viewport(vpx, vpy, vpw, vph);
-            Gl.Clear(ClearBufferMask.ColorBufferBit);
+            Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             var matrix = _openGLCamera.ProjectionMatrix(vpw, vph) * _openGLCamera.ViewMatrix;
 
