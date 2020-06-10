@@ -16,11 +16,14 @@ namespace FBXViewer.OpenGL
         private uint _indexBuffer;
         private readonly Vector3[] _vertexArray;
         private readonly uint[] _indexArray;
+        private readonly Vector2[] _uvArray;
+        private uint _uvBuffer;
 
-        private GLMesh(Vector3[] vertexArray, uint[] indexArray)
+        private GLMesh(Vector3[] vertexArray, uint[] indexArray, Vector2[] uvArray)
         {
             _vertexArray = vertexArray;
             _indexArray = indexArray;
+            _uvArray = uvArray;
             ModelMatrix = Matrix4x4.Identity;
         }
 
@@ -33,9 +36,12 @@ namespace FBXViewer.OpenGL
                 CreateBuffers();
             }
             Gl.EnableVertexAttribArray(0);
-            var err = Gl.GetError();
             Gl.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer.Value);
             Gl.VertexAttribPointer(0, 3, VertexAttribType.Float, false, 0, IntPtr.Zero);
+            
+            Gl.EnableVertexAttribArray(1);
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, _uvBuffer);
+            Gl.VertexAttribPointer(1, 2, VertexAttribType.Float, false, 0, IntPtr.Zero);
             
             Gl.BindBuffer(BufferTarget.ElementArrayBuffer, _indexBuffer);
             
@@ -71,8 +77,10 @@ namespace FBXViewer.OpenGL
 
             var indexArray = vertexIndexes.ToArray();
             var vertexArray = mesh.Vertices.Select(v => v.AsVector3()).ToArray();
+            var uvArray = mesh.TextureCoordinateChannels[0]
+                .Select(uv => new Vector2(uv.X, uv.Y)).ToArray();
 
-            return new GLMesh(vertexArray, indexArray);
+            return new GLMesh(vertexArray, indexArray, uvArray);
         }
 
         private void CreateBuffers()
@@ -84,6 +92,10 @@ namespace FBXViewer.OpenGL
             _indexBuffer = Gl.GenBuffer();
             Gl.BindBuffer(BufferTarget.ElementArrayBuffer, _indexBuffer);
             Gl.BufferData(BufferTarget.ElementArrayBuffer, (uint) (_indexArray.Length * sizeof(int)), _indexArray, BufferUsage.StaticDraw);
+
+            _uvBuffer = Gl.GenBuffer();
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, _uvBuffer);
+            Gl.BufferData(BufferTarget.ArrayBuffer, (uint)(_uvArray.Length * 8), _uvArray, BufferUsage.StaticDraw);
         }
     }
 }
