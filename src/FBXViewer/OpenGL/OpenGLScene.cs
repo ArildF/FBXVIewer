@@ -80,6 +80,8 @@ namespace FBXViewer.OpenGL
         private void GlControlOnContextCreated(object? sender, GlControlEventArgs e)
         {
             CreateShaders();
+            Gl.Enable(EnableCap.DepthTest);
+            Gl.DepthFunc(DepthFunction.Less);
         }
 
         private void CreateShaders()
