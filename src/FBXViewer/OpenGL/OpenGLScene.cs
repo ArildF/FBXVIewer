@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Numerics;
@@ -10,7 +11,6 @@ using Assimp;
 using OpenGL;
 using Brushes = System.Windows.Media.Brushes;
 using Quaternion = System.Windows.Media.Media3D.Quaternion;
-using PrimitiveType = OpenGL.PrimitiveType;
 
 namespace FBXViewer.OpenGL
 {
@@ -45,22 +45,9 @@ namespace FBXViewer.OpenGL
         public UIElement Visual { get; }
         public ILight? CameraLight { get; }
 
-        private Vector3[] _verts = {
-            new Vector3(-0.5f, -0.5f, 0),
-            new Vector3(0, 0.5f, 0),
-            new Vector3(0.5f, -.5f, 0),
-        };
-
-        private float[] _colors = {
-            1f, 0f, 0f,
-            1f, 1f, 0f,
-            0f, 1f, 0f
-        };
-
         private readonly OpenGLRendererCamera _openGLCamera;
         private uint _program;
-        private uint _vao;
-        private uint _vertexBuffer;
+        private readonly List<GLMesh> _meshes = new List<GLMesh>();
 
 
         private void GlControlOnRender(object? sender, GlControlEventArgs e)
@@ -80,24 +67,19 @@ namespace FBXViewer.OpenGL
             Gl.UseProgram(_program);
             
             var location = Gl.GetUniformLocation(_program, "MVP");
-            Gl.BindVertexArray(_vao);
-            Gl.UniformMatrix4f(location, 1, true, matrix);
-            
-            Gl.DrawArrays(PrimitiveType.Triangles, 0, 3);
+
+            foreach (var glMesh in _meshes)
+            {
+                var modelMatrix = matrix * glMesh.ModelMatrix;
+                Gl.UniformMatrix4f(location, 1, true, modelMatrix);
+
+                glMesh.Render();
+            }
         }
 
         private void GlControlOnContextCreated(object? sender, GlControlEventArgs e)
         {
             CreateShaders();
-            _vao = Gl.GenVertexArray();
-            Gl.BindVertexArray(_vao);
-
-            _vertexBuffer = Gl.GenBuffer();
-            Gl.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer);
-            Gl.BufferData(BufferTarget.ArrayBuffer, (uint) (12 * _verts.Length), _verts, BufferUsage.StaticDraw);
-            
-            Gl.EnableVertexAttribArray(0);
-            Gl.VertexAttribPointer(0, 3, VertexAttribType.Float, false, 0, IntPtr.Zero);
         }
 
         private void CreateShaders()
@@ -144,6 +126,7 @@ namespace FBXViewer.OpenGL
 
         public void LoadMesh(Mesh mesh)
         {
+            _meshes.Add(GLMesh.Create(mesh));
         }
 
         public void SetShapeKeyWeight(Mesh mesh, float weight, MeshAnimationAttachment attachment)
