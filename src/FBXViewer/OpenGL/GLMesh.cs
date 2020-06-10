@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Numerics;
 using Assimp;
 using OpenGL;
@@ -11,12 +12,15 @@ namespace FBXViewer.OpenGL
 {
     public class GLMesh
     {
-        private uint? _vao;
+        private uint? _vertexBuffer;
+        private uint _indexBuffer;
         private readonly Vector3[] _vertexArray;
+        private readonly uint[] _indexArray;
 
-        private GLMesh(Vector3[] vertexArray)
+        private GLMesh(Vector3[] vertexArray, uint[] indexArray)
         {
             _vertexArray = vertexArray;
+            _indexArray = indexArray;
             ModelMatrix = Matrix4x4.Identity;
         }
 
@@ -24,33 +28,39 @@ namespace FBXViewer.OpenGL
 
         public void Render()
         {
-            if (_vao == null)
+            if (_vertexBuffer == null)
             {
-                _vao = CreateVao(_vertexArray);
+                CreateBuffers();
             }
             Gl.EnableVertexAttribArray(0);
             var err = Gl.GetError();
-            Gl.BindBuffer(BufferTarget.ArrayBuffer, _vao.Value);
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer.Value);
             Gl.VertexAttribPointer(0, 3, VertexAttribType.Float, false, 0, IntPtr.Zero);
             
-            Gl.DrawArrays(PrimitiveType.Triangles, 0, _vertexArray.Length);
+            Gl.BindBuffer(BufferTarget.ElementArrayBuffer, _indexBuffer);
+            
+            Gl.DrawElements(PrimitiveType.Triangles, _indexArray.Length, DrawElementsType.UnsignedInt, IntPtr.Zero);
             
             Gl.DisableVertexAttribArray(0);
         }
 
         public static GLMesh Create(Mesh mesh)
         {
-            var vertices = new List<Vector3>(mesh.Faces.Count * 4);
+            var vertexIndexes = new List<uint>(mesh.Faces.Count * 4);
+            var uvs = new List<Vector2>(mesh.Faces.Count * 4);
             foreach (var face in mesh.Faces)
             {
-                vertices.Add(mesh.Vertices[face.Indices[0]].AsVector3());
-                vertices.Add(mesh.Vertices[face.Indices[1]].AsVector3());
-                vertices.Add(mesh.Vertices[face.Indices[2]].AsVector3());
+                void Add(params int[] index)
+                {
+                    for (int i = 0; i < index.Length; i++)
+                    {
+                        vertexIndexes.Add((uint)face.Indices[index[i]]); 
+                    }
+                }
+                Add(0, 1, 2);
                 if (face.IndexCount == 4)
                 {
-                    vertices.Add(mesh.Vertices[face.Indices[0]].AsVector3());
-                    vertices.Add(mesh.Vertices[face.Indices[2]].AsVector3());
-                    vertices.Add(mesh.Vertices[face.Indices[3]].AsVector3());
+                    Add(0, 2,3);
                 }
 
                 if (face.IndexCount > 4)
@@ -59,20 +69,21 @@ namespace FBXViewer.OpenGL
                 }
             }
 
-            var vertexArray = vertices.ToArray();
+            var indexArray = vertexIndexes.ToArray();
+            var vertexArray = mesh.Vertices.Select(v => v.AsVector3()).ToArray();
 
-            return new GLMesh(vertexArray);
+            return new GLMesh(vertexArray, indexArray);
         }
 
-        private static uint CreateVao(Vector3[] vertexArray)
+        private void CreateBuffers()
         {
-            var vao = Gl.GenVertexArray();
-            Gl.BindVertexArray(vao);
+            _vertexBuffer = Gl.GenBuffer();
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer.Value);
+            Gl.BufferData(BufferTarget.ArrayBuffer, (uint) (_vertexArray.Length * 12), _vertexArray, BufferUsage.StaticDraw);
 
-            uint vertexBuffer = Gl.GenBuffer();
-            Gl.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
-            Gl.BufferData(BufferTarget.ArrayBuffer, (uint) (vertexArray.Length * 12), vertexArray, BufferUsage.StaticDraw);
-            return vao;
+            _indexBuffer = Gl.GenBuffer();
+            Gl.BindBuffer(BufferTarget.ElementArrayBuffer, _indexBuffer);
+            Gl.BufferData(BufferTarget.ElementArrayBuffer, (uint) (_indexArray.Length * sizeof(int)), _indexArray, BufferUsage.StaticDraw);
         }
     }
 }
