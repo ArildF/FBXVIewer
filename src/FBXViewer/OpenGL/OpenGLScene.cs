@@ -16,8 +16,11 @@ namespace FBXViewer.OpenGL
 {
     public class OpenGLScene : IScene
     {
-        public OpenGLScene()
+        private readonly MeshLoader _meshLoader;
+
+        public OpenGLScene(MeshLoader meshLoader)
         {
+            _meshLoader = meshLoader;
             var glControl = new GlControl
             {
                 Animation = true,
@@ -133,7 +136,7 @@ namespace FBXViewer.OpenGL
 
         public void LoadMesh(Mesh mesh)
         {
-            _meshes.Add(GLMesh.Create(mesh));
+            _meshes.Add(_meshLoader.Create(mesh));
         }
 
         public void SetShapeKeyWeight(Mesh mesh, float weight, MeshAnimationAttachment attachment)
