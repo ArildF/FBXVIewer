@@ -20,10 +20,12 @@ namespace FBXViewer.OpenGL
         {
             var glControl = new GlControl
             {
-                Animation = true
+                Animation = true,
+                DepthBits = 24,
             };
             glControl.ContextCreated += GlControlOnContextCreated;
             glControl.Render += GlControlOnRender;
+            
 
             var grid = new Grid();
             grid.Background = Brushes.Aqua;
