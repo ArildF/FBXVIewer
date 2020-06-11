@@ -22,6 +22,7 @@ namespace FBXViewer.OpenGL
             {
                 Animation = true,
                 DepthBits = 24,
+                MultisampleBits = 32,
             };
             glControl.ContextCreated += GlControlOnContextCreated;
             glControl.Render += GlControlOnRender;
@@ -84,6 +85,8 @@ namespace FBXViewer.OpenGL
             CreateShaders();
             Gl.Enable(EnableCap.DepthTest);
             Gl.DepthFunc(DepthFunction.Less);
+            
+            Gl.Enable(EnableCap.Multisample);
         }
 
         private void CreateShaders()
