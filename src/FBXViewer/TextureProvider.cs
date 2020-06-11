@@ -29,7 +29,7 @@ namespace FBXViewer
             _fileName = filename;
             _currentScene = scene;
         }
-        public ImageSource? GetDiffuseTexture(Mesh mesh)
+        public BitmapSource? GetDiffuseTexture(Mesh mesh)
         {
             if (mesh.MaterialIndex < _currentScene?.MaterialCount)
             {
@@ -52,13 +52,13 @@ namespace FBXViewer
             return null;
         }
 
-        private ImageSource TryLoadFromDisk(Material material)
+        private BitmapSource? TryLoadFromDisk(Material material)
         {
             return DoTryLoadFromDisk(material).FirstOrDefault();
         }
-        private IEnumerable<ImageSource> DoTryLoadFromDisk(Material material)
+        private IEnumerable<BitmapSource> DoTryLoadFromDisk(Material material)
         {
-            ImageSource? LoadIfExists(string path)
+            BitmapSource? LoadIfExists(string path)
             {
                 if (File.Exists(path))
                 {
