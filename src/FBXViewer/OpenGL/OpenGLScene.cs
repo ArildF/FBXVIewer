@@ -17,27 +17,28 @@ namespace FBXViewer.OpenGL
     public class OpenGLScene : IScene
     {
         private readonly MeshLoader _meshLoader;
+        private bool _contextCreated;
 
         public OpenGLScene(MeshLoader meshLoader)
         {
             _meshLoader = meshLoader;
-            var glControl = new GlControl
+            _glControl = new GlControl
             {
                 Animation = true,
                 DepthBits = 24,
                 MultisampleBits = 32,
             };
-            glControl.ContextCreated += GlControlOnContextCreated;
-            glControl.Render += GlControlOnRender;
+            _glControl.ContextCreated += GlControlOnContextCreated;
+            _glControl.Render += GlControlOnRender;
             
 
             var grid = new Grid();
             grid.Background = Brushes.Aqua;
 
             var winformsHost = new WindowsFormsHost();
-            winformsHost.Child = glControl;
+            winformsHost.Child = _glControl;
 
-            MouseInput = new WinFormsMouseInput(glControl);
+            MouseInput = new WinFormsMouseInput(_glControl);
             
             grid.Children.Add(winformsHost);
 
@@ -54,7 +55,7 @@ namespace FBXViewer.OpenGL
         private readonly OpenGLRendererCamera _openGLCamera;
         private uint _program;
         private readonly List<GLMesh> _meshes = new List<GLMesh>();
-
+        private readonly GlControl _glControl;
 
         private void GlControlOnRender(object? sender, GlControlEventArgs e)
         {
@@ -73,13 +74,14 @@ namespace FBXViewer.OpenGL
             Gl.UseProgram(_program);
             
             var location = Gl.GetUniformLocation(_program, "MVP");
+            var diffuseSampler = Gl.GetUniformLocation(_program, "diffuseTextureSampler");
 
             foreach (var glMesh in _meshes)
             {
                 var modelMatrix = matrix * glMesh.ModelMatrix;
                 Gl.UniformMatrix4f(location, 1, true, modelMatrix);
 
-                glMesh.Render();
+                glMesh.Render(diffuseSampler);
             }
         }
 
@@ -90,6 +92,8 @@ namespace FBXViewer.OpenGL
             Gl.DepthFunc(DepthFunction.Less);
             
             Gl.Enable(EnableCap.Multisample);
+
+            _contextCreated = true;
         }
 
         private void CreateShaders()
@@ -136,7 +140,15 @@ namespace FBXViewer.OpenGL
 
         public void LoadMesh(Mesh mesh)
         {
-            _meshes.Add(_meshLoader.Create(mesh));
+            void AddMesh(Mesh m) => _meshes.Add(_meshLoader.Create(m));
+            if (_contextCreated)
+            {
+                AddMesh(mesh);
+            }
+            else
+            {
+                _glControl.ContextCreated += (sender, args) => AddMesh(mesh);
+            }
         }
 
         public void SetShapeKeyWeight(Mesh mesh, float weight, MeshAnimationAttachment attachment)
