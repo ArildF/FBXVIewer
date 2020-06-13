@@ -20,6 +20,20 @@ namespace FBXViewer.OpenGL
         private readonly MeshLoader _meshLoader;
         private bool _contextCreated;
 
+        private class MeshEntry
+        {
+            public readonly Mesh Mesh;
+            public readonly GLMesh GLMesh;
+            public bool Enabled;
+
+            public MeshEntry(Mesh mesh, GLMesh glMesh)
+            {
+                Mesh = mesh;
+                GLMesh = glMesh;
+                Enabled = true;
+            }
+        }
+
         public OpenGLScene(MeshLoader meshLoader)
         {
             _meshLoader = meshLoader;
@@ -54,7 +68,7 @@ namespace FBXViewer.OpenGL
 
         private readonly OpenGLRendererCamera _openGLCamera;
         private uint _program;
-        private readonly List<GLMesh> _meshes = new List<GLMesh>();
+        private readonly List<MeshEntry> _meshes = new List<MeshEntry>();
         private readonly GlControl _glControl;
 
         private void GlControlOnRender(object? sender, GlControlEventArgs e)
@@ -76,12 +90,12 @@ namespace FBXViewer.OpenGL
             var location = Gl.GetUniformLocation(_program, "MVP");
             var diffuseSampler = Gl.GetUniformLocation(_program, "diffuseTextureSampler");
 
-            foreach (var glMesh in _meshes)
+            foreach (var meshEntry in _meshes.Where(m => m.Enabled))
             {
-                var modelMatrix = matrix * glMesh.ModelMatrix;
+                var modelMatrix = matrix * meshEntry.GLMesh.ModelMatrix;
                 Gl.UniformMatrix4f(location, 1, true, modelMatrix);
 
-                glMesh.Render(diffuseSampler);
+                meshEntry.GLMesh.Render(diffuseSampler);
             }
         }
 
@@ -140,7 +154,13 @@ namespace FBXViewer.OpenGL
 
         public void LoadMesh(Mesh mesh)
         {
-            void AddMesh(Mesh m) => _meshes.Add(_meshLoader.Create(m));
+            var entry = _meshes.FirstOrDefault(m => m.Mesh == mesh);
+            if (entry != null)
+            {
+                entry.Enabled = true;
+                return;
+            }
+            void AddMesh(Mesh m) => _meshes.Add(new MeshEntry(m, _meshLoader.Create(m)));
             if (_contextCreated)
             {
                 AddMesh(mesh);
@@ -157,6 +177,11 @@ namespace FBXViewer.OpenGL
 
         public void UnloadMesh(Mesh mesh)
         {
+            var entry = _meshes.FirstOrDefault(m => m.Mesh == mesh);
+            if (entry != null)
+            {
+                entry.Enabled = false;
+            }
         }
 
         public bool RayCast(Vector2 mousePos, out RayCastResult rayCastResult)
