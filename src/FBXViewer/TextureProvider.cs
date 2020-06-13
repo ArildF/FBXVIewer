@@ -8,20 +8,22 @@ using Assimp;
 
 namespace FBXViewer
 {
-    public class TextureProvider
+    public class TextureProvider<TBitmap> where TBitmap : class
     {
         // private readonly List<Scene> _scenes = new List<Scene>();
 
         private TextureSearcher _textureSearcher;
+        private readonly ITextureLoader<TBitmap> _loader;
 
         private Scene? _currentScene;
         private string? _fileName;
         
         private readonly List<string> _searchDirectories = new List<string>();
 
-        public TextureProvider(TextureSearcher textureSearcher)
+        public TextureProvider(TextureSearcher textureSearcher, ITextureLoader<TBitmap> loader)
         {
             _textureSearcher = textureSearcher;
+            _loader = loader;
         }
 
         public void LoadScene(string filename, Scene scene)
@@ -29,7 +31,7 @@ namespace FBXViewer
             _fileName = filename;
             _currentScene = scene;
         }
-        public BitmapSource? GetDiffuseTexture(Mesh mesh)
+        public TBitmap? GetDiffuseTexture(Mesh mesh)
         {
             if (mesh.MaterialIndex < _currentScene?.MaterialCount)
             {
@@ -40,11 +42,8 @@ namespace FBXViewer
                 {
                     return TryLoadFromDisk(material);
                 }
-                
-                var bitmapImage = new BitmapImage();
-                bitmapImage.BeginInit();
-                bitmapImage.StreamSource = new MemoryStream(texture.CompressedData);
-                bitmapImage.EndInit();
+
+                var bitmapImage = _loader.FromStream(new MemoryStream(texture.CompressedData));
 
                 return bitmapImage;
             }
@@ -52,17 +51,17 @@ namespace FBXViewer
             return null;
         }
 
-        private BitmapSource? TryLoadFromDisk(Material material)
+        private TBitmap? TryLoadFromDisk(Material material)
         {
             return DoTryLoadFromDisk(material).FirstOrDefault();
         }
-        private IEnumerable<BitmapSource> DoTryLoadFromDisk(Material material)
+        private IEnumerable<TBitmap> DoTryLoadFromDisk(Material material)
         {
-            BitmapSource? LoadIfExists(string path)
+            TBitmap? LoadIfExists(string path)
             {
                 if (File.Exists(path))
                 {
-                    return new BitmapImage(new Uri(path));
+                    return _loader.FromPath(path);
                 }
 
                 return null;

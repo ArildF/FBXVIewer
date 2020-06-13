@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Windows.Media.Imaging;
 using Assimp;
 
 namespace FBXViewer
@@ -13,11 +14,11 @@ namespace FBXViewer
         private readonly Func<List<Mesh>, MeshesNode> _meshesFactory;
         private readonly Func<List<Material>, MaterialsNode> _materialsFactory;
         private readonly Func<List<EmbeddedTexture>, TexturesNode> _texturesFactory;
-        private readonly TextureProvider _textureProvider;
+        private readonly TextureProvider<BitmapSource> _textureProvider;
         private readonly MaterialProvider _materialProvider;
 
         public AssImpFileNode(Func<List<Mesh>, MeshesNode> meshesFactory, Func<List<Material>, MaterialsNode> materialsFactory, 
-            Func<List<EmbeddedTexture>, TexturesNode> texturesFactory, TextureProvider textureProvider, MaterialProvider materialProvider)
+            Func<List<EmbeddedTexture>, TexturesNode> texturesFactory, TextureProvider<BitmapSource> textureProvider, MaterialProvider materialProvider)
         {
             _meshesFactory = meshesFactory;
             _materialsFactory = materialsFactory;

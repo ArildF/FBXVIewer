@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using Assimp;
 using Quaternion = System.Windows.Media.Media3D.Quaternion;
@@ -15,7 +16,7 @@ namespace FBXViewer.Wpf
 {
     public class WpfScene : IScene
     {
-        private readonly TextureProvider _textureProvider;
+        private readonly TextureProvider<BitmapSource> _textureProvider;
         private readonly WpfRendererCamera _rendererCamera;
         private readonly Dictionary<Mesh, MeshEntry> _meshes = new Dictionary<Mesh, MeshEntry>();
         private readonly Model3DGroup _meshModelGroup;
@@ -28,7 +29,7 @@ namespace FBXViewer.Wpf
 
         public ILight CameraLight { get; }
 
-        public WpfScene(TextureProvider textureProvider)
+        public WpfScene(TextureProvider<BitmapSource> textureProvider)
         {
             _viewPort = new Viewport3D();
             

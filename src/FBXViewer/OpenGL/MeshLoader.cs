@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
+using System.Windows.Media.Imaging;
 using Assimp;
 using OpenGL;
 
@@ -10,9 +11,9 @@ namespace FBXViewer.OpenGL
 {
     public class MeshLoader
     {
-        private readonly TextureProvider _textureProvider;
+        private readonly TextureProvider<BitmapSource> _textureProvider;
 
-        public MeshLoader(TextureProvider textureProvider)
+        public MeshLoader(TextureProvider<BitmapSource> textureProvider)
         {
             _textureProvider = textureProvider;
         }
