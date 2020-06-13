@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Windows;
@@ -30,17 +31,16 @@ namespace FBXViewer.OpenGL
             };
             _glControl.ContextCreated += GlControlOnContextCreated;
             _glControl.Render += GlControlOnRender;
-            
 
-            var grid = new Grid();
-            grid.Background = Brushes.Aqua;
 
-            var winformsHost = new WindowsFormsHost();
-            winformsHost.Child = _glControl;
+            var grid = new Grid {Background = Brushes.Aqua};
+
+            var windowsFormsHost = new WindowsFormsHost();
+            windowsFormsHost.Child = _glControl;
 
             MouseInput = new WinFormsMouseInput(_glControl);
             
-            grid.Children.Add(winformsHost);
+            grid.Children.Add(windowsFormsHost);
 
             Visual = grid;
 
@@ -111,7 +111,7 @@ namespace FBXViewer.OpenGL
 
                 Gl.GetShader(id, ShaderParameterName.CompileStatus, out int result);
                 Debug.WriteLine($"Compile status: {result == Gl.TRUE}");
-                Gl.GetShaderInfoLog(id, sb.Capacity, out int length, sb);
+                Gl.GetShaderInfoLog(id, sb.Capacity, out int _, sb);
                 Debug.WriteLine(sb.ToString());
             }
             
@@ -167,7 +167,20 @@ namespace FBXViewer.OpenGL
 
         public Bounds GetBoundingBox(Mesh mesh)
         {
-            return new Bounds(1, 1, 1, new Vector3(0, 0, 0));
+            IEnumerable<float> Element(Func<Vector3D, float> f)
+            {
+                return mesh.Vertices.Select(f);
+            }
+
+            var xMin = Element(v => v.X).Min();
+            var xMax = Element(v => v.X).Max();
+            var yMin = Element(v => v.Y).Min();
+            var yMax = Element(v => v.Y).Max();
+            var zMin = Element(v => v.Z).Min();
+            var zMax = Element(v => v.Z).Max();
+                
+            return new Bounds(xMax - xMin, yMax - yMin, zMax - zMin, 
+                new Vector3((xMin + xMax) / 2, (yMin + yMax) / 2, (zMin + zMax) / 2));
         }
 
         public void ToggleWireFrame(in bool wireFrameEnabled)
