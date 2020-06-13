@@ -6,5 +6,6 @@ uniform sampler2D diffuseTextureSampler;
 
 void main()
 {
-  color = texture(diffuseTextureSampler, UV).rgb;
+  float y = 1.0 - UV.y;
+  color = texture(diffuseTextureSampler, vec2(UV.x, y)).rgb;
 }
