@@ -1,19 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Numerics;
-using System.Windows.Media.Imaging;
 using Assimp;
 using OpenGL;
+using PixelFormat = OpenGL.PixelFormat;
 
 namespace FBXViewer.OpenGL
 {
     public class MeshLoader
     {
-        private readonly TextureProvider<BitmapSource> _textureProvider;
+        private readonly TextureProvider<Bitmap> _textureProvider;
 
-        public MeshLoader(TextureProvider<BitmapSource> textureProvider)
+        public MeshLoader(TextureProvider<Bitmap> textureProvider)
         {
             _textureProvider = textureProvider;
         }
@@ -72,21 +74,25 @@ namespace FBXViewer.OpenGL
             {
                 return null;
             }
-            int stride = bitmap.PixelWidth * ((bitmap.Format.BitsPerPixel + 7) / 8);
-            byte[] pixels = new byte[stride * bitmap.PixelHeight];
-            bitmap.CopyPixels(pixels, stride, 0);
 
             uint textureId = Gl.GenTexture();
             Gl.BindTexture(TextureTarget.Texture2d, textureId);
 
-            var (internalFormat, pixelFormat) = bitmap.Format.BitsPerPixel switch
+            var (internalFormat, pixelFormat) = bitmap.PixelFormat switch
             {
-                32 => (InternalFormat.Rgba, PixelFormat.Bgra),
-                24 => (InternalFormat.Rgb, PixelFormat.Bgr),
+                System.Drawing.Imaging.PixelFormat.Format32bppArgb => (InternalFormat.Rgba, PixelFormat.Bgr),
+                System.Drawing.Imaging.PixelFormat.Format24bppRgb => (InternalFormat.Rgb, PixelFormat.Bgr),
+                // 4 => (InternalFormat.Rgba, PixelFormat.Rgba),
+                // 3 => (InternalFormat.Rgb, PixelFormat.Rgb),
                 _ => throw new ArgumentException(nameof(bitmap))
             };
-            Gl.TexImage2D(TextureTarget.Texture2d, 0, internalFormat, bitmap.PixelWidth, bitmap.PixelHeight,
-                0, pixelFormat, PixelType.UnsignedByte, pixels);
+            var bits = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height),
+                ImageLockMode.ReadOnly, bitmap.PixelFormat);
+            {
+                Gl.TexImage2D(TextureTarget.Texture2d, 0, internalFormat, bitmap.Width, bitmap.Height,
+                    0, pixelFormat, PixelType.UnsignedByte, bits.Scan0);
+            }
+
             var error = Gl.GetError();
             if (error != ErrorCode.NoError)
             {

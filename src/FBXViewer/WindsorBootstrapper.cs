@@ -1,3 +1,4 @@
+using System.Drawing;
 using System.Windows.Media.Imaging;
 using Castle.Facilities.TypedFactory;
 using Castle.MicroKernel.Registration;
@@ -25,9 +26,12 @@ namespace FBXViewer
             container.Register(Component.For<TextureSearcher>().LifestyleSingleton());
             container.Register(Component.For<MaterialProvider>().LifestyleSingleton());
             container.Register(Component.For<Coroutines>().LifestyleSingleton());
+            container.Register(Component.For<SceneContext>().LifestyleSingleton());
 
             container.Register(Component.For<ITextureLoader<BitmapSource>>()
                 .ImplementedBy<BitmapSourceTextureLoader>());
+            container.Register(Component.For<ITextureLoader<Bitmap>>()
+                .ImplementedBy<BitmapTextureLoader>());
             
             container.Kernel.AddFacility<TypedFactoryFacility>();
 

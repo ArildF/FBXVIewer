@@ -12,31 +12,30 @@ namespace FBXViewer
     {
         // private readonly List<Scene> _scenes = new List<Scene>();
 
-        private TextureSearcher _textureSearcher;
+        private readonly TextureSearcher _textureSearcher;
         private readonly ITextureLoader<TBitmap> _loader;
-
-        private Scene? _currentScene;
-        private string? _fileName;
+        private readonly SceneContext _sceneContext;
         
         private readonly List<string> _searchDirectories = new List<string>();
 
-        public TextureProvider(TextureSearcher textureSearcher, ITextureLoader<TBitmap> loader)
+        public TextureProvider(TextureSearcher textureSearcher, ITextureLoader<TBitmap> loader, SceneContext sceneContext)
         {
             _textureSearcher = textureSearcher;
             _loader = loader;
+            _sceneContext = sceneContext;
         }
 
-        public void LoadScene(string filename, Scene scene)
-        {
-            _fileName = filename;
-            _currentScene = scene;
-        }
         public TBitmap? GetDiffuseTexture(Mesh mesh)
         {
-            if (mesh.MaterialIndex < _currentScene?.MaterialCount)
+            var scene = _sceneContext.CurrentScene;
+            if (scene == null)
             {
-                var material = _currentScene.Materials[mesh.MaterialIndex];
-                var texture = _currentScene.Textures.FirstOrDefault(
+                return null;
+            }
+            if (mesh.MaterialIndex < scene.MaterialCount)
+            {
+                var material = scene.Materials[mesh.MaterialIndex];
+                var texture = scene.Textures.FirstOrDefault(
                     t => t.Filename == material.TextureDiffuse.FilePath);
                 if (texture == null)
                 {
@@ -80,7 +79,7 @@ namespace FBXViewer
 
             var textureFileName = Path.GetFileName(material.TextureDiffuse.FilePath);
 
-            var fbxDirectory = Path.GetDirectoryName(_fileName);
+            var fbxDirectory = Path.GetDirectoryName(textureFileName);
 
             if (fbxDirectory != null)
             {
