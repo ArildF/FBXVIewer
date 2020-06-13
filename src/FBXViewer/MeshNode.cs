@@ -36,7 +36,7 @@ namespace FBXViewer
                     _isSelected = value;
                     if (_isSelected)
                     {
-                        _modelPreview.LoadMesh(_mesh);
+                        _modelPreview.LoadMesh(_mesh, true);
                     }
                     else if (!IsChecked)
                     {
@@ -60,7 +60,7 @@ namespace FBXViewer
                     this.RaiseAndSetIfChanged(ref _isChecked, value);
                     if (_isChecked)
                     {
-                        _modelPreview.LoadMesh(_mesh);
+                        _modelPreview.LoadMesh(_mesh, false);
                     }
                     else
                     {

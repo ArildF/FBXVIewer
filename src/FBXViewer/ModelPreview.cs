@@ -201,9 +201,13 @@ namespace FBXViewer
             }
         }
 
-        public void LoadMesh(Mesh mesh)
+        public void LoadMesh(Mesh mesh, bool resetCamera)
         {
             _scene.LoadMesh(mesh);
+            if (!resetCamera)
+            {
+                return;
+            }
 
             var bounds = _scene.GetBoundingBox(mesh);
 
