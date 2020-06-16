@@ -22,11 +22,11 @@ namespace FBXViewer.OpenGL
             var m = new Matrix4x4();
             m.M11 = 2.0f * near / (xMax - xMin);
             m.M22 = 2.0f * near / (yMax - yMin);
-            m.M31 = (xMax + xMin) / (xMax - xMin);
-            m.M32 = (yMax + yMin) / (yMax - yMin);
+            m.M13 = (xMax + xMin) / (xMax - xMin);
+            m.M23 = (yMax + yMin) / (yMax - yMin);
             m.M33 = (-far - near) / (far - near);
-            m.M34 = -1.0f;
-            m.M43 = -2.0f * far * near / (far - near);
+            m.M43 = -1.0f;
+            m.M34 = -2.0f * far * near / (far - near);
             return m;
         }
 
