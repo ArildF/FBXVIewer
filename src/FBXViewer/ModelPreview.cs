@@ -217,7 +217,9 @@ namespace FBXViewer
             var cameraOffset = biggestExtent * 2f;
             var cameraPosition = center + new Vector3(0, 0, (float)cameraOffset);
 
-            _camera.ResetTo(cameraPosition, center);
+            var orthoWidth = bounds.SizeX * 2.0f;
+
+            _camera.ResetTo(cameraPosition, center, orthoWidth);
         }
 
         public void UnloadMesh(Mesh mesh)

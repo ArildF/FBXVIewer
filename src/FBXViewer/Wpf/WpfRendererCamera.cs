@@ -31,6 +31,12 @@ namespace FBXViewer.Wpf
 
         public Vector3 Position => _currentCamera.Position.AsVector3();
 
+        public float OrthographicWidth
+        {
+            get => (float) _orthographicCamera.Width;
+            set => _orthographicCamera.Width = value;
+        }
+
         public void Move(Vector3 position, Vector3 lookDirection, Vector3 upDirection)
         {
             _currentCamera.Position = position.AsPoint3D();

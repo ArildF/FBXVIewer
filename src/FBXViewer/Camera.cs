@@ -144,12 +144,13 @@ namespace FBXViewer
             MoveTo(newPosition,point);
         }
 
-        public void ResetTo(Vector3 cameraPosition, Vector3 pivot)
+        public void ResetTo(Vector3 cameraPosition, Vector3 pivot, float orthoWidth)
         {
             _pivot = pivot;
             var lookDir = pivot - cameraPosition;
             var rotation = lookDir.ToLookRotation(Vector3.UnitY);
             MoveCamera(cameraPosition, rotation, _pivot, animate: true);
+            _rendererCamera.OrthographicWidth = orthoWidth;
 
             _originalPosition = _position;
             _originalRotation = _rotation;

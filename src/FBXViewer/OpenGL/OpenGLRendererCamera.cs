@@ -10,7 +10,7 @@ namespace FBXViewer.OpenGL
         private Vector3 _lookDirection;
         private Vector3 _position;
 
-        private float _orthoWidth = 1f;
+        public float OrthographicWidth { get; set; } = 20f; 
         public Vector3 Position => _position;
         public bool IsOrthographic => _projection == _orthoProjection;
 
@@ -31,10 +31,10 @@ namespace FBXViewer.OpenGL
             _projection = _perspectiveProjection;
 
             _orthoProjection = (w, h) => Matrix.OrthographicProjection(
-                 - _orthoWidth / 2,
-                _orthoWidth / 2,
-                -(_orthoWidth * (h / w)) / 2.0f,
-                (_orthoWidth * (h /w)) / 2.0f,
+                 - OrthographicWidth / 2,
+                OrthographicWidth / 2,
+                -(OrthographicWidth * (h / w)) / 2.0f,
+                (OrthographicWidth * (h /w)) / 2.0f,
                 -1,
                 100000
             );
@@ -54,8 +54,8 @@ namespace FBXViewer.OpenGL
 
         public void AdjustWidth(in float delta)
         {
-            _orthoWidth = Math.Max(0, _orthoWidth + delta);
-            Debug.WriteLine(_orthoWidth);
+            OrthographicWidth = Math.Max(0, OrthographicWidth + delta);
+            Debug.WriteLine(OrthographicWidth);
         }
 
         public Matrix4x4 ViewMatrix => Matrix.LookAtDirection(_position, _lookDirection, _upDirection);
