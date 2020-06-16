@@ -9,6 +9,23 @@ namespace FBXViewer.OpenGL
         {
             return angle / 180.0f * (float)Math.PI;
         }
+        
+        public static Matrix4x4 OrthographicProjection(in float left, in float right, in float bottom, in float top, 
+            in float near, in float far)
+        {
+            var m = new Matrix4x4
+            {
+                M11 = 2.0f / (right - left),
+                M22 = 2.0f / (top - bottom),
+                M33 = -2.0f / (far - near),
+                M14 = -(right + left) / (right - left),
+                M24 = -(top + bottom) / (top - bottom),
+                M34 = -(far + near) / (far - near),
+                M44 = 1.0f
+            };
+
+            return m;
+        }
         public static Matrix4x4 PerspectiveProjection(in float fovY, in float aspectRatio, in float near, in float far)
         {
             float yMax = near * (float) Math.Tan(Radians(fovY / 2.0f));

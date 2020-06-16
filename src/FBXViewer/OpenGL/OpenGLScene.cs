@@ -11,6 +11,7 @@ using System.Windows.Forms.Integration;
 using Assimp;
 using OpenGL;
 using Brushes = System.Windows.Media.Brushes;
+using Matrix4x4 = System.Numerics.Matrix4x4;
 using Quaternion = System.Windows.Media.Media3D.Quaternion;
 
 namespace FBXViewer.OpenGL
@@ -83,7 +84,12 @@ namespace FBXViewer.OpenGL
             Gl.Viewport(vpx, vpy, vpw, vph);
             Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            var matrix = _openGLCamera.ProjectionMatrix(vpw, vph) * _openGLCamera.ViewMatrix;
+            var matrix = _openGLCamera.ProjectionMatrix(vpw, vph);
+            matrix *= _openGLCamera.ViewMatrix;
+
+            var vec = new Vector4(1, 1, 1, 1);
+
+            var ndc = Vector4.Transform(vec, matrix);
 
             Gl.UseProgram(_program);
             

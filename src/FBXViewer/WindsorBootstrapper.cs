@@ -4,6 +4,7 @@ using Castle.Facilities.TypedFactory;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using FBXViewer.OpenGL;
+using FBXViewer.Wpf;
 
 namespace FBXViewer
 {
