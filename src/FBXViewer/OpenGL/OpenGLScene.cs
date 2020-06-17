@@ -96,6 +96,7 @@ namespace FBXViewer.OpenGL
             var mLocation = Gl.GetUniformLocation(_program, "M");
             var vLocation = Gl.GetUniformLocation(_program, "V");
             var pLocation = Gl.GetUniformLocation(_program, "P");
+            var lightPositionLocation = Gl.GetUniformLocation(_program, "LightPosition_worldSpace");
             var diffuseSampler = Gl.GetUniformLocation(_program, "diffuseTextureSampler");
 
             foreach (var meshEntry in _meshes.Where(m => m.Enabled))
@@ -104,6 +105,7 @@ namespace FBXViewer.OpenGL
                 Gl.UniformMatrix4f(mLocation, 1, true, modelMatrix);
                 Gl.UniformMatrix4f(pLocation, 1, true, projectionMatrix);
                 Gl.UniformMatrix4f(vLocation, 1, true, viewMatrix);
+                Gl.Uniform3f(lightPositionLocation, 1, new Vector3(-50, 200, 50));
 
                 meshEntry.GLMesh.Render(diffuseSampler);
             }
