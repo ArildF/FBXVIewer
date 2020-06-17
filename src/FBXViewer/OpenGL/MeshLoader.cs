@@ -49,6 +49,7 @@ namespace FBXViewer.OpenGL
             var vertexArray = mesh.Vertices.Select(v => v.AsVector3()).ToArray();
             var uvArray = mesh.TextureCoordinateChannels[0]
                 .Select(uv => new Vector2(uv.X, uv.Y)).ToArray();
+            var normalArray = mesh.Normals.Select(n => n.AsVector3()).ToArray();
             
             uint vertexBuffer = Gl.GenBuffer();
             Gl.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
@@ -62,9 +63,13 @@ namespace FBXViewer.OpenGL
             Gl.BindBuffer(BufferTarget.ArrayBuffer, uvBuffer);
             Gl.BufferData(BufferTarget.ArrayBuffer, (uint)(uvArray.Length * 8), uvArray, BufferUsage.StaticDraw);
 
+            uint normalBuffer = Gl.GenBuffer();
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, normalBuffer);
+            Gl.BufferData(BufferTarget.ArrayBuffer, (uint) (normalArray.Length * 12), normalArray, BufferUsage.StaticDraw);
+
             uint? textureId = LoadTexture(mesh);
 
-            return new GLMesh(vertexBuffer, indexBuffer, uvBuffer, indexArray.Length) {DiffuseTextureId = textureId};
+            return new GLMesh(vertexBuffer, indexBuffer, uvBuffer, normalBuffer, indexArray.Length) {DiffuseTextureId = textureId};
         }
 
         private uint? LoadTexture(Mesh mesh)

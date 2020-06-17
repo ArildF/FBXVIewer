@@ -10,14 +10,16 @@ namespace FBXViewer.OpenGL
         private readonly uint _vertexBuffer;
         private readonly uint _indexBuffer;
         private readonly  uint _uvBuffer;
+        private readonly uint _normalBuffer;
         private readonly int _indexCount;
 
 
-        public GLMesh(in uint vertexBuffer, in uint indexBuffer, in uint uvBuffer, int indexCount)
+        public GLMesh(in uint vertexBuffer, in uint indexBuffer, in uint uvBuffer, in uint normalBuffer, int indexCount)
         {
             _vertexBuffer = vertexBuffer;
             _indexBuffer = indexBuffer;
             _uvBuffer = uvBuffer;
+            _normalBuffer = normalBuffer;
             _indexCount = indexCount;
             ModelMatrix = Matrix4x4.Identity;
         }
@@ -34,6 +36,10 @@ namespace FBXViewer.OpenGL
             Gl.EnableVertexAttribArray(1);
             Gl.BindBuffer(BufferTarget.ArrayBuffer, _uvBuffer);
             Gl.VertexAttribPointer(1, 2, VertexAttribType.Float, false, 0, IntPtr.Zero);
+            
+            Gl.EnableVertexAttribArray(2);
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, _normalBuffer);
+            Gl.VertexAttribPointer(2, 3, VertexAttribType.Float, false, 0, IntPtr.Zero);
             
             Gl.BindBuffer(BufferTarget.ElementArrayBuffer, _indexBuffer);
 
