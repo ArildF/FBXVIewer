@@ -84,22 +84,26 @@ namespace FBXViewer.OpenGL
             Gl.Viewport(vpx, vpy, vpw, vph);
             Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            var matrix = _openGLCamera.ProjectionMatrix(vpw, vph);
-            matrix *= _openGLCamera.ViewMatrix;
+            var projectionMatrix = _openGLCamera.ProjectionMatrix(vpw, vph);
+            var viewMatrix = _openGLCamera.ViewMatrix;
 
             var vec = new Vector4(1, 1, 1, 1);
 
-            var ndc = Vector4.Transform(vec, matrix);
+            var ndc = Vector4.Transform(vec, projectionMatrix);
 
             Gl.UseProgram(_program);
             
-            var location = Gl.GetUniformLocation(_program, "MVP");
+            var mLocation = Gl.GetUniformLocation(_program, "M");
+            var vLocation = Gl.GetUniformLocation(_program, "V");
+            var pLocation = Gl.GetUniformLocation(_program, "P");
             var diffuseSampler = Gl.GetUniformLocation(_program, "diffuseTextureSampler");
 
             foreach (var meshEntry in _meshes.Where(m => m.Enabled))
             {
-                var modelMatrix = matrix * meshEntry.GLMesh.ModelMatrix;
-                Gl.UniformMatrix4f(location, 1, true, modelMatrix);
+                var modelMatrix = meshEntry.GLMesh.ModelMatrix;
+                Gl.UniformMatrix4f(mLocation, 1, true, modelMatrix);
+                Gl.UniformMatrix4f(pLocation, 1, true, projectionMatrix);
+                Gl.UniformMatrix4f(vLocation, 1, true, viewMatrix);
 
                 meshEntry.GLMesh.Render(diffuseSampler);
             }
