@@ -23,6 +23,7 @@ namespace FBXViewer
             container.Register(Component.For<IScene>().ImplementedBy<OpenGLScene>().LifestyleSingleton());
             // container.Register(Component.For<IScene>().ImplementedBy<WpfScene>().LifestyleSingleton());
             container.Register(Component.For<MeshLoader>().LifestyleSingleton());
+            container.Register(Component.For<TextureLoader>().LifestyleSingleton());
             container.Register(Component.For(typeof(TextureProvider<>)).LifestyleSingleton());
             container.Register(Component.For<TextureSearcher>().LifestyleSingleton());
             container.Register(Component.For<MaterialProvider>().LifestyleSingleton());

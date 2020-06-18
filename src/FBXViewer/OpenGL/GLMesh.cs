@@ -25,7 +25,7 @@ namespace FBXViewer.OpenGL
         }
 
         public Matrix4x4 ModelMatrix { get; }
-        public uint? DiffuseTextureId { get; set; }
+        public Texture DiffuseTexture { get; set; }
 
         public void Render(int diffuseTextureId)
         {
@@ -43,10 +43,10 @@ namespace FBXViewer.OpenGL
             
             Gl.BindBuffer(BufferTarget.ElementArrayBuffer, _indexBuffer);
 
-            if (DiffuseTextureId != null)
+            if (DiffuseTexture != null)
             {
                 Gl.ActiveTexture(TextureUnit.Texture0);
-                Gl.BindTexture(TextureTarget.Texture2d, DiffuseTextureId ?? 0);
+                Gl.BindTexture(TextureTarget.Texture2d, DiffuseTexture.Buffer);
                 Gl.Uniform1i(diffuseTextureId, 1, 0);
             }
             
