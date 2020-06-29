@@ -10,6 +10,7 @@
     <ItemGroup>
       <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
       <PackageReference Include="Castle.Windsor" Version="5.0.1" />
+      <PackageReference Include="CommandLineParser" Version="2.8.0" />
       <PackageReference Include="OpenGL.Net.WinForms" Version="0.8.4" />
       <PackageReference Include="ReactiveUI" Version="11.3.8" />
       <PackageReference Include="WaveEngine.Bindings.OpenGL" Version="1.0.4998" />

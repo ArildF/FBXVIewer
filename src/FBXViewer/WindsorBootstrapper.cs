@@ -10,7 +10,7 @@ namespace FBXViewer
 {
     public class WindsorBootstrapper
     {
-        public static WindsorContainer Bootstrap()
+        public static WindsorContainer Bootstrap(CommandLineOptions commandLineOptions)
         {
             var container = new WindsorContainer();
 
@@ -20,8 +20,15 @@ namespace FBXViewer
             container.Register(Component.For<MainWindowViewModel>());
             container.Register(Component.For<TreeNodeViewModel>().LifestyleTransient());
             container.Register(Component.For<ModelPreview>().LifestyleSingleton());
-            container.Register(Component.For<IScene>().ImplementedBy<OpenGLScene>().LifestyleSingleton());
-            // container.Register(Component.For<IScene>().ImplementedBy<WpfScene>().LifestyleSingleton());
+            if (commandLineOptions.Renderer == Renderer.OpenGL)
+            {
+                container.Register(Component.For<IScene>().ImplementedBy<OpenGLScene>().LifestyleSingleton());
+            }
+            else
+            {
+                container.Register(Component.For<IScene>().ImplementedBy<WpfScene>().LifestyleSingleton());
+            }
+
             container.Register(Component.For<MeshLoader>().LifestyleSingleton());
             container.Register(Component.For<TextureLoader>().LifestyleSingleton());
             container.Register(Component.For(typeof(TextureProvider<>)).LifestyleSingleton());
@@ -34,7 +41,7 @@ namespace FBXViewer
                 .ImplementedBy<BitmapSourceTextureLoader>());
             container.Register(Component.For<ITextureLoader<Bitmap>>()
                 .ImplementedBy<BitmapTextureLoader>());
-            
+
             container.Kernel.AddFacility<TypedFactoryFacility>();
 
             return container;
