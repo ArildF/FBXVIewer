@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using Assimp;
+using Assimp.Configs;
+using Assimp.Unmanaged;
 
 namespace FBXViewer
 {
@@ -35,6 +37,9 @@ namespace FBXViewer
         public void Load(string fileName)
         {
             _context = new AssimpContext();
+            
+            _context.SetConfig(new BooleanPropertyConfig(AiConfigs.AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false));
+            
             _fileName = fileName;
             _scene = _context.ImportFile(fileName);
             _sceneContext.CurrentScene = _scene;
