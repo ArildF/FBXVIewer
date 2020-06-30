@@ -204,20 +204,7 @@ namespace FBXViewer.OpenGL
 
         public Bounds GetBoundingBox(Mesh mesh)
         {
-            IEnumerable<float> Element(Func<Vector3D, float> f)
-            {
-                return mesh.Vertices.Select(f);
-            }
-
-            var xMin = Element(v => v.X).Min();
-            var xMax = Element(v => v.X).Max();
-            var yMin = Element(v => v.Y).Min();
-            var yMax = Element(v => v.Y).Max();
-            var zMin = Element(v => v.Z).Min();
-            var zMax = Element(v => v.Z).Max();
-                
-            return new Bounds(xMax - xMin, yMax - yMin, zMax - zMin, 
-                new Vector3((xMin + xMax) / 2, (yMin + yMax) / 2, (zMin + zMax) / 2));
+            return mesh.BoundingBox.ToBounds();
         }
 
         public void ToggleWireFrame(in bool wireFrameEnabled)

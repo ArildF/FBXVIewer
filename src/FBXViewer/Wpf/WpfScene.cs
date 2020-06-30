@@ -236,14 +236,7 @@ namespace FBXViewer.Wpf
 
         public Bounds GetBoundingBox(Mesh mesh)
         {
-            if (!_meshes.TryGetValue(mesh, out var meshEntry))
-            {
-                throw new ArgumentException(nameof(mesh));
-            }
-
-            var bounds = meshEntry.Geometry.Bounds;
-            return new Bounds((float) bounds.SizeX, (float) bounds.SizeY, (float) bounds.SizeZ, 
-                bounds.Location.AsVector3() + (bounds.Size.AsVector3() / 2));
+            return mesh.BoundingBox.ToBounds();
         }
 
         private (Model3DGroup, MeshGeometry3D) CreateWireFrame(Mesh mesh)

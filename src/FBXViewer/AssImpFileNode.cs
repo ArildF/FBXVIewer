@@ -41,7 +41,7 @@ namespace FBXViewer
             _context.SetConfig(new BooleanPropertyConfig(AiConfigs.AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false));
             
             _fileName = fileName;
-            _scene = _context.ImportFile(fileName);
+            _scene = _context.ImportFile(fileName, PostProcessSteps.GenerateBoundingBoxes);
             _sceneContext.CurrentScene = _scene;
             _materialProvider.Load(_scene);
         }

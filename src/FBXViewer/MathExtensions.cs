@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Media.Media3D;
+using Assimp;
 using Vector3D = Assimp.Vector3D;
 using MVector3D = System.Windows.Media.Media3D.Vector3D;
 using Quaternion = System.Numerics.Quaternion;
@@ -103,6 +104,17 @@ namespace FBXViewer
         public static Point AsUvPoint(this Vector3D self)
         {
             return new Point(self.X, 1-self.Y);
+        }
+
+        public static Bounds ToBounds(this BoundingBox self)
+        {
+            return new Bounds
+            {
+                SizeX = self.Max.X - self.Min.X,
+                SizeY = self.Max.Y - self.Min.Y,
+                SizeZ = self.Max.Z - self.Min.Z,
+                Location = ((self.Min + self.Max) / 2).AsVector3()
+            };
         }
         
         public static Quaternion ToLookRotation(this Vector3 forward, Vector3 up)
