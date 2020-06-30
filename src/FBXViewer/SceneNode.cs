@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Assimp;
+using ReactiveUI;
 
 namespace FBXViewer
 {
@@ -11,6 +12,7 @@ namespace FBXViewer
         private readonly Func<Node, SceneNode> _sceneNodeFactory;
         private readonly SceneContext _context;
         private readonly Func<Mesh, MeshNode> _meshNodeFactory;
+        private bool _shouldShow;
 
         public SceneNode(Node node, Func<Node, SceneNode> sceneNodeFactory, SceneContext context,
             Func<Mesh, MeshNode> meshNodeFactory)
@@ -20,6 +22,21 @@ namespace FBXViewer
             _context = context;
             _meshNodeFactory = meshNodeFactory;
         }
+        
+        public override bool IsChecked 
+        {
+            get => _shouldShow;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _shouldShow, value);
+                foreach (var child in GetChildren())
+                {
+                    child.IsChecked = value;
+                }
+            }
+        }
+
+        public override bool SupportsMultiSelect => _node.HasMeshes;
 
         public override string? Text => _node.Name;
         public override bool HasChildren => true;
