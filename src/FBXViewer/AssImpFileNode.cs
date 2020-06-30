@@ -13,15 +13,21 @@ namespace FBXViewer
         private readonly Func<List<Mesh>, MeshesNode> _meshesFactory;
         private readonly Func<List<Material>, MaterialsNode> _materialsFactory;
         private readonly Func<List<EmbeddedTexture>, TexturesNode> _texturesFactory;
+        private readonly Func<Node, SceneNode> _sceneNodeFactory;
         private readonly MaterialProvider _materialProvider;
         private readonly SceneContext _sceneContext;
 
-        public AssImpFileNode(Func<List<Mesh>, MeshesNode> meshesFactory, Func<List<Material>, MaterialsNode> materialsFactory, 
-            Func<List<EmbeddedTexture>, TexturesNode> texturesFactory, MaterialProvider materialProvider, SceneContext sceneContext)
+        public AssImpFileNode(Func<List<Mesh>, MeshesNode> meshesFactory, 
+            Func<List<Material>, MaterialsNode> materialsFactory, 
+            Func<List<EmbeddedTexture>, TexturesNode> texturesFactory, 
+            Func<Node, SceneNode> sceneNodeFactory,
+            MaterialProvider materialProvider, 
+            SceneContext sceneContext)
         {
             _meshesFactory = meshesFactory;
             _materialsFactory = materialsFactory;
             _texturesFactory = texturesFactory;
+            _sceneNodeFactory = sceneNodeFactory;
             _materialProvider = materialProvider;
             _sceneContext = sceneContext;
         }
@@ -43,6 +49,8 @@ namespace FBXViewer
             {
                yield break;
             }
+
+            yield return _sceneNodeFactory(_scene.RootNode);
             yield return _meshesFactory(_scene.Meshes);
             yield return _texturesFactory(_scene.Textures);
             yield return _materialsFactory(_scene.Materials);
