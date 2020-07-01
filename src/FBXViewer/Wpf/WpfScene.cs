@@ -128,11 +128,13 @@ namespace FBXViewer.Wpf
                     }
                 },
                 Geometry = geometry,
-                Transform = transform.ToTransform3D(),
             };
 
 
-            var group = new Model3DGroup();
+            var group = new Model3DGroup()
+            {
+                Transform = transform.ToTransform3D(),
+            };
             group.Children.Add(geometryModel);
             _meshModelGroup.Children.Add(group);
 
@@ -243,7 +245,12 @@ namespace FBXViewer.Wpf
 
         public Bounds GetBoundingBox(Mesh mesh)
         {
-            return mesh.BoundingBox.ToBounds();
+            if (!_meshes.TryGetValue(mesh, out var entry))
+            {
+                return new Bounds();
+            }
+
+            return mesh.BoundingBox.ToBounds() * entry.ModelGroup.Transform;
         }
 
         private (Model3DGroup, MeshGeometry3D) CreateWireFrame(Mesh mesh)

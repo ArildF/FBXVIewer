@@ -210,5 +210,7 @@ namespace FBXViewer
             quaternion.W = (m01 - m10) * num2;
             return quaternion;
         }
+
+       
     }
 }

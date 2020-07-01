@@ -204,7 +204,14 @@ namespace FBXViewer.OpenGL
 
         public Bounds GetBoundingBox(Mesh mesh)
         {
-            return mesh.BoundingBox.ToBounds();
+            var entry = _meshes.FirstOrDefault(m => m.Mesh == mesh);
+            if (entry == null)
+            {
+                return new Bounds();
+            }
+
+            var matrix = Matrix4x4.Transpose(entry.GLMesh.ModelMatrix);
+            return mesh.BoundingBox.ToBounds() * matrix;
         }
 
         public void ToggleWireFrame(in bool wireFrameEnabled)
