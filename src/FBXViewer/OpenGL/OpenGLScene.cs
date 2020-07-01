@@ -19,7 +19,6 @@ namespace FBXViewer.OpenGL
     public class OpenGLScene : IScene
     {
         private readonly MeshLoader _meshLoader;
-        private bool _contextCreated;
 
         private class MeshEntry
         {
@@ -61,6 +60,8 @@ namespace FBXViewer.OpenGL
 
             CameraLight = new OpenGLLight();
             _openGLCamera =  new OpenGLRendererCamera(-Vector3.UnitZ, Vector3.UnitZ, Vector3.UnitY);
+            
+            _glControl.CreateControl();
         }
 
         public IRendererCamera RendererCamera => _openGLCamera;
@@ -114,12 +115,11 @@ namespace FBXViewer.OpenGL
         private void GlControlOnContextCreated(object? sender, GlControlEventArgs e)
         {
             CreateShaders();
+            
             Gl.Enable(EnableCap.DepthTest);
             Gl.DepthFunc(DepthFunction.Less);
             
             Gl.Enable(EnableCap.Multisample);
-
-            _contextCreated = true;
         }
 
         private void CreateShaders()
@@ -172,15 +172,7 @@ namespace FBXViewer.OpenGL
                 entry.Enabled = true;
                 return;
             }
-            void AddMesh(Mesh m) => _meshes.Add(new MeshEntry(m, _meshLoader.Create(m, transform)));
-            if (_contextCreated)
-            {
-                AddMesh(mesh);
-            }
-            else
-            {
-                _glControl.ContextCreated += (sender, args) => AddMesh(mesh);
-            }
+            _meshes.Add(new MeshEntry(mesh, _meshLoader.Create(mesh, transform)));
         }
 
         public void SetShapeKeyWeight(Mesh mesh, float weight, MeshAnimationAttachment attachment)
