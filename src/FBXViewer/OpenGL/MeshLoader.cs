@@ -5,6 +5,7 @@ using System.Linq;
 using System.Numerics;
 using Assimp;
 using OpenGL;
+using Matrix4x4 = System.Numerics.Matrix4x4;
 
 namespace FBXViewer.OpenGL
 {
@@ -17,7 +18,7 @@ namespace FBXViewer.OpenGL
             _loader = loader;
         }
 
-        public GLMesh Create(Mesh mesh)
+        public GLMesh Create(Mesh mesh, Matrix4x4 transform)
         {
             var vertexIndexes = new List<uint>(mesh.Faces.Count * 4);
             var uvs = new List<Vector2>(mesh.Faces.Count * 4);
@@ -66,7 +67,11 @@ namespace FBXViewer.OpenGL
 
 
             var texture = _loader.LoadDiffuse(mesh);
-            return new GLMesh(vertexBuffer, indexBuffer, uvBuffer, normalBuffer, indexArray.Length) {DiffuseTexture = texture};
+            return new GLMesh(vertexBuffer, indexBuffer, uvBuffer, normalBuffer, indexArray.Length)
+            {
+                DiffuseTexture = texture,
+                ModelMatrix = transform,
+            };
         }
     }
 }

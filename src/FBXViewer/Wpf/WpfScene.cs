@@ -9,6 +9,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using Assimp;
+using Matrix4x4 = System.Numerics.Matrix4x4;
 using Quaternion = System.Windows.Media.Media3D.Quaternion;
 using Vector3D = System.Windows.Media.Media3D.Vector3D;
 
@@ -65,7 +66,7 @@ namespace FBXViewer.Wpf
             MouseInput = new WpfMouseInput(border);
         }
 
-        public void LoadMesh(Mesh mesh)
+        public void LoadMesh(Mesh mesh, Matrix4x4 transform)
         {
             UnloadMesh(mesh);
 
@@ -114,6 +115,9 @@ namespace FBXViewer.Wpf
                 }
                 : (Brush) Brushes.Pink;
 
+            // because reasons?
+            transform = Matrix4x4.Transpose(transform);
+            
             var geometryModel = new GeometryModel3D
             {
                 Material = new MaterialGroup
@@ -124,6 +128,7 @@ namespace FBXViewer.Wpf
                     }
                 },
                 Geometry = geometry,
+                Transform = transform.ToTransform3D(),
             };
 
 
@@ -132,6 +137,8 @@ namespace FBXViewer.Wpf
             _meshModelGroup.Children.Add(group);
 
             var (wireFrame, wireFrameGeometry) = CreateWireFrame(mesh);
+            wireFrame.Transform = transform.ToTransform3D();
+            
             _wireFrameModelGroup.Children.Add(wireFrame);
             _meshes[mesh] = new MeshEntry(group, wireFrame, geometry, wireFrameGeometry);
             

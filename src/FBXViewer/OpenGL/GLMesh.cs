@@ -24,8 +24,8 @@ namespace FBXViewer.OpenGL
             ModelMatrix = Matrix4x4.Identity;
         }
 
-        public Matrix4x4 ModelMatrix { get; }
-        public Texture DiffuseTexture { get; set; }
+        public Matrix4x4 ModelMatrix { get; set; }
+        public Texture? DiffuseTexture { get; set; }
 
         public void Render(int diffuseTextureId)
         {

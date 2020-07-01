@@ -5,6 +5,7 @@ using System.Numerics;
 using System.Windows;
 using System.Windows.Media.Media3D;
 using Assimp;
+using Matrix4x4 = System.Numerics.Matrix4x4;
 using Vector3D = Assimp.Vector3D;
 using MVector3D = System.Windows.Media.Media3D.Vector3D;
 using Quaternion = System.Numerics.Quaternion;
@@ -115,6 +116,40 @@ namespace FBXViewer
                 SizeZ = self.Max.Z - self.Min.Z,
                 Location = ((self.Min + self.Max) / 2).AsVector3()
             };
+        }
+
+        public static unsafe Matrix4x4 ToNumMatrix4x4(this Assimp.Matrix4x4 self)
+        {
+            return *(Matrix4x4*) (&self);
+        }
+
+        public static Transform3D ToTransform3D(this Matrix4x4 self)
+        {
+            return new MatrixTransform3D(self.ToMatrix3D());
+        }
+
+        public static Matrix3D ToMatrix3D(this Matrix4x4 self)
+        {
+            var ret =  new Matrix3D(
+                self.M11,
+                self.M12,
+                self.M13,
+                self.M14,
+                self.M21,
+                self.M22,
+                self.M23,
+                self.M24,
+                self.M31,
+                self.M32,
+                self.M33,
+                self.M34,
+                self.M41,
+                self.M42,
+                self.M43,
+                self.M44
+                );
+            Console.WriteLine(ret);
+            return ret;
         }
         
         public static Quaternion ToLookRotation(this Vector3 forward, Vector3 up)

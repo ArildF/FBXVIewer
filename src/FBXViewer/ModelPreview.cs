@@ -8,6 +8,7 @@ using System.Windows.Media;
 using Assimp;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using KeyEventHandler = System.Windows.Input.KeyEventHandler;
+using Matrix4x4 = System.Numerics.Matrix4x4;
 using MVector3D = System.Windows.Media.Media3D.Vector3D;
 using Vector = System.Windows.Vector;
 
@@ -201,9 +202,9 @@ namespace FBXViewer
             }
         }
 
-        public void LoadMesh(Mesh mesh, bool resetCamera)
+        public void LoadMesh(Mesh mesh, bool resetCamera, Matrix4x4 transform)
         {
-            _scene.LoadMesh(mesh);
+            _scene.LoadMesh(mesh, transform);
             if (!resetCamera)
             {
                 return;

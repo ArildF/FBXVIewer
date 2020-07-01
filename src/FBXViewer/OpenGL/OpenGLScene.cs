@@ -164,7 +164,7 @@ namespace FBXViewer.OpenGL
             }
         }
 
-        public void LoadMesh(Mesh mesh)
+        public void LoadMesh(Mesh mesh, Matrix4x4 transform)
         {
             var entry = _meshes.FirstOrDefault(m => m.Mesh == mesh);
             if (entry != null)
@@ -172,7 +172,7 @@ namespace FBXViewer.OpenGL
                 entry.Enabled = true;
                 return;
             }
-            void AddMesh(Mesh m) => _meshes.Add(new MeshEntry(m, _meshLoader.Create(m)));
+            void AddMesh(Mesh m) => _meshes.Add(new MeshEntry(m, _meshLoader.Create(m, transform)));
             if (_contextCreated)
             {
                 AddMesh(mesh);

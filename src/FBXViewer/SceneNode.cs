@@ -22,6 +22,8 @@ namespace FBXViewer
             _context = context;
             _meshNodeFactory = meshNodeFactory;
         }
+
+        public Matrix4x4 Transform => (Parent?.Transform ?? Matrix4x4.Identity) * _node.Transform;
         
         public override bool IsChecked 
         {
@@ -56,6 +58,7 @@ namespace FBXViewer
                 {
                     var meshNode = _meshNodeFactory(mesh);
                     meshNode.IsSubMesh = _node.MeshCount > 1;
+                    meshNode.SceneParent = this;
                     yield return meshNode;
                 }
             }

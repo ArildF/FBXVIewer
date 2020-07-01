@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Assimp;
 using ReactiveUI;
+using Matrix4x4 = System.Numerics.Matrix4x4;
 
 namespace FBXViewer
 {
@@ -36,7 +37,7 @@ namespace FBXViewer
                     _isSelected = value;
                     if (_isSelected)
                     {
-                        _modelPreview.LoadMesh(_mesh, true);
+                        _modelPreview.LoadMesh(_mesh, true, CalculateTransform());
                     }
                     else if (!IsChecked)
                     {
@@ -60,7 +61,7 @@ namespace FBXViewer
                     this.RaiseAndSetIfChanged(ref _isChecked, value);
                     if (_isChecked)
                     {
-                        _modelPreview.LoadMesh(_mesh, false);
+                        _modelPreview.LoadMesh(_mesh, false, CalculateTransform());
                     }
                     else
                     {
@@ -68,6 +69,11 @@ namespace FBXViewer
                     }
                 }
             }
+        }
+
+        private Matrix4x4 CalculateTransform()
+        {
+            return (SceneParent?.Transform ?? Assimp.Matrix4x4.Identity).ToNumMatrix4x4();
         }
 
         public override object GetPreview()
@@ -80,6 +86,8 @@ namespace FBXViewer
             : $"Mesh '{_mesh.Name}'";
         
         public override bool HasChildren => true;
+        public SceneNode? SceneParent { get; set; }
+
         protected override IEnumerable<INode> CreateChildren()
         {
             foreach (var node in _mesh.PrimitiveProperties())
