@@ -20,7 +20,7 @@ void main()
   float y = 1.0 - UV.y;
   vec3 diffuse = texture(diffuseTextureSampler, vec2(UV.x, y)).rgb;
   vec3 ambient = vec3(0.1, 0.1, 0.1) * diffuse;
-  vec3 specular = vec3(0.3, 0.3, 0.3) * 3;
+  vec3 specular = vec3(0.3, 0.3, 0.3);
   
   float lightDistance = length(LightPosition_worldSpace - Position_worldSpace);
   
