@@ -37,22 +37,21 @@ namespace FBXViewer.OpenGL
         public OpenGLScene(MeshLoader meshLoader)
         {
             _meshLoader = meshLoader;
-            _glControl = new GlControl
+            var glControl = new GlControl
             {
                 Animation = true,
                 DepthBits = 24,
                 MultisampleBits = 32,
             };
-            _glControl.ContextCreated += GlControlOnContextCreated;
-            _glControl.Render += GlControlOnRender;
+            glControl.ContextCreated += GlControlOnContextCreated;
+            glControl.Render += GlControlOnRender;
 
 
             var grid = new Grid {Background = Brushes.Aqua};
 
-            var windowsFormsHost = new WindowsFormsHost();
-            windowsFormsHost.Child = _glControl;
+            var windowsFormsHost = new WindowsFormsHost {Child = glControl};
 
-            MouseInput = new WinFormsMouseInput(_glControl);
+            MouseInput = new WinFormsMouseInput(glControl);
             
             grid.Children.Add(windowsFormsHost);
 
@@ -61,7 +60,7 @@ namespace FBXViewer.OpenGL
             CameraLight = new OpenGLLight();
             _openGLCamera =  new OpenGLRendererCamera(-Vector3.UnitZ, Vector3.UnitZ, Vector3.UnitY);
             
-            _glControl.CreateControl();
+            glControl.CreateControl();
         }
 
         public IRendererCamera RendererCamera => _openGLCamera;
@@ -71,7 +70,6 @@ namespace FBXViewer.OpenGL
         private readonly OpenGLRendererCamera _openGLCamera;
         private uint _program;
         private readonly List<MeshEntry> _meshes = new List<MeshEntry>();
-        private readonly GlControl _glControl;
 
         private void GlControlOnRender(object? sender, GlControlEventArgs e)
         {
@@ -87,10 +85,6 @@ namespace FBXViewer.OpenGL
 
             var projectionMatrix = _openGLCamera.ProjectionMatrix(vpw, vph);
             var viewMatrix = _openGLCamera.ViewMatrix;
-
-            var vec = new Vector4(1, 1, 1, 1);
-
-            var ndc = Vector4.Transform(vec, projectionMatrix);
 
             Gl.UseProgram(_program);
             
@@ -135,8 +129,8 @@ namespace FBXViewer.OpenGL
                 Gl.ShaderSource(id, new[]{source});
                 Gl.CompileShader(id);
 
-                Gl.GetShader(id, ShaderParameterName.CompileStatus, out int result);
-                Debug.WriteLine($"Compile status: {result == Gl.TRUE}");
+                Gl.GetShader(id, ShaderParameterName.CompileStatus, out int compileStatus);
+                Debug.WriteLine($"Compile status: {compileStatus == Gl.TRUE}");
                 Gl.GetShaderInfoLog(id, sb.Capacity, out int _, sb);
                 Debug.WriteLine(sb.ToString());
             }
@@ -149,19 +143,17 @@ namespace FBXViewer.OpenGL
             Gl.AttachShader(_program, vertexShader);
             Gl.LinkProgram(_program);
             
-            Gl.GetProgram(_program, ProgramProperty.LinkStatus, out int result);
-            Debug.WriteLine($"Link status: {result == Gl.TRUE}");
-            Gl.GetProgramInfoLog(_program, sb.Capacity, out int length, sb);
+            Gl.GetProgram(_program, ProgramProperty.LinkStatus, out int linkResult);
+            Debug.WriteLine($"Link status: {linkResult == Gl.TRUE}");
+            Gl.GetProgramInfoLog(_program, sb.Capacity, out int _, sb);
         }
 
         private string LoadShaderFromResource(string file)
         {
             var uri = new Uri("/OpenGL/Shaders/" + file, UriKind.Relative);
             var stream = Application.GetResourceStream(uri);
-            using (var reader = new StreamReader(stream.Stream))
-            {
-                return reader.ReadToEnd();
-            }
+            using var reader = new StreamReader(stream.Stream);
+            return reader.ReadToEnd();
         }
 
         public void LoadMesh(Mesh mesh, Matrix4x4 transform)
