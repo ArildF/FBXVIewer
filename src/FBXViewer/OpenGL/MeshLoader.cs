@@ -67,7 +67,14 @@ namespace FBXViewer.OpenGL
 
 
             var texture = _loader.LoadDiffuse(mesh);
-            return new GLMesh(vertexBuffer, indexBuffer, uvBuffer, normalBuffer, indexArray.Length)
+            var buffers = new Buffers
+            {
+                IndexBuffer = indexBuffer,
+                NormalBuffer = normalBuffer,
+                UvBuffer = uvBuffer,
+                VertexBuffer = vertexBuffer
+            };
+            return new GLMesh(buffers, indexArray.Length)
             {
                 DiffuseTexture = texture,
                 ModelMatrix = transform,

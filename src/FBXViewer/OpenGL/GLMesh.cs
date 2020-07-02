@@ -7,20 +7,14 @@ namespace FBXViewer.OpenGL
 {
     public class GLMesh
     {
-        private readonly uint _vertexBuffer;
-        private readonly uint _indexBuffer;
-        private readonly  uint _uvBuffer;
-        private readonly uint _normalBuffer;
+        private readonly Buffers _buffers;
         private readonly int _indexCount;
 
 
-        public GLMesh(in uint vertexBuffer, in uint indexBuffer, in uint uvBuffer, in uint normalBuffer, int indexCount)
+        public GLMesh(Buffers buffers, int indexCount)
         {
-            _vertexBuffer = vertexBuffer;
-            _indexBuffer = indexBuffer;
-            _uvBuffer = uvBuffer;
-            _normalBuffer = normalBuffer;
             _indexCount = indexCount;
+            _buffers = buffers;
             ModelMatrix = Matrix4x4.Identity;
         }
 
@@ -30,18 +24,18 @@ namespace FBXViewer.OpenGL
         public void Render(int diffuseTextureId)
         {
             Gl.EnableVertexAttribArray(0);
-            Gl.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer);
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, _buffers.VertexBuffer);
             Gl.VertexAttribPointer(0, 3, VertexAttribType.Float, false, 0, IntPtr.Zero);
             
             Gl.EnableVertexAttribArray(1);
-            Gl.BindBuffer(BufferTarget.ArrayBuffer, _uvBuffer);
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, _buffers.UvBuffer);
             Gl.VertexAttribPointer(1, 2, VertexAttribType.Float, false, 0, IntPtr.Zero);
             
             Gl.EnableVertexAttribArray(2);
-            Gl.BindBuffer(BufferTarget.ArrayBuffer, _normalBuffer);
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, _buffers.NormalBuffer);
             Gl.VertexAttribPointer(2, 3, VertexAttribType.Float, false, 0, IntPtr.Zero);
             
-            Gl.BindBuffer(BufferTarget.ElementArrayBuffer, _indexBuffer);
+            Gl.BindBuffer(BufferTarget.ElementArrayBuffer, _buffers.IndexBuffer);
 
             if (DiffuseTexture != null)
             {
