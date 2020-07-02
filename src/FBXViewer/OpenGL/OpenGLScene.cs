@@ -100,7 +100,7 @@ namespace FBXViewer.OpenGL
                 Gl.UniformMatrix4f(mLocation, 1, true, modelMatrix);
                 Gl.UniformMatrix4f(pLocation, 1, true, projectionMatrix);
                 Gl.UniformMatrix4f(vLocation, 1, true, viewMatrix);
-                Gl.Uniform3f(lightPositionLocation, 1, new Vector3(-50, 200, 50));
+                Gl.Uniform3f(lightPositionLocation, 1, CameraLight?.Position ?? new Vector3(-50, 200, 50));
 
                 meshEntry.GLMesh.Render(diffuseSampler);
             }
