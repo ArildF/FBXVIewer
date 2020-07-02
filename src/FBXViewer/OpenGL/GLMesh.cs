@@ -35,6 +35,14 @@ namespace FBXViewer.OpenGL
             Gl.BindBuffer(BufferTarget.ArrayBuffer, _buffers.NormalBuffer);
             Gl.VertexAttribPointer(2, 3, VertexAttribType.Float, false, 0, IntPtr.Zero);
             
+            Gl.EnableVertexAttribArray(3);
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, _buffers.TangentBuffer);
+            Gl.VertexAttribPointer(3, 3, VertexAttribType.Float, false, 0, IntPtr.Zero);
+            
+            Gl.EnableVertexAttribArray(4);
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, _buffers.BiTangentBuffer);
+            Gl.VertexAttribPointer(4, 3, VertexAttribType.Float, false, 0, IntPtr.Zero);
+            
             Gl.BindBuffer(BufferTarget.ElementArrayBuffer, _buffers.IndexBuffer);
 
             if (DiffuseTexture != null)

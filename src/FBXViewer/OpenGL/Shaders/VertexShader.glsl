@@ -2,6 +2,8 @@
 layout(location = 0) in vec3 vertexPosition_modelspace;
 layout(location = 1) in vec2 uv_uvSpace;
 layout(location = 2) in vec3 vertexNormal_modelSpace;
+layout(location = 3) in vec3 tangent_modelSpace;
+layout(location = 4) in vec3 biTangent_modelSpace;
 
 uniform mat4 P;
 uniform mat4 M;
@@ -30,7 +32,7 @@ void main()
     
     Normal_cameraSpace = (V * M * vec4(vertexNormal_modelSpace, 0)).xyz;
     
-    fragmentColor = vertexNormal_modelSpace;
+    fragmentColor = biTangent_modelSpace;
     
     UV = uv_uvSpace;
 }

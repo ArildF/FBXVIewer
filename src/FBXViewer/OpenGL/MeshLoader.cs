@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using Assimp;
@@ -21,7 +20,6 @@ namespace FBXViewer.OpenGL
         public GLMesh Create(Mesh mesh, Matrix4x4 transform)
         {
             var vertexIndexes = new List<uint>(mesh.Faces.Count * 4);
-            var uvs = new List<Vector2>(mesh.Faces.Count * 4);
             foreach (var face in mesh.Faces)
             {
                 void Add(params int[] index)
@@ -48,6 +46,8 @@ namespace FBXViewer.OpenGL
             var uvArray = mesh.TextureCoordinateChannels[0]
                 .Select(uv => new Vector2(uv.X, uv.Y)).ToArray();
             var normalArray = mesh.Normals.Select(n => n.AsVector3()).ToArray();
+            var tangentArray = mesh.Tangents.Select(t => t.AsVector3()).ToArray();
+            var biTangentArray = mesh.BiTangents.Select(t => t.AsVector3()).ToArray();
             
             uint vertexBuffer = Gl.GenBuffer();
             Gl.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
@@ -64,6 +64,14 @@ namespace FBXViewer.OpenGL
             uint normalBuffer = Gl.GenBuffer();
             Gl.BindBuffer(BufferTarget.ArrayBuffer, normalBuffer);
             Gl.BufferData(BufferTarget.ArrayBuffer, (uint) (normalArray.Length * 12), normalArray, BufferUsage.StaticDraw);
+            
+            uint tangentBuffer = Gl.GenBuffer();
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, tangentBuffer);
+            Gl.BufferData(BufferTarget.ArrayBuffer, (uint) (tangentArray.Length * 12), vertexArray, BufferUsage.StaticDraw);
+            
+            uint biTangentBuffer = Gl.GenBuffer();
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, biTangentBuffer);
+            Gl.BufferData(BufferTarget.ArrayBuffer, (uint) (biTangentArray.Length * 12), vertexArray, BufferUsage.StaticDraw);
 
 
             var texture = _loader.LoadDiffuse(mesh);
@@ -72,7 +80,9 @@ namespace FBXViewer.OpenGL
                 IndexBuffer = indexBuffer,
                 NormalBuffer = normalBuffer,
                 UvBuffer = uvBuffer,
-                VertexBuffer = vertexBuffer
+                VertexBuffer = vertexBuffer,
+                TangentBuffer = tangentBuffer,
+                BiTangentBuffer = biTangentBuffer
             };
             return new GLMesh(buffers, indexArray.Length)
             {

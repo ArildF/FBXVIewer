@@ -14,6 +14,7 @@ uniform vec3 LightPosition_worldSpace;
 
 void main()
 {
+    
   vec3 LightColor = vec3(1,1,1);
   float LightPower = 5000f;
   
@@ -36,6 +37,6 @@ void main()
   
   //color = ambient;
   color = ambient + 
-      diffuse * LightColor * LightPower * cosTheta / (lightDistance * lightDistance) +
-      specular * LightColor * LightPower * pow(cosAlpha, 5) / (lightDistance * lightDistance);
+    diffuse * LightColor * LightPower * cosTheta / (lightDistance * lightDistance) +
+    specular * LightColor * LightPower * pow(cosAlpha, 5) / (lightDistance * lightDistance);
 }

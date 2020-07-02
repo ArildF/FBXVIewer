@@ -6,5 +6,7 @@ namespace FBXViewer.OpenGL
         public uint IndexBuffer { get; set; }
         public uint UvBuffer { get; set; }
         public uint NormalBuffer { get; set; }
+        public uint TangentBuffer { get; set; }
+        public uint BiTangentBuffer { get; set; }
     }
 }
