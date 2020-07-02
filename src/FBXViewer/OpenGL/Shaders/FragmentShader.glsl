@@ -36,6 +36,6 @@ void main()
   
   //color = ambient;
   color = ambient + 
-  diffuse * LightColor * LightPower * cosTheta / (lightDistance * lightDistance) +
-  specular * LightColor * LightPower * pow(cosAlpha, 5) / (lightDistance * lightDistance);
+      diffuse * LightColor * LightPower * cosTheta / (lightDistance * lightDistance) +
+      specular * LightColor * LightPower * pow(cosAlpha, 5) / (lightDistance * lightDistance);
 }
