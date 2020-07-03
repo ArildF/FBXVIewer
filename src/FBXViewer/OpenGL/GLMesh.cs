@@ -20,8 +20,9 @@ namespace FBXViewer.OpenGL
 
         public Matrix4x4 ModelMatrix { get; set; }
         public Texture? DiffuseTexture { get; set; }
+        public Texture? NormalMap { get; set; }
 
-        public void Render(int diffuseTextureId)
+        public void Render(int diffuseTextureId, int normalTextureId)
         {
             Gl.EnableVertexAttribArray(0);
             Gl.BindBuffer(BufferTarget.ArrayBuffer, _buffers.VertexBuffer);
@@ -45,13 +46,18 @@ namespace FBXViewer.OpenGL
             
             Gl.BindBuffer(BufferTarget.ElementArrayBuffer, _buffers.IndexBuffer);
 
-            if (DiffuseTexture != null)
+            void BindTexture(int textureId, TextureUnit unit, Texture? texture, int slot)
             {
-                Gl.ActiveTexture(TextureUnit.Texture0);
-                Gl.BindTexture(TextureTarget.Texture2d, DiffuseTexture.Buffer);
-                Gl.Uniform1i(diffuseTextureId, 1, 0);
+                if (texture != null)
+                {
+                    Gl.ActiveTexture(unit);
+                    Gl.BindTexture(TextureTarget.Texture2d, texture.Buffer);
+                    Gl.Uniform1i(textureId, 1, slot);
+                }
             }
-            
+            BindTexture(diffuseTextureId, TextureUnit.Texture0, DiffuseTexture, 0);
+            BindTexture(normalTextureId, TextureUnit.Texture1, NormalMap, 1);
+
             Gl.DrawElements(PrimitiveType.Triangles, _indexCount, DrawElementsType.UnsignedInt, IntPtr.Zero);
             
             Gl.DisableVertexAttribArray(0);

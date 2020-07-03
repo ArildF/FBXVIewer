@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Threading.Tasks;
@@ -19,13 +20,23 @@ namespace FBXViewer.OpenGL
 
         public Texture LoadDiffuse(Mesh mesh)
         {
-            var textureTask = LoadTexture(mesh);
+            return LoadTexture(mesh, TextureType.Diffuse);
+        }
+
+        public Texture LoadNormalMap(Mesh mesh)
+        {
+            return LoadTexture(mesh, TextureType.Normal);
+        }
+
+        private Texture LoadTexture(Mesh mesh, TextureType type)
+        {
+            var textureTask = LoadTextureAsync(mesh, type);
             return new Texture(textureTask);
         }
 
-        private async Task<uint?> LoadTexture(Mesh mesh)
+        private async Task<uint?> LoadTextureAsync(Mesh mesh, TextureType type)
         {
-            var bitmap = await Task.Run(() => _textureProvider.GetDiffuseTexture(mesh));
+            var bitmap = await Task.Run(() => _textureProvider.GetTexture(mesh, type));
             if (bitmap == null)
             {
                 return null;

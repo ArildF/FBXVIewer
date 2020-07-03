@@ -67,14 +67,15 @@ namespace FBXViewer.OpenGL
             
             uint tangentBuffer = Gl.GenBuffer();
             Gl.BindBuffer(BufferTarget.ArrayBuffer, tangentBuffer);
-            Gl.BufferData(BufferTarget.ArrayBuffer, (uint) (tangentArray.Length * 12), vertexArray, BufferUsage.StaticDraw);
+            Gl.BufferData(BufferTarget.ArrayBuffer, (uint) (tangentArray.Length * 12), tangentArray, BufferUsage.StaticDraw);
             
             uint biTangentBuffer = Gl.GenBuffer();
             Gl.BindBuffer(BufferTarget.ArrayBuffer, biTangentBuffer);
-            Gl.BufferData(BufferTarget.ArrayBuffer, (uint) (biTangentArray.Length * 12), vertexArray, BufferUsage.StaticDraw);
+            Gl.BufferData(BufferTarget.ArrayBuffer, (uint) (biTangentArray.Length * 12), biTangentArray, BufferUsage.StaticDraw);
 
 
             var texture = _loader.LoadDiffuse(mesh);
+            var normalMap = _loader.LoadNormalMap(mesh);
             var buffers = new Buffers
             {
                 IndexBuffer = indexBuffer,
@@ -88,6 +89,7 @@ namespace FBXViewer.OpenGL
             {
                 DiffuseTexture = texture,
                 ModelMatrix = transform,
+                NormalMap = normalMap,
             };
         }
     }

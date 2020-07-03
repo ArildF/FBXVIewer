@@ -102,7 +102,7 @@ namespace FBXViewer.Wpf
                 TriangleIndices = new Int32Collection(triangleIndices),
                 TextureCoordinates = textureCoords != null ? new PointCollection(textureCoords) : null
             };
-            var diffuse = _textureProvider.GetDiffuseTexture(mesh);
+            var diffuse = _textureProvider.GetTexture(mesh, TextureType.Diffuse);
 
             // the ViewPortUnits is very important, or the brush will map MaxU x MaxV to 1 x 1
             // see https://books.google.no/books?id=ubgRAAAAQBAJ&pg=PA582&lpg=PA582

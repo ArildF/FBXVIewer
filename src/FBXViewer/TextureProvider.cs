@@ -23,18 +23,25 @@ namespace FBXViewer
             _sceneContext = sceneContext;
         }
 
-        public TBitmap? GetDiffuseTexture(Mesh mesh)
+        public TBitmap? GetTexture(Mesh mesh, TextureType type)
         {
             var scene = _sceneContext.CurrentScene;
             if (scene == null)
             {
                 return null;
             }
+           
             if (mesh.MaterialIndex < scene.MaterialCount)
             {
                 var material = scene.Materials[mesh.MaterialIndex];
+                var path = type switch
+                {
+                    TextureType.Diffuse => material.TextureDiffuse.FilePath,
+                    TextureType.Normal => material.TextureNormal.FilePath,
+                    _ => throw new NotSupportedException(),
+                };
                 var texture = scene.Textures.FirstOrDefault(
-                    t => t.Filename == material.TextureDiffuse.FilePath);
+                    t => t.Filename == path);
                 if (texture == null)
                 {
                     return TryLoadFromDisk(material);
