@@ -4,6 +4,7 @@ in vec3 fragmentColor;
 in vec3 EyeDirection_tangentSpace;
 in vec3 LightDirection_tangentSpace;
 in vec3 Position_worldSpace;
+in vec3 vertexNormal;
 out vec3 color;
 
 uniform sampler2D normalTextureSampler;
@@ -16,14 +17,17 @@ void main()
 {
     
   vec3 LightColor = vec3(1,1,1);
-  float LightPower = 500f;
+  float LightPower = 50f;
   
   float y = 1.0 - UV.y;
   vec3 diffuse = texture(diffuseTextureSampler, vec2(UV.x, y)).rgb;
   vec3 ambient = vec3(0.1, 0.1, 0.1) * diffuse * 1;
   vec3 specular = vec3(0.3, 0.3, 0.3);
   
-  vec3 normal_TangentSpace = normalize(texture(normalTextureSampler, vec2(UV.x, y))).xyz;
+  vec3 packedNormal = texture(normalTextureSampler, vec2(UV.x, y)).xyz;
+  packedNormal.xy = packedNormal.xy * 2.0 - 1.0;
+  
+  vec3 normal_TangentSpace = normalize(packedNormal);
   
   float lightDistance = length(LightPosition_worldSpace - Position_worldSpace);
   
@@ -37,6 +41,7 @@ void main()
   
   float cosAlpha = clamp(dot(eyeVector, reflection), 0, 1);
   
+  //color = fragmentColor;
   color = ambient + 
     diffuse * LightColor * LightPower * cosTheta / (lightDistance * lightDistance) +
     specular * LightColor * LightPower * pow(cosAlpha, 5) / (lightDistance * lightDistance);

@@ -86,6 +86,14 @@ namespace FBXViewer
             }
         }
 
+        private float _lightStrength;
+
+        public float LightStrength
+        {
+            get => _lightStrength;
+            set => this.RaiseAndSetIfChanged(ref _lightStrength, value);
+        }
+
         private void UpdateRotation()
         {
             _scene.SetRootRotation( 

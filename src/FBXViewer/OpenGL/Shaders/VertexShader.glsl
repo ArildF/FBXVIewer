@@ -15,6 +15,7 @@ out vec3 Position_worldSpace;
 
 out vec3 LightDirection_tangentSpace;
 out vec3 EyeDirection_tangentSpace;
+out vec3 vertexNormal;
 
 void main()
 {
@@ -42,7 +43,7 @@ void main()
     LightDirection_tangentSpace = normalize(TBN * lightDirection_cameraSpace);
     EyeDirection_tangentSpace = normalize(TBN * eyeDirection_cameraSpace);
     
-    fragmentColor = biTangent_modelSpace;
+    fragmentColor = TBN * vertexBitangent_cameraSpace;
     
     UV = uv_uvSpace;
 }
