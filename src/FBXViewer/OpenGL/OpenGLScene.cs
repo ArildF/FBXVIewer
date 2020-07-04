@@ -99,6 +99,8 @@ namespace FBXViewer.OpenGL
                 Gl.UniformMatrix4f(u.V, 1, true, viewMatrix);
                 Gl.Uniform3f(u.LightPosition, 1, CameraLight?.Position ?? new Vector3(-50, 200, 50));
                 Gl.Uniform1f(u.LightPower, 1, _settingsViewModel.LightStrength);
+                Gl.Uniform1f(u.LightPower, 1, _settingsViewModel.LightStrength);
+                Gl.Uniform1f(u.Ambient, 1, _settingsViewModel.Ambient);
 
                 meshEntry.GLMesh.Render(u);
             }

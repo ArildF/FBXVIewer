@@ -15,8 +15,11 @@ namespace FBXViewer.OpenGL
                 DiffuseSampler = Gl.GetUniformLocation(program, "diffuseTextureSampler"),
                 NormalSampler = Gl.GetUniformLocation(program, "normalTextureSampler"),
                 LightPower = Gl.GetUniformLocation(program, "LightPower"),
+                Ambient = Gl.GetUniformLocation(program, "Ambient"),
             };
         }
+
+        public int Ambient { get; private set; }
 
         public int LightPower { get; private set; }
 

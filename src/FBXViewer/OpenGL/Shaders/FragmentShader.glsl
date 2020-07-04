@@ -13,6 +13,7 @@ uniform mat4 M;
 uniform mat4 V;
 uniform vec3 LightPosition_worldSpace;
 uniform float LightPower;
+uniform float Ambient;
 
 void main()
 {
@@ -21,7 +22,7 @@ void main()
   
   float y = 1.0 - UV.y;
   vec3 diffuse = texture(diffuseTextureSampler, vec2(UV.x, y)).rgb;
-  vec3 ambient = vec3(0.1, 0.1, 0.1) * diffuse * 1;
+  vec3 ambient = Ambient * diffuse;
   vec3 specular = vec3(0.3, 0.3, 0.3);
   
   vec3 packedNormal = texture(normalTextureSampler, vec2(UV.x, y)).xyz;

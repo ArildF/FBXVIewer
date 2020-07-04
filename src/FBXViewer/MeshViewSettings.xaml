@@ -73,6 +73,10 @@
                     <Label>Light strength</Label>
                     <TextBox Text="{Binding LightStrength, UpdateSourceTrigger=PropertyChanged}"
                              Grid.Column="1" Grid.Row="0"/>
+                    
+                    <Label Grid.Row="1" Grid.Column="0">Ambient</Label>
+                    <TextBox Text="{Binding Ambient, UpdateSourceTrigger=PropertyChanged}"
+                             Grid.Column="1" Grid.Row="1"/>
                 </Grid>
                 
             </StackPanel>

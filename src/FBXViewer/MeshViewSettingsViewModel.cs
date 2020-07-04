@@ -10,6 +10,7 @@ namespace FBXViewer
             _meshEnabled = true;
 
             LightStrength = 50;
+            Ambient = 0.1f;
         }
 
         private bool _wireFrameEnabled;
@@ -85,6 +86,14 @@ namespace FBXViewer
         {
             get => _lightStrength;
             set => this.RaiseAndSetIfChanged(ref _lightStrength, value);
+        }
+        
+        private float _ambient;
+
+        public float Ambient
+        {
+            get => _ambient;
+            set => this.RaiseAndSetIfChanged(ref _ambient, value);
         }
     }
 }
