@@ -23,6 +23,7 @@ namespace FBXViewer
         
         private readonly MeshViewSettingsViewModel _settingsViewModel;
         private readonly IScene _scene;
+        private MeshViewSettings _settings;
 
         public ModelView(MainWindow mainWindow, IScene scene, Coroutines coroutines, 
             MeshViewSettingsViewModel settingsViewModel)
@@ -41,9 +42,9 @@ namespace FBXViewer
             border.SetValue(Grid.RowSpanProperty, 1);
 
             _settingsViewModel = settingsViewModel;
-            var settings = new MeshViewSettings(_settingsViewModel);
-            grid.Children.Add(settings);
-            settings.SetValue(Grid.RowProperty, 1);
+            _settings = new MeshViewSettings(_settingsViewModel);
+            grid.Children.Add(_settings);
+            _settings.SetValue(Grid.RowProperty, 1);
 
             var input = scene.MouseInput;
 
@@ -54,7 +55,7 @@ namespace FBXViewer
 
             input.MouseDown += DoubleClick;
               
-            mainWindow.AddHandler(UIElement.PreviewKeyDownEvent, new KeyEventHandler(KeyDown), true);
+            mainWindow.AddHandler(UIElement.KeyDownEvent, new KeyEventHandler(KeyDown), false);
             Element = grid;
         }
 
@@ -72,7 +73,11 @@ namespace FBXViewer
         
         private void KeyDown(object sender, KeyEventArgs e)
         {
-            Debug.WriteLine($"Key down {e.Key}");
+            if (_settings.IsKeyboardFocusWithin)
+            {
+                return;
+            }
+            Debug.WriteLine($"Key down {e.Key} {e.Handled} {e.InputSource}");
             if (e.Key == Key.Decimal)
             {
                 _camera.ResetToDefault();
