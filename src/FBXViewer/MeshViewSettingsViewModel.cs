@@ -3,11 +3,11 @@ using ReactiveUI;
 
 namespace FBXViewer
 {
-    public class MeshPreviewSettingsViewModel : ReactiveObject
+    public class MeshViewSettingsViewModel : ReactiveObject
     {
         private readonly IScene _scene;
 
-        public MeshPreviewSettingsViewModel(IScene scene)
+        public MeshViewSettingsViewModel(IScene scene)
         {
             _scene = scene;
             _wireFrameEnabled = true;

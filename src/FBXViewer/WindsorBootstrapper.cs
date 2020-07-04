@@ -19,7 +19,7 @@ namespace FBXViewer
             container.Register(Component.For<MainWindow>().ImplementedBy<MainWindow>());
             container.Register(Component.For<MainWindowViewModel>());
             container.Register(Component.For<TreeNodeViewModel>().LifestyleTransient());
-            container.Register(Component.For<ModelPreview>().LifestyleSingleton());
+            container.Register(Component.For<ModelView>().LifestyleSingleton());
             if (commandLineOptions.Renderer == Renderer.OpenGL)
             {
                 container.Register(Component.For<IScene>().ImplementedBy<OpenGLScene>().LifestyleSingleton());

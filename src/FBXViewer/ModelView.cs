@@ -14,17 +14,17 @@ using Vector = System.Windows.Vector;
 
 namespace FBXViewer
 {
-    public class ModelPreview
+    public class ModelView
     {
         private readonly Camera _camera;
         private IDragHandler? _dragHandler;
 
         public UIElement Element { get; }
         
-        private readonly MeshPreviewSettingsViewModel _settingsViewModel;
+        private readonly MeshViewSettingsViewModel _settingsViewModel;
         private readonly IScene _scene;
 
-        public ModelPreview(MainWindow mainWindow, IScene scene, Coroutines coroutines)
+        public ModelView(MainWindow mainWindow, IScene scene, Coroutines coroutines)
         {
             _scene = scene;
             _camera = new Camera(scene.RendererCamera, Vector3.Zero, coroutines, scene.CameraLight); 
@@ -39,8 +39,8 @@ namespace FBXViewer
             grid.Children.Add(border);
             border.SetValue(Grid.RowSpanProperty, 1);
 
-            _settingsViewModel = new MeshPreviewSettingsViewModel(scene);
-            var settings = new MeshPreviewSettings(_settingsViewModel);
+            _settingsViewModel = new MeshViewSettingsViewModel(scene);
+            var settings = new MeshViewSettings(_settingsViewModel);
             grid.Children.Add(settings);
             settings.SetValue(Grid.RowProperty, 1);
 
@@ -143,10 +143,10 @@ namespace FBXViewer
 
         private abstract class DragHandlerBase : IDragHandler
         {
-            protected readonly ModelPreview Outer;
+            protected readonly ModelView Outer;
             private Point _pos;
 
-            protected DragHandlerBase(ModelPreview outer, Point point)
+            protected DragHandlerBase(ModelView outer, Point point)
             {
                 _pos = point;
                 Outer = outer;
@@ -168,7 +168,7 @@ namespace FBXViewer
 
         private class PanDragHandler : DragHandlerBase
         {
-            public PanDragHandler(ModelPreview outer, Point point) : base(outer, point)
+            public PanDragHandler(ModelView outer, Point point) : base(outer, point)
             {
             }
             protected override void DoMouseDrag(Vector delta)
@@ -180,7 +180,7 @@ namespace FBXViewer
 
         private class OrbitHandler : DragHandlerBase
         {
-            public OrbitHandler(ModelPreview outer, Point point) : base(outer, point)
+            public OrbitHandler(ModelView outer, Point point) : base(outer, point)
             {
             }
 
@@ -192,7 +192,7 @@ namespace FBXViewer
 
         private class DollyHandler : DragHandlerBase
         {
-            public DollyHandler(ModelPreview outer, Point point) : base(outer, point)
+            public DollyHandler(ModelView outer, Point point) : base(outer, point)
             {
             }
 

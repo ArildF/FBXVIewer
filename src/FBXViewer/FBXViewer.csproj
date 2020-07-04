@@ -18,13 +18,13 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Page Update="MeshPreviewSettings.xaml">
+      <Page Update="MeshViewSettings.xaml">
         <Generator></Generator>
       </Page>
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="MeshPreviewSettings.xaml.cs">
+      <Compile Update="MeshViewSettings.xaml.cs">
         <DependentUpon>MeshPreviewSettings.xaml</DependentUpon>
       </Compile>
       <Compile Remove="OpenGL\OpenGLConverterExtensions.cs" />

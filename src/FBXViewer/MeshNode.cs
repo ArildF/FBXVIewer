@@ -8,13 +8,13 @@ namespace FBXViewer
     public class MeshNode : BaseNode
     {
         private readonly Mesh _mesh;
-        private readonly ModelPreview _modelPreview;
+        private readonly ModelView _modelView;
         private readonly MaterialProvider _materialProvider;
 
-        public MeshNode(Mesh mesh, ModelPreview modelPreview, MaterialProvider materialProvider)
+        public MeshNode(Mesh mesh, ModelView modelView, MaterialProvider materialProvider)
         {
             _mesh = mesh;
-            _modelPreview = modelPreview;
+            _modelView = modelView;
             _materialProvider = materialProvider;
         }
 
@@ -37,11 +37,11 @@ namespace FBXViewer
                     _isSelected = value;
                     if (_isSelected)
                     {
-                        _modelPreview.LoadMesh(_mesh, true, CalculateTransform());
+                        _modelView.LoadMesh(_mesh, true, CalculateTransform());
                     }
                     else if (!IsChecked)
                     {
-                       _modelPreview.UnloadMesh(_mesh); 
+                       _modelView.UnloadMesh(_mesh); 
                     }
                 }
             }
@@ -61,11 +61,11 @@ namespace FBXViewer
                     this.RaiseAndSetIfChanged(ref _isChecked, value);
                     if (_isChecked)
                     {
-                        _modelPreview.LoadMesh(_mesh, false, CalculateTransform());
+                        _modelView.LoadMesh(_mesh, false, CalculateTransform());
                     }
                     else
                     {
-                        _modelPreview.UnloadMesh(_mesh);
+                        _modelView.UnloadMesh(_mesh);
                     }
                 }
             }
@@ -78,7 +78,7 @@ namespace FBXViewer
 
         public override object GetPreview()
         {
-            return _modelPreview.Element;
+            return _modelView.Element;
         }
 
         public override string Text => IsSubMesh 

@@ -2,9 +2,9 @@ using System.Windows.Controls;
 
 namespace FBXViewer
 {
-    public partial class MeshPreviewSettings : UserControl
+    public partial class MeshViewSettings : UserControl
     {
-        public MeshPreviewSettings(MeshPreviewSettingsViewModel vm)
+        public MeshViewSettings(MeshViewSettingsViewModel vm)
         {
             InitializeComponent();
             DataContext = vm;
