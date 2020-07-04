@@ -9,6 +9,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using Assimp;
+using ReactiveUI;
 using Matrix4x4 = System.Numerics.Matrix4x4;
 using Quaternion = System.Windows.Media.Media3D.Quaternion;
 using Vector3D = System.Windows.Media.Media3D.Vector3D;
@@ -30,7 +31,7 @@ namespace FBXViewer.Wpf
 
         public ILight CameraLight { get; }
 
-        public WpfScene(TextureProvider<BitmapSource> textureProvider)
+        public WpfScene(TextureProvider<BitmapSource> textureProvider, MeshViewSettingsViewModel settingsViewModel)
         {
             _viewPort = new Viewport3D();
             
@@ -64,6 +65,25 @@ namespace FBXViewer.Wpf
             border.Child = _viewPort;
             Visual = border;
             MouseInput = new WpfMouseInput(border);
+
+
+            settingsViewModel.WhenAnyValue(s => s.MeshEnabled,
+                s => s.WireFrameEnabled).Subscribe(_ =>
+            {
+                ToggleMesh(settingsViewModel.MeshEnabled);
+                ToggleWireFrame(settingsViewModel.WireFrameEnabled);
+            });
+
+            settingsViewModel.WhenAnyValue(
+                s => s.YRotation,
+                s => s.XRotation,
+                s => s.ZRotation).Subscribe(_ =>
+            {
+                SetRootRotation(
+                    new Quaternion(new Vector3D(1, 0, 0), settingsViewModel.XRotation) *
+                    new Quaternion(new Vector3D(0, 1, 0), settingsViewModel.YRotation) *
+                    new Quaternion(new Vector3D(0, 0, 1), settingsViewModel.ZRotation));
+            });
         }
 
         public void LoadMesh(Mesh mesh, Matrix4x4 transform)

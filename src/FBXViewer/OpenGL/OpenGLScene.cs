@@ -12,7 +12,6 @@ using Assimp;
 using OpenGL;
 using Brushes = System.Windows.Media.Brushes;
 using Matrix4x4 = System.Numerics.Matrix4x4;
-using Quaternion = System.Windows.Media.Media3D.Quaternion;
 
 namespace FBXViewer.OpenGL
 {
@@ -199,17 +198,6 @@ namespace FBXViewer.OpenGL
             return mesh.BoundingBox.ToBounds() * matrix;
         }
 
-        public void ToggleWireFrame(in bool wireFrameEnabled)
-        {
-        }
-
-        public void ToggleMesh(in bool meshEnabled)
-        {
-        }
-
-        public void SetRootRotation(Quaternion quaternion)
-        {
-        }
 
         public IMouseInput MouseInput { get; }
     }

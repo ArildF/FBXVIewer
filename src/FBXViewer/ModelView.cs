@@ -24,7 +24,8 @@ namespace FBXViewer
         private readonly MeshViewSettingsViewModel _settingsViewModel;
         private readonly IScene _scene;
 
-        public ModelView(MainWindow mainWindow, IScene scene, Coroutines coroutines)
+        public ModelView(MainWindow mainWindow, IScene scene, Coroutines coroutines, 
+            MeshViewSettingsViewModel settingsViewModel)
         {
             _scene = scene;
             _camera = new Camera(scene.RendererCamera, Vector3.Zero, coroutines, scene.CameraLight); 
@@ -39,7 +40,7 @@ namespace FBXViewer
             grid.Children.Add(border);
             border.SetValue(Grid.RowSpanProperty, 1);
 
-            _settingsViewModel = new MeshViewSettingsViewModel(scene);
+            _settingsViewModel = settingsViewModel;
             var settings = new MeshViewSettings(_settingsViewModel);
             grid.Children.Add(settings);
             settings.SetValue(Grid.RowProperty, 1);

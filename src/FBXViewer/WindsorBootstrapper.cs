@@ -36,6 +36,7 @@ namespace FBXViewer
             container.Register(Component.For<MaterialProvider>().LifestyleSingleton());
             container.Register(Component.For<Coroutines>().LifestyleSingleton());
             container.Register(Component.For<SceneContext>().LifestyleSingleton());
+            container.Register(Component.For<MeshViewSettingsViewModel>().LifestyleSingleton());
 
             container.Register(Component.For<ITextureLoader<BitmapSource>>()
                 .ImplementedBy<BitmapSourceTextureLoader>());

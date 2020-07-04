@@ -16,10 +16,6 @@ namespace FBXViewer
         void UnloadMesh(Mesh mesh);
         bool RayCast(Vector2 mousePos, out RayCastResult rayCastResult);
         Bounds GetBoundingBox(Mesh mesh);
-        void ToggleWireFrame(in bool wireFrameEnabled);
-        void ToggleMesh(in bool meshEnabled);
-        void SetRootRotation(Quaternion quaternion);
-        
         IMouseInput MouseInput { get; }
     }
 }

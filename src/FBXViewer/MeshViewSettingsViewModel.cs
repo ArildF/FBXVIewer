@@ -1,15 +1,11 @@
-using System.Windows.Media.Media3D;
 using ReactiveUI;
 
 namespace FBXViewer
 {
     public class MeshViewSettingsViewModel : ReactiveObject
     {
-        private readonly IScene _scene;
-
-        public MeshViewSettingsViewModel(IScene scene)
+        public MeshViewSettingsViewModel()
         {
-            _scene = scene;
             _wireFrameEnabled = true;
             _meshEnabled = true;
         }
@@ -22,7 +18,6 @@ namespace FBXViewer
             set
             {
                 this.RaiseAndSetIfChanged(ref _wireFrameEnabled, value);
-                _scene.ToggleWireFrame(_wireFrameEnabled);
             }
         }
 
@@ -35,7 +30,6 @@ namespace FBXViewer
             set
             {
                 this.RaiseAndSetIfChanged(ref _zRotation, value);
-                UpdateRotation();
             }
         }
         
@@ -47,7 +41,6 @@ namespace FBXViewer
             set
             {
                 this.RaiseAndSetIfChanged(ref _yRotation, value);
-                UpdateRotation();
             }
         }
         
@@ -59,7 +52,6 @@ namespace FBXViewer
             set
             {
                 this.RaiseAndSetIfChanged(ref _xRotation, value);
-                UpdateRotation();
             }
         }
 
@@ -82,7 +74,6 @@ namespace FBXViewer
             set
             {
                 this.RaiseAndSetIfChanged(ref _meshEnabled, value);
-                _scene.ToggleMesh(_meshEnabled);
             }
         }
 
@@ -92,14 +83,6 @@ namespace FBXViewer
         {
             get => _lightStrength;
             set => this.RaiseAndSetIfChanged(ref _lightStrength, value);
-        }
-
-        private void UpdateRotation()
-        {
-            _scene.SetRootRotation( 
-                new Quaternion(new Vector3D(1, 0, 0), XRotation) *
-                new Quaternion(new Vector3D(0, 1, 0), YRotation) *
-                new Quaternion(new Vector3D(0, 0, 1), ZRotation));
         }
     }
 }
