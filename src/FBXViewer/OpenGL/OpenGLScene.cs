@@ -86,23 +86,18 @@ namespace FBXViewer.OpenGL
             var viewMatrix = _openGLCamera.ViewMatrix;
 
             Gl.UseProgram(_program);
-            
-            var mLocation = Gl.GetUniformLocation(_program, "M");
-            var vLocation = Gl.GetUniformLocation(_program, "V");
-            var pLocation = Gl.GetUniformLocation(_program, "P");
-            var lightPositionLocation = Gl.GetUniformLocation(_program, "LightPosition_worldSpace");
-            var diffuseSampler = Gl.GetUniformLocation(_program, "diffuseTextureSampler");
-            var normalSampler = Gl.GetUniformLocation(_program, "normalTextureSampler");
+
+            var u = Uniforms.Get(_program);
 
             foreach (var meshEntry in _meshes.Where(m => m.Enabled))
             {
                 var modelMatrix = meshEntry.GLMesh.ModelMatrix;
-                Gl.UniformMatrix4f(mLocation, 1, true, modelMatrix);
-                Gl.UniformMatrix4f(pLocation, 1, true, projectionMatrix);
-                Gl.UniformMatrix4f(vLocation, 1, true, viewMatrix);
-                Gl.Uniform3f(lightPositionLocation, 1, CameraLight?.Position ?? new Vector3(-50, 200, 50));
+                Gl.UniformMatrix4f(u.M, 1, true, modelMatrix);
+                Gl.UniformMatrix4f(u.P, 1, true, projectionMatrix);
+                Gl.UniformMatrix4f(u.V, 1, true, viewMatrix);
+                Gl.Uniform3f(u.LightPosition, 1, CameraLight?.Position ?? new Vector3(-50, 200, 50));
 
-                meshEntry.GLMesh.Render(diffuseSampler, normalSampler);
+                meshEntry.GLMesh.Render(u);
             }
         }
 

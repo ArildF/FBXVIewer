@@ -22,7 +22,7 @@ namespace FBXViewer.OpenGL
         public Texture? DiffuseTexture { get; set; }
         public Texture? NormalMap { get; set; }
 
-        public void Render(int diffuseTextureId, int normalTextureId)
+        public void Render(Uniforms u)
         {
             Gl.EnableVertexAttribArray(0);
             Gl.BindBuffer(BufferTarget.ArrayBuffer, _buffers.VertexBuffer);
@@ -55,8 +55,8 @@ namespace FBXViewer.OpenGL
                     Gl.Uniform1i(textureId, 1, slot);
                 }
             }
-            BindTexture(diffuseTextureId, TextureUnit.Texture0, DiffuseTexture, 0);
-            BindTexture(normalTextureId, TextureUnit.Texture1, NormalMap, 1);
+            BindTexture(u.DiffuseSampler, TextureUnit.Texture0, DiffuseTexture, 0);
+            BindTexture(u.NormalSampler, TextureUnit.Texture1, NormalMap, 1);
 
             Gl.DrawElements(PrimitiveType.Triangles, _indexCount, DrawElementsType.UnsignedInt, IntPtr.Zero);
             
