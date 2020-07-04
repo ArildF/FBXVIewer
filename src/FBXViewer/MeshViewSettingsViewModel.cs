@@ -8,6 +8,8 @@ namespace FBXViewer
         {
             _wireFrameEnabled = true;
             _meshEnabled = true;
+
+            LightStrength = 50;
         }
 
         private bool _wireFrameEnabled;

@@ -18,6 +18,7 @@ namespace FBXViewer.OpenGL
     public class OpenGLScene : IScene
     {
         private readonly MeshLoader _meshLoader;
+        private readonly MeshViewSettingsViewModel _settingsViewModel;
 
         private class MeshEntry
         {
@@ -33,9 +34,10 @@ namespace FBXViewer.OpenGL
             }
         }
 
-        public OpenGLScene(MeshLoader meshLoader)
+        public OpenGLScene(MeshLoader meshLoader, MeshViewSettingsViewModel settingsViewModel)
         {
             _meshLoader = meshLoader;
+            _settingsViewModel = settingsViewModel;
             var glControl = new GlControl
             {
                 Animation = true,
@@ -96,6 +98,7 @@ namespace FBXViewer.OpenGL
                 Gl.UniformMatrix4f(u.P, 1, true, projectionMatrix);
                 Gl.UniformMatrix4f(u.V, 1, true, viewMatrix);
                 Gl.Uniform3f(u.LightPosition, 1, CameraLight?.Position ?? new Vector3(-50, 200, 50));
+                Gl.Uniform1f(u.LightPower, 1, _settingsViewModel.LightStrength);
 
                 meshEntry.GLMesh.Render(u);
             }

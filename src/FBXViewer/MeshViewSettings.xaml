@@ -60,6 +60,20 @@
                     <TextBox Text="{Binding ZRotation, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1"
                              Grid.Row="2" />
                 </Grid>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Label>Light strength</Label>
+                    <TextBox Text="{Binding LightStrength, UpdateSourceTrigger=PropertyChanged}"
+                             Grid.Column="1" Grid.Row="0"/>
+                </Grid>
                 
             </StackPanel>
             <Grid>

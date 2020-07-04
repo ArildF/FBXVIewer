@@ -12,12 +12,12 @@ uniform sampler2D diffuseTextureSampler;
 uniform mat4 M;
 uniform mat4 V;
 uniform vec3 LightPosition_worldSpace;
+uniform float LightPower;
 
 void main()
 {
     
   vec3 LightColor = vec3(1,1,1);
-  float LightPower = 50f;
   
   float y = 1.0 - UV.y;
   vec3 diffuse = texture(diffuseTextureSampler, vec2(UV.x, y)).rgb;
