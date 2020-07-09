@@ -46,8 +46,18 @@ namespace FBXViewer.OpenGL
                 return null;
             }
             
+            
             uint textureId = Gl.GenTexture();
             Gl.BindTexture(TextureTarget.Texture2d, textureId);
+
+            if (bitmap.PixelFormat.NotIn(System.Drawing.Imaging.PixelFormat.Format32bppArgb, 
+                System.Drawing.Imaging.PixelFormat.Format24bppRgb))
+            {
+                bitmap = bitmap.Clone(new Rectangle(0, 0, bitmap.Width, bitmap.Height),
+                    System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+            }
+            
+            bitmap.Save(@$"E:\tmp\textures\{type}.bmp");
 
             var (internalFormat, pixelFormat) = bitmap.PixelFormat switch
             {
@@ -55,7 +65,7 @@ namespace FBXViewer.OpenGL
                 System.Drawing.Imaging.PixelFormat.Format24bppRgb => (InternalFormat.Rgb, PixelFormat.Bgr),
                 // 4 => (InternalFormat.Rgba, PixelFormat.Rgba),
                 // 3 => (InternalFormat.Rgb, PixelFormat.Rgb),
-                _ => throw new ArgumentException(nameof(bitmap))
+                _ => throw new ArgumentException($"Unsupported pixel format: {bitmap.PixelFormat}", nameof(bitmap))
             };
             var bits = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height),
                 ImageLockMode.ReadOnly, bitmap.PixelFormat);

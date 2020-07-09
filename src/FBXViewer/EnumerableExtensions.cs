@@ -1,10 +1,20 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FBXViewer
 {
     public static class EnumerableExtensions
     {
+        public static bool In<T>(this T self, params T[] items)
+        {
+            return items.Any(i => i?.Equals(self) ?? false);
+        }
+
+        public static bool NotIn<T>(this T self, params T[] items)
+        {
+            return !(self.In(items));
+        }
         public static IEnumerable<(T First, T Last)> Pairs<T>(this IEnumerable<T> self)
         {
             using (var enumerator = self.GetEnumerator())
