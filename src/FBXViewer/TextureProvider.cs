@@ -104,18 +104,6 @@ namespace FBXViewer
                     yield return source;
                 }
             }
-
-            var searchPath = _textureSearcher.Search(textureFileName);
-            source = LoadIfExists(searchPath);
-            if (source != null)
-            {
-                var directory = Path.GetDirectoryName(searchPath);
-                if (directory != null)
-                {
-                    _searchDirectories.Add(directory);
-                    yield return source;
-                }
-            }
         }
     }
 }

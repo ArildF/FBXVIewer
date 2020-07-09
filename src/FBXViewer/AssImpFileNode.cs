@@ -43,7 +43,8 @@ namespace FBXViewer
             _fileName = fileName;
             _scene = _context.ImportFile(fileName, 
                 PostProcessSteps.GenerateBoundingBoxes | 
-                PostProcessSteps.CalculateTangentSpace);
+                PostProcessSteps.CalculateTangentSpace | 
+                PostProcessSteps.EmbedTextures);
             _sceneContext.CurrentScene = _scene;
             _materialProvider.Load(_scene);
         }
