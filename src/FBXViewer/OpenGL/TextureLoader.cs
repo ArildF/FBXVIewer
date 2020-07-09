@@ -46,6 +46,8 @@ namespace FBXViewer.OpenGL
             {
                 return null;
             }
+            
+            bitmap.Save(@$"E:\tmp\textures\{type}.bmp");
 
             uint textureId = Gl.GenTexture();
             Gl.BindTexture(TextureTarget.Texture2d, textureId);

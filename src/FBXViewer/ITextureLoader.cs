@@ -1,3 +1,4 @@
+using System.Drawing;
 using System.IO;
 
 namespace FBXViewer
@@ -6,5 +7,6 @@ namespace FBXViewer
     {
         TBitmap FromPath(string path);
         TBitmap FromStream(Stream stream);
+        TBitmap FromColor(in Color color);
     }
 }

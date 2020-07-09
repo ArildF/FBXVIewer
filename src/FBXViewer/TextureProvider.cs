@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using Assimp;
@@ -14,7 +14,6 @@ namespace FBXViewer
         private readonly ITextureLoader<TBitmap> _loader;
         private readonly SceneContext _sceneContext;
         
-        private readonly List<string> _searchDirectories = new List<string>();
 
         public TextureProvider(TextureSearcher textureSearcher, ITextureLoader<TBitmap> loader, SceneContext sceneContext)
         {
@@ -45,7 +44,7 @@ namespace FBXViewer
                     t => t.Filename == path);
                 if (texture == null)
                 {
-                    return TryLoadFromDisk(material);
+                    return GetDefaultTexture(type);
                 }
 
                 var bitmapImage = _loader.FromStream(new MemoryStream(texture.CompressedData));
@@ -56,54 +55,16 @@ namespace FBXViewer
             return null;
         }
 
-        private TBitmap? TryLoadFromDisk(Material material)
+        private TBitmap? GetDefaultTexture(TextureType type)
         {
-            return DoTryLoadFromDisk(material).FirstOrDefault();
-        }
-        private IEnumerable<TBitmap> DoTryLoadFromDisk(Material material)
-        {
-            TBitmap? LoadIfExists(string path)
+            var color = type switch
             {
-                if (File.Exists(path))
-                {
-                    return _loader.FromPath(path);
-                }
-
-                return null;
-            }
-
-            if (String.IsNullOrEmpty(material.TextureDiffuse.FilePath))
-            {
-                yield break;
-            }
-
-            var source = LoadIfExists(material.TextureDiffuse.FilePath);
-            if (source != null)
-            {
-                yield return source;
-            }
-
-            var textureFileName = Path.GetFileName(material.TextureDiffuse.FilePath);
-
-            var fbxDirectory = Path.GetDirectoryName(textureFileName);
-
-            if (fbxDirectory != null)
-            {
-                source = LoadIfExists(Path.Combine(fbxDirectory, textureFileName));
-                if (source != null)
-                {
-                    yield return source;
-                }
-            }
-
-            foreach (var searchDirectory in _searchDirectories)
-            {
-                source = LoadIfExists(Path.Combine(searchDirectory, textureFileName));
-                if (source != null)
-                {
-                    yield return source;
-                }
-            }
+                TextureType.Diffuse => Color.Fuchsia,
+                TextureType.Normal => Color.Blue,
+                TextureType.Specular => Color.FromArgb(255, 255 / 3, 255 / 3, 255 / 3),
+                _ => throw new ArgumentException($"Unsupported texture type: {type}", nameof(type)),
+            };
+            return _loader.FromColor(color);
         }
     }
 }
