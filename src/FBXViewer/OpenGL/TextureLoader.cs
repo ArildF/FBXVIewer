@@ -57,7 +57,7 @@ namespace FBXViewer.OpenGL
                     System.Drawing.Imaging.PixelFormat.Format24bppRgb);
             }
             
-            bitmap.Save(@$"E:\tmp\textures\{type}.bmp");
+            // bitmap.Save(@$"E:\tmp\textures\{type}.bmp");
 
             var (internalFormat, pixelFormat) = bitmap.PixelFormat switch
             {
