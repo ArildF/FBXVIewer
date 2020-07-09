@@ -76,6 +76,7 @@ namespace FBXViewer.OpenGL
 
             var texture = _loader.LoadDiffuse(mesh);
             var normalMap = _loader.LoadNormalMap(mesh);
+            var specularMap = _loader.LoadSpecularMap(mesh);
             var buffers = new Buffers
             {
                 IndexBuffer = indexBuffer,
@@ -90,6 +91,7 @@ namespace FBXViewer.OpenGL
                 DiffuseTexture = texture,
                 ModelMatrix = transform,
                 NormalMap = normalMap,
+                SpecularMap = specularMap,
             };
         }
     }

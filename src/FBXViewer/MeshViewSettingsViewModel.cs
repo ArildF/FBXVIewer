@@ -11,6 +11,7 @@ namespace FBXViewer
 
             LightStrength = 50;
             Ambient = 0.1f;
+            SpecularMapStrength = 1;
         }
 
         private bool _wireFrameEnabled;
@@ -94,6 +95,14 @@ namespace FBXViewer
         {
             get => _ambient;
             set => this.RaiseAndSetIfChanged(ref _ambient, value);
+        }
+
+        private float _specularMapStrength;
+
+        public float SpecularMapStrength
+        {
+            get => _specularMapStrength;
+            set => this.RaiseAndSetIfChanged(ref _specularMapStrength, value);
         }
     }
 }

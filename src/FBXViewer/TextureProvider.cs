@@ -38,6 +38,7 @@ namespace FBXViewer
                 {
                     TextureType.Diffuse => material.TextureDiffuse.FilePath,
                     TextureType.Normal => material.TextureNormal.FilePath,
+                    TextureType.Specular => material.TextureSpecular.FilePath,
                     _ => throw new NotSupportedException(),
                 };
                 var texture = scene.Textures.FirstOrDefault(

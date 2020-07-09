@@ -21,6 +21,7 @@ namespace FBXViewer.OpenGL
         public Matrix4x4 ModelMatrix { get; set; }
         public Texture? DiffuseTexture { get; set; }
         public Texture? NormalMap { get; set; }
+        public Texture? SpecularMap { get; set; }
 
         public void Render(Uniforms u)
         {
@@ -57,6 +58,7 @@ namespace FBXViewer.OpenGL
             }
             BindTexture(u.DiffuseSampler, TextureUnit.Texture0, DiffuseTexture, 0);
             BindTexture(u.NormalSampler, TextureUnit.Texture1, NormalMap, 1);
+            BindTexture(u.SpecularSampler, TextureUnit.Texture2, SpecularMap, 2);
 
             Gl.DrawElements(PrimitiveType.Triangles, _indexCount, DrawElementsType.UnsignedInt, IntPtr.Zero);
             

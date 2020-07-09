@@ -27,6 +27,11 @@ namespace FBXViewer.OpenGL
         {
             return LoadTexture(mesh, TextureType.Normal);
         }
+        
+        public Texture LoadSpecularMap(Mesh mesh)
+        {
+            return LoadTexture(mesh, TextureType.Specular);
+        }
 
         private Texture LoadTexture(Mesh mesh, TextureType type)
         {

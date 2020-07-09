@@ -101,6 +101,7 @@ namespace FBXViewer.OpenGL
                 Gl.Uniform1f(u.LightPower, 1, _settingsViewModel.LightStrength);
                 Gl.Uniform1f(u.LightPower, 1, _settingsViewModel.LightStrength);
                 Gl.Uniform1f(u.Ambient, 1, _settingsViewModel.Ambient);
+                Gl.Uniform1f(u.SpecularStrength, 1, _settingsViewModel.SpecularMapStrength);
 
                 meshEntry.GLMesh.Render(u);
             }

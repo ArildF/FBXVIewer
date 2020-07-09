@@ -77,6 +77,10 @@
                     <Label Grid.Row="1" Grid.Column="0">Ambient</Label>
                     <TextBox Text="{Binding Ambient, UpdateSourceTrigger=PropertyChanged}"
                              Grid.Column="1" Grid.Row="1"/>
+                    
+                    <Label Grid.Row="2" Grid.Column="0">Specular map strength</Label>
+                    <TextBox Text="{Binding SpecularMapStrength, UpdateSourceTrigger=PropertyChanged}"
+                             Grid.Column="1" Grid.Row="2"/>
                 </Grid>
                 
             </StackPanel>
