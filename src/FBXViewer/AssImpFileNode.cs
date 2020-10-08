@@ -16,6 +16,7 @@ namespace FBXViewer
         private readonly Func<List<Material>, MaterialsNode> _materialsFactory;
         private readonly Func<List<EmbeddedTexture>, TexturesNode> _texturesFactory;
         private readonly Func<Node, SceneNode> _sceneNodeFactory;
+        private readonly Func<List<Animation>, AnimationsNode> _animationsNodeFactory;
         private readonly MaterialProvider _materialProvider;
         private readonly SceneContext _sceneContext;
 
@@ -23,6 +24,7 @@ namespace FBXViewer
             Func<List<Material>, MaterialsNode> materialsFactory, 
             Func<List<EmbeddedTexture>, TexturesNode> texturesFactory, 
             Func<Node, SceneNode> sceneNodeFactory,
+            Func<List<Animation>, AnimationsNode> animationsNodeFactory,
             MaterialProvider materialProvider, 
             SceneContext sceneContext)
         {
@@ -30,6 +32,7 @@ namespace FBXViewer
             _materialsFactory = materialsFactory;
             _texturesFactory = texturesFactory;
             _sceneNodeFactory = sceneNodeFactory;
+            _animationsNodeFactory = animationsNodeFactory;
             _materialProvider = materialProvider;
             _sceneContext = sceneContext;
         }
@@ -62,6 +65,7 @@ namespace FBXViewer
             yield return _meshesFactory(_scene.Meshes);
             yield return _texturesFactory(_scene.Textures);
             yield return _materialsFactory(_scene.Materials);
+            yield return _animationsNodeFactory(_scene.Animations);
         }
     }
 }
