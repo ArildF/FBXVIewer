@@ -33,21 +33,22 @@ namespace FBXViewer
             if (mesh.MaterialIndex < scene.MaterialCount)
             {
                 var material = scene.Materials[mesh.MaterialIndex];
-                var path = type switch
+                var slot = type switch
                 {
-                    TextureType.Diffuse => material.TextureDiffuse.FilePath,
-                    TextureType.Normal => material.TextureNormal.FilePath,
-                    TextureType.Specular => material.TextureSpecular.FilePath,
+                    TextureType.Diffuse => material.TextureDiffuse,
+                    TextureType.Normal => material.TextureNormal,
+                    TextureType.Specular => material.TextureSpecular,
                     _ => throw new NotSupportedException(),
                 };
-                var texture = scene.Textures.FirstOrDefault(
-                    t => t.Filename == path);
-                if (texture == null)
+                
+                var texture = scene.Textures.Select((embeddedTexture, index) => new{embeddedTexture, index})
+                    .FirstOrDefault(t => t.index == slot.TextureIndex);
+                if (slot.TextureType != Assimp.TextureType.None || texture == null)
                 {
                     return GetDefaultTexture(type);
                 }
 
-                var bitmapImage = _loader.FromStream(new MemoryStream(texture.CompressedData));
+                var bitmapImage = _loader.FromStream(new MemoryStream(texture.embeddedTexture.CompressedData));
 
                 return bitmapImage;
             }
