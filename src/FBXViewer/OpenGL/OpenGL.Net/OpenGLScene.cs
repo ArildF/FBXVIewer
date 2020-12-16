@@ -13,7 +13,7 @@ using OpenGL;
 using Brushes = System.Windows.Media.Brushes;
 using Matrix4x4 = System.Numerics.Matrix4x4;
 
-namespace FBXViewer.OpenGL
+namespace FBXViewer.OpenGL.OpenGL.Net
 {
     public class OpenGLScene : IScene
     {

@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace FBXViewer.OpenGL
+namespace FBXViewer.OpenGL.Silk.Net
 {
     public class Texture
     {

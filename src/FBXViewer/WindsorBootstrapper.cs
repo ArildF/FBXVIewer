@@ -4,7 +4,11 @@ using Castle.Facilities.TypedFactory;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using FBXViewer.OpenGL;
+using FBXViewer.OpenGL.OpenGL.Net;
+using FBXViewer.OpenGL.Silk.Net;
 using FBXViewer.Wpf;
+using MeshLoader = FBXViewer.OpenGL.OpenGL.Net.MeshLoader;
+using TextureLoader = FBXViewer.OpenGL.OpenGL.Net.TextureLoader;
 
 namespace FBXViewer
 {
@@ -24,12 +28,18 @@ namespace FBXViewer
             {
                 container.Register(Component.For<IScene>().ImplementedBy<OpenGLScene>().LifestyleSingleton());
             }
-            else
+            else if (commandLineOptions.Renderer == Renderer.WPF)
             {
                 container.Register(Component.For<IScene>().ImplementedBy<WpfScene>().LifestyleSingleton());
             }
+            else
+            {
+                container.Register(Component.For<IScene>().ImplementedBy<SilkScene>());
+            }
 
             container.Register(Component.For<MeshLoader>().LifestyleSingleton());
+            container.Register(Component.For<FBXViewer.OpenGL.Silk.Net.MeshLoader>().LifestyleSingleton());
+            container.Register(Component.For<FBXViewer.OpenGL.Silk.Net.TextureLoader>().LifestyleSingleton());
             container.Register(Component.For<TextureLoader>().LifestyleSingleton());
             container.Register(Component.For(typeof(TextureProvider<>)).LifestyleSingleton());
             container.Register(Component.For<TextureSearcher>().LifestyleSingleton());

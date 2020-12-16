@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 
-namespace FBXViewer.OpenGL
+namespace FBXViewer.OpenGL.Silk.Net
 {
     public class WinFormsMouseInput : IMouseInput
     {

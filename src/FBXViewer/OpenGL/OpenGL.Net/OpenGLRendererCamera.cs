@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Numerics;
 
-namespace FBXViewer.OpenGL
+namespace FBXViewer.OpenGL.OpenGL.Net
 {
     public class OpenGLRendererCamera : IRendererCamera
     {

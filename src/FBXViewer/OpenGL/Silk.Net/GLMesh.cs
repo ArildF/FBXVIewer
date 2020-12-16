@@ -3,7 +3,7 @@ using OpenGL;
 using Matrix4x4 = System.Numerics.Matrix4x4;
 using PrimitiveType = OpenGL.PrimitiveType;
 
-namespace FBXViewer.OpenGL
+namespace FBXViewer.OpenGL.Silk.Net
 {
     public class GLMesh
     {

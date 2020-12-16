@@ -6,7 +6,7 @@ using Assimp;
 using OpenGL;
 using PixelFormat = OpenGL.PixelFormat;
 
-namespace FBXViewer.OpenGL
+namespace FBXViewer.OpenGL.Silk.Net
 {
     public class TextureLoader
     {

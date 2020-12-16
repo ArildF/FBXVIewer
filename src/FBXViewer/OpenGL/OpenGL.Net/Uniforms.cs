@@ -1,6 +1,6 @@
 using OpenGL;
 
-namespace FBXViewer.OpenGL
+namespace FBXViewer.OpenGL.OpenGL.Net
 {
     public struct Uniforms
     {

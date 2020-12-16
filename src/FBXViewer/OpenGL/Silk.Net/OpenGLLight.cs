@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace FBXViewer.OpenGL
+namespace FBXViewer.OpenGL.Silk.Net
 {
     public class OpenGLLight : ILight
     {
