@@ -70,7 +70,7 @@ namespace FBXViewer
         
         private void KeyDown(object? sender, KeyEventArgs e)
         {
-            if (_settings.IsKeyboardFocusWithin)
+            if (_settings.IsFocused)
             {
                 return;
             }

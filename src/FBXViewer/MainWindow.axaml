@@ -1,12 +1,11 @@
-﻿<Window x:Class="FBXViewer.MainWindow"
-        xmlns="https://github.com/avaloniaui"
+﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FBXViewer"
-        mc:Ignorable="d"
-        Background="{DynamicResource Background}"
-        Icon="Art/Icon.jpg"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="FBXViewer.MainWindow"
+        Icon="/Art/Icon.jpg"
         Title="FBX Viewer">
     <Window.DataTemplates>
         <DataTemplate DataType="{x:Type local:ShapeKeyViewModel}">
@@ -26,12 +25,12 @@
                     <MenuItem Header="_Open" Click="Open_OnClick" />
                 </MenuItem>
             </Menu>
-            <TextBox DockPanel.Dock="Bottom" Text="{Binding ErrorText}" 
+            <TextBox DockPanel.Dock="Bottom" Text="{Binding ErrorText}"
                      Height="100"
                      Foreground="Red"/>
-                     
-            <Grid >
-                
+    
+            <Grid>
+    
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="0.5*"></ColumnDefinition>
                     <ColumnDefinition Width="5"></ColumnDefinition>

@@ -10,12 +10,11 @@
 
     <ItemGroup>
       <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
-      <PackageReference Include="Avalonia" Version="0.10.0-rc1" />
-      <PackageReference Include="Avalonia.Desktop" Version="0.10.0-rc1" />
-      <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.0-rc1" />
+      <PackageReference Include="Avalonia" Version="0.9.12" />
+      <PackageReference Include="Avalonia.Desktop" Version="0.9.12" />
+      <PackageReference Include="Avalonia.ReactiveUI" Version="0.9.12" />
       <PackageReference Include="Castle.Windsor" Version="5.0.1" />
       <PackageReference Include="CommandLineParser" Version="2.8.0" />
-      <PackageReference Include="MessageBoxSlim.Avalonia" Version="0.9.8" />
       <PackageReference Include="OpenGL.Net.WinForms" Version="0.8.4" />
       <PackageReference Include="ReactiveUI" Version="13.0.1" />
       <PackageReference Include="WaveEngine.Bindings.OpenGL" Version="1.0.4998" />

@@ -1,32 +1,33 @@
 ﻿<Application x:Class="FBXViewer.App"
              xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:avalonia="https://github.com/avaloniaui">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Application.Resources>
-        <SolidColorBrush x:Key="Background" Color="#FF383838"/>
-        <SolidColorBrush x:Key="Foreground" Color="#DDDDDD"/>
+        <!-- <SolidColorBrush x:Key="Background" Color="#FF383838"/> -->
+        <!-- <SolidColorBrush x:Key="Foreground" Color="#DDDDDD"/> -->
     </Application.Resources>
-    <Application.Styles>
-        
-        <Style Selector="TextBlock">
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Foreground" Value="{DynamicResource Foreground}"/>
-        </Style>
-        
-        <Style Selector="ContentControl">
-            <Setter Property="Background" Value="{DynamicResource Background}"></Setter>
-        </Style>
-        
-        <Style Selector="Window">
-            <Setter Property="Background" Value="{DynamicResource Background}"/>
-        </Style>
-        
-        <Style Selector="TreeView">
-            <Setter Property="Background" Value="{DynamicResource Background}"/>
-        </Style>
-        <Style Selector="TextBox">
-            <Setter Property="Background" Value="{DynamicResource Background}"/>
-        </Style>
+	<Application.Styles>
+		<StyleInclude Source="avares://Avalonia.Themes.Default/DefaultTheme.xaml"/>
+		<StyleInclude Source="avares://Avalonia.Themes.Default/Accents/BaseLight.xaml"/>
+    <!--      -->
+    <!--     <Style Selector="TextBlock"> -->
+    <!--         <Setter Property="FontSize" Value="14"/> -->
+    <!--         <Setter Property="FontWeight" Value="Bold"/> -->
+    <!--         <Setter Property="Foreground" Value="{DynamicResource Foreground}"/> -->
+    <!--     </Style> -->
+    <!--      -->
+    <!--     <Style Selector="ContentControl"> -->
+    <!--         <Setter Property="Background" Value="{DynamicResource Background}"></Setter> -->
+    <!--     </Style> -->
+    <!--      -->
+    <!--     <Style Selector="Window"> -->
+    <!--         <Setter Property="Background" Value="{DynamicResource Background}"/> -->
+    <!--     </Style> -->
+    <!--      -->
+    <!--     <Style Selector="TreeView"> -->
+    <!--         <Setter Property="Background" Value="{DynamicResource Background}"/> -->
+    <!--     </Style> -->
+    <!--     <Style Selector="TextBox"> -->
+    <!--         <Setter Property="Background" Value="{DynamicResource Background}"/> -->
+    <!--     </Style> -->
     </Application.Styles>
 </Application>
