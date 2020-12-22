@@ -10,9 +10,12 @@ namespace FBXViewer
         private readonly MainWindowViewModel _mainWindowViewModel;
         private readonly INode _node;
         private readonly Func<INode, TreeNodeViewModel> _nodeFactory;
-        private readonly List<object> _children = new List<object>();
+        private readonly List<object> _children = new();
 
-        private static readonly object Dummy = new object();
+        private object? _preview;
+        private object? _thumbnail;
+
+        private static readonly object Dummy = new();
         
         public TreeNodeViewModel(MainWindowViewModel mainWindowViewModel, INode node, Func<INode, TreeNodeViewModel> nodeFactory)
         {
@@ -43,9 +46,9 @@ namespace FBXViewer
                 }
             }
         }
-        public object? Preview => _node.GetPreview();
+        public object? Preview => _preview ??= _node.GetPreview();
         public string Text => _node.Text ?? "";
-        public object? PreviewThumbnail => _node.GetPreviewThumbnail();
+        public object? PreviewThumbnail => _thumbnail ??= _node.GetPreviewThumbnail();
 
         public object? UIDataContext => _node.UIDataContext;
 
