@@ -1,8 +1,8 @@
 ﻿using System.Linq;
-using System.Net.WebSockets;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Castle.Core;
 
 namespace FBXViewer
 {
@@ -20,6 +20,7 @@ namespace FBXViewer
             InitializeComponent();
         }
 
+        [DoNotSelect]
         public MainWindow()
         {
             InitializeComponent();
