@@ -30,7 +30,7 @@ namespace FBXViewer
             return elt;
         }
 
-        public override string Text => $"Texture '{_texture.Filename}'";
+        public override string Text => $"Texture '{Path.GetFileName(_texture.Filename)}'";
         public override bool HasChildren => true;
         protected override IEnumerable<INode> CreateChildren()
         {
