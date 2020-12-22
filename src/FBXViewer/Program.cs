@@ -1,5 +1,4 @@
 using Avalonia;
-using Avalonia.Logging.Serilog;
 using Avalonia.ReactiveUI;
 
 namespace FBXViewer
@@ -9,7 +8,7 @@ namespace FBXViewer
 	    public static AppBuilder BuildAvaloniaApp()
 		    => AppBuilder.Configure<App>()
 			    .UsePlatformDetect()
-			    .LogToDebug()
+			    .LogToTrace()
 			    .UseReactiveUI();
         public static void Main(string[] args)
         {
