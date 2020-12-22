@@ -36,32 +36,31 @@
                     <ColumnDefinition Width="5"></ColumnDefinition>
                     <ColumnDefinition Width="1*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <!-- <TreeView Grid.Column="0" -->
-                <!--           ItemsSource="{Binding RootNodes}"> -->
-                <!--     <TreeView.Resources> -->
-                <!--         <Style TargetType="TreeViewItem"> -->
-                <!--             <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay}"/> -->
-                <!--         </Style> -->
-                <!--         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter> -->
-                <!--     </TreeView.Resources> -->
-                <!-- -->
-                <!--     <TreeView.ItemTemplate> -->
-                <!--         <HierarchicalDataTemplate DataType="local:TreeNodeViewModel" -->
-                <!--                                   ItemsSource="{Binding Children}"> -->
-                <!--             <Grid> -->
-                <!--                 <DockPanel MaxHeight="16"> -->
-                <!--                     <CheckBox -->
-                <!--                         Visibility="{Binding IsMultiSelect, Converter={StaticResource BooleanToVisibilityConverter}}" -->
-                <!--                         IsChecked="{Binding IsChecked, Mode=TwoWay}" -->
-                <!--                         VerticalAlignment="Top" /> -->
-                <!--                     <TextBlock Text="{Binding Text}" VerticalAlignment="Top" /> -->
-                <!--                     <ContentControl Content="{Binding PreviewThumbnail}" VerticalAlignment="Top" /> -->
-                <!--                 </DockPanel> -->
-                <!--                 <ContentControl Content="{Binding UIDataContext}" HorizontalAlignment="Stretch"/> -->
-                <!--             </Grid> -->
-                <!--         </HierarchicalDataTemplate> -->
-                <!--     </TreeView.ItemTemplate> -->
-                <!-- </TreeView> -->
+                <TreeView Grid.Column="0"
+                          Items="{Binding RootNodes}">
+                    <TreeView.Styles>
+                        <Style Selector="TreeViewItem">
+                            <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay}"/>
+                        </Style>
+                    </TreeView.Styles>
+                
+                    <TreeView.ItemTemplate>
+                        <TreeDataTemplate DataType="local:TreeNodeViewModel"
+                                                  ItemsSource="{Binding Children}">
+                            <Grid>
+                                <DockPanel MaxHeight="16">
+                                    <CheckBox 
+                                        IsVisible="{Binding IsMultiSelect}"
+                                        IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                        VerticalAlignment="Top" />
+                                    <TextBlock Text="{Binding Text}" VerticalAlignment="Top" />
+                                    <ContentControl Content="{Binding PreviewThumbnail}" VerticalAlignment="Top" />
+                                </DockPanel>
+                                <ContentControl Content="{Binding UIDataContext}" HorizontalAlignment="Stretch"/>
+                            </Grid>
+                        </TreeDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
                 <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"/>
                 <ContentControl Content="{Binding Preview}" Grid.Column="2"/>
             </Grid>
