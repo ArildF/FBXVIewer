@@ -3,7 +3,6 @@ using System.Collections;
 using System.Diagnostics;
 using System.Numerics;
 using Quaternion = System.Numerics.Quaternion;
-using Vector = System.Windows.Vector;
 
 namespace FBXViewer
 {
@@ -109,7 +108,7 @@ namespace FBXViewer
             MoveTo(_position, _pivot);
         }
 
-        public void Orbit(Vector delta)
+        public void Orbit(Vector3 delta)
         {
             var rotation = Quaternion.CreateFromAxisAngle(Vector3.Transform(Vector3.UnitX, _rotation), (float) delta.Y) * _rotation;
             rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitY, (float) -delta.X) * rotation;

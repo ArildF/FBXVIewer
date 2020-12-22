@@ -1,5 +1,4 @@
 using System.Numerics;
-using System.Windows.Media.Media3D;
 
 namespace FBXViewer
 {
@@ -22,12 +21,6 @@ namespace FBXViewer
         {
             return new Bounds(bounds.SizeX, bounds.SizeY, bounds.SizeZ,
                 Vector3.Transform(bounds.Location, matrix4X4));
-        }
-        
-        public static Bounds operator *(Bounds bounds, Transform3D transform3D)
-        {
-            return new Bounds(bounds.SizeX, bounds.SizeY, bounds.SizeZ,
-                transform3D.Transform(bounds.Location.AsPoint3D()).AsVector3());
         }
     }
 }

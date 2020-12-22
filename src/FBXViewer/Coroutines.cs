@@ -2,8 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Windows.Threading;
+using Avalonia.Threading;
 
 namespace FBXViewer
 {
@@ -19,7 +18,7 @@ namespace FBXViewer
 
         public Coroutines()
         {
-            _timer = new DispatcherTimer(DispatcherPriority.Normal, Dispatcher.CurrentDispatcher);
+            _timer = new DispatcherTimer(DispatcherPriority.Normal);
             _timer.Interval = TimeSpan.FromMilliseconds(30);
             _timer.Tick += TimerOnTick;
             _currentTime = DateTime.Now;

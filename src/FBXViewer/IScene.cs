@@ -1,15 +1,16 @@
 using System.Numerics;
 using System.Windows;
 using Assimp;
+using Avalonia;
+using Avalonia.Controls;
 using Matrix4x4 = System.Numerics.Matrix4x4;
-using Quaternion = System.Windows.Media.Media3D.Quaternion;
 
 namespace FBXViewer
 {
     public interface IScene
     {
         IRendererCamera RendererCamera { get; }
-        UIElement Visual { get; }
+        IControl Visual { get; }
         ILight? CameraLight { get; }
         void LoadMesh(Mesh mesh, Matrix4x4 transform);
         void SetShapeKeyWeight(Mesh mesh, float weight, MeshAnimationAttachment attachment);

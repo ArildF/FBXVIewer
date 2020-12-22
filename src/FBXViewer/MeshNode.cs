@@ -76,7 +76,7 @@ namespace FBXViewer
             return (SceneParent?.Transform ?? Assimp.Matrix4x4.Identity).ToNumMatrix4x4();
         }
 
-        public override object GetPreview()
+        public override object? GetPreview()
         {
             return _modelView.Element;
         }

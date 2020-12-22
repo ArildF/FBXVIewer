@@ -2,58 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Windows;
-using System.Windows.Media.Media3D;
 using Assimp;
+using Avalonia;
 using Matrix4x4 = System.Numerics.Matrix4x4;
 using Vector3D = Assimp.Vector3D;
-using MVector3D = System.Windows.Media.Media3D.Vector3D;
 using Quaternion = System.Numerics.Quaternion;
 
 namespace FBXViewer
 {
     public static class MathExtensions
     {
-        public static Vector3D AsVector3D(this Point3D self)
-        {
-            return new Vector3D((float)self.X, (float)self.Y, (float)self.Z);
-        }
-
-        public static Vector3 AsVector3(this Point3D self)
-        {
-            return new Vector3((float)self.X, (float)self.Y, (float)self.Z);
-        }
-        
-        public static Vector3 AsVector3(this MVector3D self)
-        {
-            return new Vector3((float)self.X, (float)self.Y, (float)self.Z);
-        }
-        
         public static Vector3 AsVector3(this Vector3D self)
         {
             return new Vector3(self.X, self.Y, self.Z);
         }
-        
-        public static Vector3 AsVector3(this Size3D self)
-        {
-            return new Vector3((float)self.X, (float)self.Y, (float)self.Z);
-        }
-        
-        public static Vector3D AsVector3D(this MVector3D self)
-        {
-            return new Vector3D((float)self.X, (float)self.Y, (float)self.Z);
-        }
 
-        public static MVector3D AsMVector3D(this Vector3 self)
-        {
-            return new MVector3D(self.X, self.Y, self.Z);
-        }
+        public static Vector3 AsVector3(this Point point) => new Vector3((float) point.X, (float) point.Y, 0);
         
-        public static Point3D AsPoint3D(this Vector3 self)
-        {
-            return new Point3D(self.X, self.Y, self.Z);
-        }
-
         public static Vector3 Forward(this Quaternion self)
         {
             return Vector3.Transform(Vector3.UnitZ, self);
@@ -83,7 +48,7 @@ namespace FBXViewer
         {
             bool IsEqualish(float dot)
             {
-                return (double) dot > 0.999998986721039;
+                return dot > 0.999998986721039;
             }
             var dot = Quaternion.Dot(q1, q2);
             return IsEqualish(dot) ? 0.0f : (float) ((double) Math.Acos(Math.Min(Math.Abs((float)dot), 1f)) * 2.0 * 57.2957801818848);
@@ -123,34 +88,6 @@ namespace FBXViewer
             return *(Matrix4x4*) (&self);
         }
 
-        public static Transform3D ToTransform3D(this Matrix4x4 self)
-        {
-            return new MatrixTransform3D(self.ToMatrix3D());
-        }
-
-        public static Matrix3D ToMatrix3D(this Matrix4x4 self)
-        {
-            var ret =  new Matrix3D(
-                self.M11,
-                self.M12,
-                self.M13,
-                self.M14,
-                self.M21,
-                self.M22,
-                self.M23,
-                self.M24,
-                self.M31,
-                self.M32,
-                self.M33,
-                self.M34,
-                self.M41,
-                self.M42,
-                self.M43,
-                self.M44
-                );
-            Console.WriteLine(ret);
-            return ret;
-        }
         
         public static Quaternion ToLookRotation(this Vector3 forward, Vector3 up)
         {

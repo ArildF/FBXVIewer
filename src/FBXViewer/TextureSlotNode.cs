@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media.Imaging;
 using Assimp;
+using Avalonia.Controls;
+using Avalonia.Media.Imaging;
 
 namespace FBXViewer
 {
@@ -29,7 +27,7 @@ namespace FBXViewer
                 return null;
             }
             var elt = new Image();
-            elt.Source = new BitmapImage(new Uri(_textureSlot.FilePath));
+            elt.Source = new Bitmap(_textureSlot.FilePath);
 
             return elt;
         }

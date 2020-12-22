@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+using Avalonia.Controls;
 using Microsoft.Win32;
 
 namespace FBXViewer
@@ -15,14 +18,17 @@ namespace FBXViewer
         {
             var ofd = new OpenFileDialog
             {
-                Filter = textureFileName + "|" + "*.*"
+                Filters = new List<FileDialogFilter>
+                {
+                    new() {Name = textureFileName, Extensions = new List<string>{"*.*"}}
+                },
             };
-            if (ofd.ShowDialog(_mainWindow) == true)
+            var result = ofd.ShowAsync(_mainWindow).Result;
+            return result switch
             {
-                return ofd.FileName;
-            }
-
-            return textureFileName;
+                {Length: > 0} => result.First(),
+                _ => textureFileName
+            };
         }
     }
 }

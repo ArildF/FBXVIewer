@@ -1,12 +1,13 @@
-using System.Windows.Controls;
+using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
 
 namespace FBXViewer
 {
-    public partial class MeshViewSettings : UserControl
+    public class MeshViewSettings : UserControl
     {
         public MeshViewSettings(MeshViewSettingsViewModel vm)
         {
-            InitializeComponent();
+            AvaloniaXamlLoader.Load(this);
             DataContext = vm;
         }
     }

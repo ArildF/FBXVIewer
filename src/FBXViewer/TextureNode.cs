@@ -1,9 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Windows.Controls;
-using System.Windows.Media.Imaging;
 using Assimp;
+using Avalonia.Controls;
+using Avalonia.Media.Imaging;
 
 namespace FBXViewer
 {
@@ -16,18 +15,15 @@ namespace FBXViewer
             _texture = texture;
         }
         
-        public override object GetPreview()
+        public override object? GetPreview()
         {
             if (!_texture.HasCompressedData)
             {
-                return false;
+                return null;
             }
             var elt = new Image();
             
-            var bitmapImage = new BitmapImage();
-            bitmapImage.BeginInit();
-            bitmapImage.StreamSource = new MemoryStream(_texture.CompressedData);
-            bitmapImage.EndInit();
+            var bitmapImage = new Bitmap(new MemoryStream(_texture.CompressedData));
 
             elt.Source = bitmapImage;
 

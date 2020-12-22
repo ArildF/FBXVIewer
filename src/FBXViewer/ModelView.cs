@@ -1,16 +1,13 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
 using Assimp;
-using KeyEventArgs = System.Windows.Input.KeyEventArgs;
-using KeyEventHandler = System.Windows.Input.KeyEventHandler;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Media;
 using Matrix4x4 = System.Numerics.Matrix4x4;
-using MVector3D = System.Windows.Media.Media3D.Vector3D;
-using Vector = System.Windows.Vector;
 
 namespace FBXViewer
 {
@@ -19,7 +16,7 @@ namespace FBXViewer
         private readonly Camera _camera;
         private IDragHandler? _dragHandler;
 
-        public UIElement Element { get; }
+        public Visual Element { get; }
         
         private readonly MeshViewSettingsViewModel _settingsViewModel;
         private readonly IScene _scene;
@@ -55,7 +52,7 @@ namespace FBXViewer
 
             input.MouseDown += DoubleClick;
               
-            mainWindow.AddHandler(UIElement.KeyDownEvent, new KeyEventHandler(KeyDown), false);
+            mainWindow.AddHandler(InputElement.KeyDownEvent, KeyDown,RoutingStrategies.Bubble, false);
             Element = grid;
         }
 
@@ -71,26 +68,26 @@ namespace FBXViewer
             }
         }
         
-        private void KeyDown(object sender, KeyEventArgs e)
+        private void KeyDown(object? sender, KeyEventArgs e)
         {
             if (_settings.IsKeyboardFocusWithin)
             {
                 return;
             }
-            Debug.WriteLine($"Key down {e.Key} {e.Handled} {e.InputSource}");
+            Debug.WriteLine($"Key down {e.Key} {e.Handled} {e.Source}");
             if (e.Key == Key.Decimal)
             {
                 _camera.ResetToDefault();
             }
 
-            View? view = (e.Key, Keyboard.Modifiers) switch
+            View? view = (e.Key, e.KeyModifiers) switch
             {
-                (Key.NumPad1, ModifierKeys.None) => View.Front,
-                (Key.NumPad1, ModifierKeys.Control) => View.Back,
-                (Key.NumPad3, ModifierKeys.None) => View.Right,
-                (Key.NumPad3, ModifierKeys.Control) => View.Left,
-                (Key.NumPad7, ModifierKeys.None) => View.Top,
-                (Key.NumPad7, ModifierKeys.Control) => View.Bottom,
+                (Key.NumPad1, KeyModifiers.None) => View.Front,
+                (Key.NumPad1, KeyModifiers.Control) => View.Back,
+                (Key.NumPad3, KeyModifiers.None) => View.Right,
+                (Key.NumPad3, KeyModifiers.Control) => View.Left,
+                (Key.NumPad7, KeyModifiers.None) => View.Top,
+                (Key.NumPad7, KeyModifiers.Control) => View.Bottom,
                 _ => null,
             };
             if (view != null)
@@ -116,15 +113,15 @@ namespace FBXViewer
         {
             Debug.WriteLine($"Mouse down: {e.MouseButton} {e.Position}");
             bool isMiddle = e.MouseButton == MouseButton.Middle;
-            if (isMiddle && Keyboard.IsKeyDown(Key.LeftShift))
-            {
-                _dragHandler = new PanDragHandler(this, e.Position);
-            }
-            else if (isMiddle && Keyboard.IsKeyDown(Key.LeftCtrl))
-            {
-                _dragHandler = new DollyHandler(this, e.Position);
-            }
-            else if (isMiddle)
+            // if (isMiddle && Keyboard.IsKeyDown(Key.LeftShift))
+            // {
+            //     _dragHandler = new PanDragHandler(this, e.Position);
+            // }
+            // else if (isMiddle && Keyboard.IsKeyDown(Key.LeftCtrl))
+            // {
+            //     _dragHandler = new DollyHandler(this, e.Position);
+            // }
+            if (isMiddle)
             {
                 _dragHandler = new OrbitHandler(this, e.Position);
             }
@@ -169,7 +166,7 @@ namespace FBXViewer
 
             }
 
-            protected abstract void DoMouseDrag(Vector delta);
+            protected abstract void DoMouseDrag(Point delta);
         }
 
         private class PanDragHandler : DragHandlerBase
@@ -177,7 +174,7 @@ namespace FBXViewer
             public PanDragHandler(ModelView outer, Point point) : base(outer, point)
             {
             }
-            protected override void DoMouseDrag(Vector delta)
+            protected override void DoMouseDrag(Point delta)
             {
                 delta *= 50;
                 Outer._camera.Pan((float) delta.X, (float) delta.Y);
@@ -190,9 +187,9 @@ namespace FBXViewer
             {
             }
 
-            protected override void DoMouseDrag(Vector delta)
+            protected override void DoMouseDrag(Point delta)
             {
-                Outer._camera.Orbit(delta);
+                Outer._camera.Orbit(delta.AsVector3());
             }
         }
 
@@ -202,7 +199,7 @@ namespace FBXViewer
             {
             }
 
-            protected override void DoMouseDrag(Vector delta)
+            protected override void DoMouseDrag(Point delta)
             {
                 Outer._camera.Dolly(delta.Y * -15);
             }

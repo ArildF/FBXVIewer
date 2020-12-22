@@ -5,7 +5,6 @@ namespace FBXViewer
     public enum Renderer
     {
         OpenGL,
-        WPF
     }
     public class CommandLineOptions
     {

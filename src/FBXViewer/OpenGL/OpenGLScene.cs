@@ -5,12 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Forms.Integration;
 using Assimp;
+using Avalonia.Controls;
+using Avalonia.Media;
 using OpenGL;
-using Brushes = System.Windows.Media.Brushes;
 using Matrix4x4 = System.Numerics.Matrix4x4;
 
 namespace FBXViewer.OpenGL
@@ -50,22 +48,22 @@ namespace FBXViewer.OpenGL
 
             var grid = new Grid {Background = Brushes.Aqua};
 
-            var windowsFormsHost = new WindowsFormsHost {Child = glControl};
+            // var windowsFormsHost = new NativeControlHost{Child = glControl};
 
-            MouseInput = new WinFormsMouseInput(glControl);
+            MouseInput = new WinFormsMouseInput();
             
-            grid.Children.Add(windowsFormsHost);
+            // grid.Children.Add(windowsFormsHost);
 
             Visual = grid;
 
             CameraLight = new OpenGLLight();
             _openGLCamera =  new OpenGLRendererCamera(-Vector3.UnitZ, Vector3.UnitZ, Vector3.UnitY);
             
-            glControl.CreateControl();
+            // glControl.CreateControl();
         }
 
         public IRendererCamera RendererCamera => _openGLCamera;
-        public UIElement Visual { get; }
+        public IControl Visual { get; }
         public ILight? CameraLight { get; }
 
         private readonly OpenGLRendererCamera _openGLCamera;
@@ -78,33 +76,33 @@ namespace FBXViewer.OpenGL
 
             int vpx = 0;
             int vpy = 0;
-            int vpw = senderControl?.ClientSize.Width ?? 1;
-            int vph = senderControl?.ClientSize.Height ?? 1;
-
-            Gl.Viewport(vpx, vpy, vpw, vph);
-            Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
-            var projectionMatrix = _openGLCamera.ProjectionMatrix(vpw, vph);
-            var viewMatrix = _openGLCamera.ViewMatrix;
-
-            Gl.UseProgram(_program);
-
-            var u = Uniforms.Get(_program);
-
-            foreach (var meshEntry in _meshes.Where(m => m.Enabled))
-            {
-                var modelMatrix = meshEntry.GLMesh.ModelMatrix;
-                Gl.UniformMatrix4f(u.M, 1, true, modelMatrix);
-                Gl.UniformMatrix4f(u.P, 1, true, projectionMatrix);
-                Gl.UniformMatrix4f(u.V, 1, true, viewMatrix);
-                Gl.Uniform3f(u.LightPosition, 1, CameraLight?.Position ?? new Vector3(-50, 200, 50));
-                Gl.Uniform1f(u.LightPower, 1, _settingsViewModel.LightStrength);
-                Gl.Uniform1f(u.LightPower, 1, _settingsViewModel.LightStrength);
-                Gl.Uniform1f(u.Ambient, 1, _settingsViewModel.Ambient);
-                Gl.Uniform1f(u.SpecularStrength, 1, _settingsViewModel.SpecularMapStrength);
-
-                meshEntry.GLMesh.Render(u);
-            }
+            // int vpw = senderControl?.ClientSize.Width ?? 1;
+            // int vph = senderControl?.ClientSize.Height ?? 1;
+            //
+            // Gl.Viewport(vpx, vpy, vpw, vph);
+            // Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            //
+            // var projectionMatrix = _openGLCamera.ProjectionMatrix(vpw, vph);
+            // var viewMatrix = _openGLCamera.ViewMatrix;
+            //
+            // Gl.UseProgram(_program);
+            //
+            // var u = Uniforms.Get(_program);
+            //
+            // foreach (var meshEntry in _meshes.Where(m => m.Enabled))
+            // {
+            //     var modelMatrix = meshEntry.GLMesh.ModelMatrix;
+            //     Gl.UniformMatrix4f(u.M, 1, true, modelMatrix);
+            //     Gl.UniformMatrix4f(u.P, 1, true, projectionMatrix);
+            //     Gl.UniformMatrix4f(u.V, 1, true, viewMatrix);
+            //     Gl.Uniform3f(u.LightPosition, 1, CameraLight?.Position ?? new Vector3(-50, 200, 50));
+            //     Gl.Uniform1f(u.LightPower, 1, _settingsViewModel.LightStrength);
+            //     Gl.Uniform1f(u.LightPower, 1, _settingsViewModel.LightStrength);
+            //     Gl.Uniform1f(u.Ambient, 1, _settingsViewModel.Ambient);
+            //     Gl.Uniform1f(u.SpecularStrength, 1, _settingsViewModel.SpecularMapStrength);
+            //
+            //     meshEntry.GLMesh.Render(u);
+            // }
         }
 
         private void GlControlOnContextCreated(object? sender, GlControlEventArgs e)
@@ -151,10 +149,10 @@ namespace FBXViewer.OpenGL
 
         private string LoadShaderFromResource(string file)
         {
-            var uri = new Uri("/OpenGL/Shaders/" + file, UriKind.Relative);
-            var stream = Application.GetResourceStream(uri);
-            using var reader = new StreamReader(stream.Stream);
-            return reader.ReadToEnd();
+            // var uri = new Uri("/OpenGL/Shaders/" + file, UriKind.Relative);
+            // var stream = Application.GetResourceStream(uri);
+            // using var reader = new StreamReader(stream.Stream);
+            return "";
         }
 
         public void LoadMesh(Mesh mesh, Matrix4x4 transform)
